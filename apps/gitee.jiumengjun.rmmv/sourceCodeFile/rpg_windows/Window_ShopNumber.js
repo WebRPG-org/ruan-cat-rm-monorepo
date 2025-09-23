@@ -2,14 +2,16 @@
 // Window_ShopNumber.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 窗口_商店数值
-// Window_ShopNumber
-//
-// 在商店画面上的输入要买卖的商品数量的窗口。
-// The window for inputting quantity of items to buy or sell on the shop
-// screen.
-
+/**
+ * 窗口_商店数值
+ *
+ * 在商店画面上的输入要买卖的商品数量的窗口。
+ * The window for inputting quantity of items to buy or sell on the shop
+ * screen.
+ *
+ * @class Window_ShopNumber
+ * @extends Window_Selectable
+ */
 function Window_ShopNumber() {
 	this.initialize.apply(this, arguments);
 }
@@ -17,7 +19,15 @@ function Window_ShopNumber() {
 Window_ShopNumber.prototype = Object.create(Window_Selectable.prototype);
 Window_ShopNumber.prototype.constructor = Window_ShopNumber;
 
-/* 初始化 */
+/**
+ * 初始化窗口。
+ * Initialize the window.
+ *
+ * @param {number} x - 窗口的 X 坐标
+ * @param {number} y - 窗口的 Y 坐标
+ * @param {number} height - 窗口的高度
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.initialize = function (x, y, height) {
 	var width = this.windowWidth();
 	Window_Selectable.prototype.initialize.call(this, x, y, width, height);
@@ -29,17 +39,35 @@ Window_ShopNumber.prototype.initialize = function (x, y, height) {
 	this.createButtons();
 };
 
-/* 窗口宽度 */
+/**
+ * 获取窗口宽度。
+ * Get the window width.
+ *
+ * @returns {number} 窗口宽度
+ */
 Window_ShopNumber.prototype.windowWidth = function () {
 	return 456;
 };
 
-/* 数值 */
+/**
+ * 获取当前数值。
+ * Get the current number.
+ *
+ * @returns {number} 当前数值
+ */
 Window_ShopNumber.prototype.number = function () {
 	return this._number;
 };
 
-/* 设置 */
+/**
+ * 设置商品信息。
+ * Set up the item information.
+ *
+ * @param {RPG.BaseItem} item - 商品对象
+ * @param {number} max - 最大数量
+ * @param {number} price - 单价
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.setup = function (item, max, price) {
 	this._item = item;
 	this._max = Math.floor(max);
@@ -50,13 +78,24 @@ Window_ShopNumber.prototype.setup = function (item, max, price) {
 	this.refresh();
 };
 
-/* 设置货币单位 */
+/**
+ * 设置货币单位。
+ * Set the currency unit.
+ *
+ * @param {string} currencyUnit - 货币单位
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.setCurrencyUnit = function (currencyUnit) {
 	this._currencyUnit = currencyUnit;
 	this.refresh();
 };
 
-/* 创建按钮 */
+/**
+ * 创建按钮。
+ * Create the buttons.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.createButtons = function () {
 	var bitmap = ImageManager.loadSystem("ButtonSet");
 	var buttonWidth = 48;
@@ -80,7 +119,12 @@ Window_ShopNumber.prototype.createButtons = function () {
 	this._buttons[4].setClickHandler(this.onButtonOk.bind(this));
 };
 
-/* 放置按钮 */
+/**
+ * 放置按钮。
+ * Place the buttons.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.placeButtons = function () {
 	var numButtons = this._buttons.length;
 	var spacing = 16;
@@ -97,7 +141,12 @@ Window_ShopNumber.prototype.placeButtons = function () {
 	}
 };
 
-/* 更新按钮可见性 */
+/**
+ * 更新按钮可见性。
+ * Update button visibility.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.updateButtonsVisiblity = function () {
 	if (TouchInput.date > Input.date) {
 		this.showButtons();
@@ -106,21 +155,36 @@ Window_ShopNumber.prototype.updateButtonsVisiblity = function () {
 	}
 };
 
-/* 显示按钮 */
+/**
+ * 显示按钮。
+ * Show the buttons.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.showButtons = function () {
 	for (var i = 0; i < this._buttons.length; i++) {
 		this._buttons[i].visible = true;
 	}
 };
 
-/* 隐藏按钮 */
+/**
+ * 隐藏按钮。
+ * Hide the buttons.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.hideButtons = function () {
 	for (var i = 0; i < this._buttons.length; i++) {
 		this._buttons[i].visible = false;
 	}
 };
 
-/* 刷新 */
+/**
+ * 刷新窗口内容。
+ * Refresh the window contents.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.refresh = function () {
 	this.contents.clear();
 	this.drawItemName(this._item, 0, this.itemY());
@@ -129,7 +193,12 @@ Window_ShopNumber.prototype.refresh = function () {
 	this.drawTotalPrice();
 };
 
-/* 绘制乘号 */
+/**
+ * 绘制乘号。
+ * Draw the multiplication sign.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.drawMultiplicationSign = function () {
 	var sign = "\u00d7";
 	var width = this.textWidth(sign);
@@ -139,7 +208,12 @@ Window_ShopNumber.prototype.drawMultiplicationSign = function () {
 	this.drawText(sign, x, y, width);
 };
 
-/* 绘制数值 */
+/**
+ * 绘制数值。
+ * Draw the number.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.drawNumber = function () {
 	var x = this.cursorX();
 	var y = this.itemY();
@@ -148,59 +222,114 @@ Window_ShopNumber.prototype.drawNumber = function () {
 	this.drawText(this._number, x, y, width, "right");
 };
 
-/* 绘制总价 */
+/**
+ * 绘制总价。
+ * Draw the total price.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.drawTotalPrice = function () {
 	var total = this._price * this._number;
 	var width = this.contentsWidth() - this.textPadding();
 	this.drawCurrencyValue(total, this._currencyUnit, 0, this.priceY(), width);
 };
 
-/* 项目 Y 坐标 */
+/**
+ * 获取项目的 Y 坐标。
+ * Get the Y coordinate of the item.
+ *
+ * @returns {number} 项目 Y 坐标
+ */
 Window_ShopNumber.prototype.itemY = function () {
 	return Math.round(this.contentsHeight() / 2 - this.lineHeight() * 1.5);
 };
 
-/* 价格 Y 坐标 */
+/**
+ * 获取价格的 Y 坐标。
+ * Get the Y coordinate of the price.
+ *
+ * @returns {number} 价格 Y 坐标
+ */
 Window_ShopNumber.prototype.priceY = function () {
 	return Math.round(this.contentsHeight() / 2 + this.lineHeight() / 2);
 };
 
-/* 按钮 Y 坐标 */
+/**
+ * 获取按钮的 Y 坐标。
+ * Get the Y coordinate of the buttons.
+ *
+ * @returns {number} 按钮 Y 坐标
+ */
 Window_ShopNumber.prototype.buttonY = function () {
 	return Math.round(this.priceY() + this.lineHeight() * 2.5);
 };
 
-/* 光标宽度 */
+/**
+ * 获取光标宽度。
+ * Get the cursor width.
+ *
+ * @returns {number} 光标宽度
+ */
 Window_ShopNumber.prototype.cursorWidth = function () {
 	var digitWidth = this.textWidth("0");
 	return this.maxDigits() * digitWidth + this.textPadding() * 2;
 };
 
-/* 光标 X 坐标 */
+/**
+ * 获取光标的 X 坐标。
+ * Get the X coordinate of the cursor.
+ *
+ * @returns {number} 光标 X 坐标
+ */
 Window_ShopNumber.prototype.cursorX = function () {
 	return this.contentsWidth() - this.cursorWidth() - this.textPadding();
 };
 
-/* 最大位数 */
+/**
+ * 获取最大位数。
+ * Get the maximum number of digits.
+ *
+ * @returns {number} 最大位数
+ */
 Window_ShopNumber.prototype.maxDigits = function () {
 	return 2;
 };
 
-/* 更新 */
+/**
+ * 更新窗口。
+ * Update the window.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.update = function () {
 	Window_Selectable.prototype.update.call(this);
 	this.processNumberChange();
 };
 
-/* 是否确定触发 */
+/**
+ * 检查是否触发确定操作。
+ * Check if the OK operation is triggered.
+ *
+ * @returns {boolean} 是否触发确定操作
+ */
 Window_ShopNumber.prototype.isOkTriggered = function () {
 	return Input.isTriggered("ok");
 };
 
-/* 播放确定声音 */
+/**
+ * 播放确定声音（空实现）。
+ * Play the OK sound (empty implementation).
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.playOkSound = function () {};
 
-/* 处理数值改变 */
+/**
+ * 处理数值改变。
+ * Process number changes.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.processNumberChange = function () {
 	if (this.isOpenAndActive()) {
 		if (Input.isRepeated("right")) {
@@ -218,7 +347,13 @@ Window_ShopNumber.prototype.processNumberChange = function () {
 	}
 };
 
-/* 改变数值 */
+/**
+ * 改变数值。
+ * Change the number.
+ *
+ * @param {number} amount - 改变量
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.changeNumber = function (amount) {
 	var lastNumber = this._number;
 	this._number = (this._number + amount).clamp(1, this._max);
@@ -228,32 +363,62 @@ Window_ShopNumber.prototype.changeNumber = function (amount) {
 	}
 };
 
-/* 更新光标 */
+/**
+ * 更新光标位置。
+ * Update the cursor position.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.updateCursor = function () {
 	this.setCursorRect(this.cursorX(), this.itemY(), this.cursorWidth(), this.lineHeight());
 };
 
-/* 当按钮-向上 */
+/**
+ * 当向上按钮点击时的处理函数。
+ * Handler for when the up button is clicked.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.onButtonUp = function () {
 	this.changeNumber(1);
 };
 
-/* 当按钮-向上 2 */
+/**
+ * 当向上按钮（+10）点击时的处理函数。
+ * Handler for when the up button (+10) is clicked.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.onButtonUp2 = function () {
 	this.changeNumber(10);
 };
 
-/* 当按钮-向下 */
+/**
+ * 当向下按钮点击时的处理函数。
+ * Handler for when the down button is clicked.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.onButtonDown = function () {
 	this.changeNumber(-1);
 };
 
-/* 当按钮-向下 2 */
+/**
+ * 当向下按钮（-10）点击时的处理函数。
+ * Handler for when the down button (-10) is clicked.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.onButtonDown2 = function () {
 	this.changeNumber(-10);
 };
 
-/* 当按钮-确定 */
+/**
+ * 当确定按钮点击时的处理函数。
+ * Handler for when the OK button is clicked.
+ *
+ * @returns {void}
+ */
 Window_ShopNumber.prototype.onButtonOk = function () {
 	this.processOk();
 };

@@ -2,14 +2,12 @@
 // Window_ScrollText.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 窗口_滚动文本
-// Window_ScrollText
-//
-// 显示滚动文本的窗口。没有边框显示，但为了方便起见，将其作为窗口处理。
-// The window for displaying scrolling text. No frame is displayed, but it
-// is handled as a window for convenience.
-
+/**
+ * 显示滚动文本的窗口，无边框显示，但为了方便起见作为窗口处理
+ * Window for displaying scrolling text. No frame is displayed, but it is handled as a window for convenience
+ * @class
+ * @extends Window_Base
+ */
 function Window_ScrollText() {
 	this.initialize.apply(this, arguments);
 }
@@ -17,7 +15,10 @@ function Window_ScrollText() {
 Window_ScrollText.prototype = Object.create(Window_Base.prototype);
 Window_ScrollText.prototype.constructor = Window_ScrollText;
 
-/* 初始化 */
+/**
+ * 初始化滚动文本窗口
+ * Initialize the scroll text window
+ */
 Window_ScrollText.prototype.initialize = function () {
 	var width = Graphics.boxWidth;
 	var height = Graphics.boxHeight;
@@ -28,7 +29,10 @@ Window_ScrollText.prototype.initialize = function () {
 	this._allTextHeight = 0;
 };
 
-/* 更新 */
+/**
+ * 更新窗口
+ * Update window
+ */
 Window_ScrollText.prototype.update = function () {
 	Window_Base.prototype.update.call(this);
 	if ($gameMessage.scrollMode()) {
@@ -41,14 +45,20 @@ Window_ScrollText.prototype.update = function () {
 	}
 };
 
-/* 开始信息 */
+/**
+ * 开始显示消息
+ * Start displaying message
+ */
 Window_ScrollText.prototype.startMessage = function () {
 	this._text = $gameMessage.allText();
 	this.refresh();
 	this.show();
 };
 
-/* 刷新 */
+/**
+ * 刷新窗口
+ * Refresh window
+ */
 Window_ScrollText.prototype.refresh = function () {
 	var textState = { index: 0 };
 	textState.text = this.convertEscapeCharacters(this._text);
@@ -59,12 +69,19 @@ Window_ScrollText.prototype.refresh = function () {
 	this.drawTextEx(this._text, this.textPadding(), 1);
 };
 
-/* 内容高度 */
+/**
+ * 获取内容高度
+ * Get contents height
+ * @returns {number} 内容高度 - Contents height
+ */
 Window_ScrollText.prototype.contentsHeight = function () {
 	return Math.max(this._allTextHeight, 1);
 };
 
-/* 更新信息 */
+/**
+ * 更新消息
+ * Update message
+ */
 Window_ScrollText.prototype.updateMessage = function () {
 	this.origin.y += this.scrollSpeed();
 	if (this.origin.y >= this.contents.height) {
@@ -72,7 +89,11 @@ Window_ScrollText.prototype.updateMessage = function () {
 	}
 };
 
-/* 滚动速度 */
+/**
+ * 获取滚动速度
+ * Get scroll speed
+ * @returns {number} 滚动速度 - Scroll speed
+ */
 Window_ScrollText.prototype.scrollSpeed = function () {
 	var speed = $gameMessage.scrollSpeed() / 2;
 	if (this.isFastForward()) {
@@ -81,7 +102,11 @@ Window_ScrollText.prototype.scrollSpeed = function () {
 	return speed;
 };
 
-/* 是否快进 */
+/**
+ * 检查是否快进
+ * Check if fast forward
+ * @returns {boolean} 是否快进 - Whether fast forward
+ */
 Window_ScrollText.prototype.isFastForward = function () {
 	if ($gameMessage.scrollNoFast()) {
 		return false;
@@ -90,12 +115,19 @@ Window_ScrollText.prototype.isFastForward = function () {
 	}
 };
 
-/* 快进倍率 */
+/**
+ * 获取快进倍率
+ * Get fast forward rate
+ * @returns {number} 快进倍率 - Fast forward rate
+ */
 Window_ScrollText.prototype.fastForwardRate = function () {
 	return 3;
 };
 
-/* 结束信息 */
+/**
+ * 结束消息
+ * Terminate message
+ */
 Window_ScrollText.prototype.terminateMessage = function () {
 	this._text = null;
 	$gameMessage.clear();

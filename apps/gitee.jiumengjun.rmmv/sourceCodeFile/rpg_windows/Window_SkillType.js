@@ -2,13 +2,12 @@
 // Window_SkillType.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 窗口_物品列表
-// Window_ItemList
-//
-// 在物品画面上的选择物品的窗口。
-// The window for selecting an item on the item screen.
-
+/**
+ * 窗口_物品列表 / Window_ItemList
+ * 在物品画面上的选择物品的窗口 / The window for selecting an item on the item screen.
+ * @class
+ * @extends Window_Selectable
+ */
 function Window_ItemList() {
 	this.initialize.apply(this, arguments);
 }
@@ -16,14 +15,23 @@ function Window_ItemList() {
 Window_ItemList.prototype = Object.create(Window_Selectable.prototype);
 Window_ItemList.prototype.constructor = Window_ItemList;
 
-/* 初始化 */
+/**
+ * 初始化 / Initialize
+ * @param {number} x - 窗口的 x 坐标 / The x coordinate of the window
+ * @param {number} y - 窗口的 y 坐标 / The y coordinate of the window
+ * @param {number} width - 窗口的宽度 / The width of the window
+ * @param {number} height - 窗口的高度 / The height of the window
+ */
 Window_ItemList.prototype.initialize = function (x, y, width, height) {
 	Window_Selectable.prototype.initialize.call(this, x, y, width, height);
 	this._category = "none";
 	this._data = [];
 };
 
-/* 设置类别 */
+/**
+ * 设置类别 / Set Category
+ * @param {string} category - 物品类别 / The item category
+ */
 Window_ItemList.prototype.setCategory = function (category) {
 	if (this._category !== category) {
 		this._category = category;
@@ -32,33 +40,52 @@ Window_ItemList.prototype.setCategory = function (category) {
 	}
 };
 
-/* 最大列数 */
+/**
+ * 最大列数 / Maximum Columns
+ * @returns {number} 最大列数 / The maximum number of columns
+ */
 Window_ItemList.prototype.maxCols = function () {
 	return 2;
 };
 
-/* 间距 */
+/**
+ * 间距 / Spacing
+ * @returns {number} 项目间距 / The spacing between items
+ */
 Window_ItemList.prototype.spacing = function () {
 	return 48;
 };
 
-/* 最大项目数 */
+/**
+ * 最大项目数 / Maximum Items
+ * @returns {number} 最大项目数 / The maximum number of items
+ */
 Window_ItemList.prototype.maxItems = function () {
 	return this._data ? this._data.length : 1;
 };
 
-/* 项目 */
+/**
+ * 项目 / Item
+ * @returns {RPG.BaseItem|null} 当前选中的物品对象或 null / The currently selected item object or null
+ */
 Window_ItemList.prototype.item = function () {
 	var index = this.index();
 	return this._data && index >= 0 ? this._data[index] : null;
 };
 
-/* 是否当前项目启用 */
+/**
+ * 是否当前项目启用 / Is Current Item Enabled
+ * @returns {boolean} 当前项目是否可用 / Whether the current item is enabled
+ */
 Window_ItemList.prototype.isCurrentItemEnabled = function () {
 	return this.isEnabled(this.item());
 };
 
-/* 包含 */
+/**
+ * 包含 / Includes
+ * @param {RPG.BaseItem} item - 要检查的物品 / The item to check
+ * @returns {boolean} 是否包含该物品 / Whether the item is included
+ */
 Window_ItemList.prototype.includes = function (item) {
 	switch (this._category) {
 		case "item":
@@ -74,17 +101,26 @@ Window_ItemList.prototype.includes = function (item) {
 	}
 };
 
-/* 是否需要数量 */
+/**
+ * 是否需要数量 / Needs Number
+ * @returns {boolean} 是否需要显示数量 / Whether to display the number
+ */
 Window_ItemList.prototype.needsNumber = function () {
 	return true;
 };
 
-/* 是否启用 */
+/**
+ * 是否启用 / Is Enabled
+ * @param {RPG.BaseItem} item - 要检查的物品 / The item to check
+ * @returns {boolean} 物品是否可用 / Whether the item is enabled
+ */
 Window_ItemList.prototype.isEnabled = function (item) {
 	return $gameParty.canUse(item);
 };
 
-/* 制作项目列表 */
+/**
+ * 制作项目列表 / Make Item List
+ */
 Window_ItemList.prototype.makeItemList = function () {
 	this._data = $gameParty.allItems().filter(function (item) {
 		return this.includes(item);
@@ -94,13 +130,18 @@ Window_ItemList.prototype.makeItemList = function () {
 	}
 };
 
-/* 选择上一个 */
+/**
+ * 选择上一个 / Select Last
+ */
 Window_ItemList.prototype.selectLast = function () {
 	var index = this._data.indexOf($gameParty.lastItem());
 	this.select(index >= 0 ? index : 0);
 };
 
-/* 绘制项目 */
+/**
+ * 绘制项目 / Draw Item
+ * @param {number} index - 项目索引 / The item index
+ */
 Window_ItemList.prototype.drawItem = function (index) {
 	var item = this._data[index];
 	if (item) {
@@ -114,12 +155,21 @@ Window_ItemList.prototype.drawItem = function (index) {
 	}
 };
 
-/* 数字宽度 */
+/**
+ * 数字宽度 / Number Width
+ * @returns {number} 数字文本的宽度 / The width of the number text
+ */
 Window_ItemList.prototype.numberWidth = function () {
 	return this.textWidth("000");
 };
 
-/* 绘制物品数量 */
+/**
+ * 绘制物品数量 / Draw Item Number
+ * @param {RPG.BaseItem} item - 物品对象 / The item object
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ * @param {number} width - 宽度 / The width
+ */
 Window_ItemList.prototype.drawItemNumber = function (item, x, y, width) {
 	if (this.needsNumber()) {
 		this.drawText(":", x, y, width - this.textWidth("00"), "right");
@@ -127,25 +177,28 @@ Window_ItemList.prototype.drawItemNumber = function (item, x, y, width) {
 	}
 };
 
-/* 更新帮助 */
+/**
+ * 更新帮助 / Update Help
+ */
 Window_ItemList.prototype.updateHelp = function () {
 	this.setHelpWindowItem(this.item());
 };
 
-/* 刷新 */
+/**
+ * 刷新 / Refresh
+ */
 Window_ItemList.prototype.refresh = function () {
 	this.makeItemList();
 	this.createContents();
 	this.drawAllItems();
 };
 
-//----------------------------------------------------------------------------
-// 窗口技能类型
-// Window_SkillType
-//
-// 在技能画面上的选择技能类型的窗口。
-// The window for selecting a skill type on the skill screen.
-
+/**
+ * 窗口技能类型 / Window_SkillType
+ * 在技能画面上的选择技能类型的窗口 / The window for selecting a skill type on the skill screen.
+ * @class
+ * @extends Window_Command
+ */
 function Window_SkillType() {
 	this.initialize.apply(this, arguments);
 }
@@ -153,18 +206,28 @@ function Window_SkillType() {
 Window_SkillType.prototype = Object.create(Window_Command.prototype);
 Window_SkillType.prototype.constructor = Window_SkillType;
 
-/* 初始化 */
+/**
+ * 初始化 / Initialize
+ * @param {number} x - 窗口的 x 坐标 / The x coordinate of the window
+ * @param {number} y - 窗口的 y 坐标 / The y coordinate of the window
+ */
 Window_SkillType.prototype.initialize = function (x, y) {
 	Window_Command.prototype.initialize.call(this, x, y);
 	this._actor = null;
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度 / Window Width
+ * @returns {number} 窗口宽度 / The window width
+ */
 Window_SkillType.prototype.windowWidth = function () {
 	return 240;
 };
 
-/* 设置角色 */
+/**
+ * 设置角色 / Set Actor
+ * @param {Game_Actor} actor - 要设置的角色对象 / The actor object to set
+ */
 Window_SkillType.prototype.setActor = function (actor) {
 	if (this._actor !== actor) {
 		this._actor = actor;
@@ -173,12 +236,17 @@ Window_SkillType.prototype.setActor = function (actor) {
 	}
 };
 
-/* 可见的行数 */
+/**
+ * 可见的行数 / Number of Visible Rows
+ * @returns {number} 可见行数 / The number of visible rows
+ */
 Window_SkillType.prototype.numVisibleRows = function () {
 	return 4;
 };
 
-/* 制作指令列表 */
+/**
+ * 制作指令列表 / Make Command List
+ */
 Window_SkillType.prototype.makeCommandList = function () {
 	if (this._actor) {
 		var skillTypes = this._actor.addedSkillTypes();
@@ -192,7 +260,9 @@ Window_SkillType.prototype.makeCommandList = function () {
 	}
 };
 
-/* 更新 */
+/**
+ * 更新 / Update
+ */
 Window_SkillType.prototype.update = function () {
 	Window_Command.prototype.update.call(this);
 	if (this._skillWindow) {
@@ -200,12 +270,17 @@ Window_SkillType.prototype.update = function () {
 	}
 };
 
-/* 设置技能窗口 */
+/**
+ * 设置技能窗口 / Set Skill Window
+ * @param {Window_SkillList} skillWindow - 技能窗口 / The skill window
+ */
 Window_SkillType.prototype.setSkillWindow = function (skillWindow) {
 	this._skillWindow = skillWindow;
 };
 
-/* 选择上一个 */
+/**
+ * 选择上一个 / Select Last
+ */
 Window_SkillType.prototype.selectLast = function () {
 	var skill = this._actor.lastMenuSkill();
 	if (skill) {

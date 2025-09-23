@@ -2,13 +2,12 @@
 // Window_Status.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 窗口_状态
-// Window_Status
-//
-// 在状态画面上的显示完整状态的窗口。
-// The window for displaying full status on the status screen.
-
+/**
+ * 窗口_状态 / Window_Status
+ * 在状态画面上的显示完整状态的窗口 / The window for displaying full status on the status screen.
+ * @class
+ * @extends Window_Selectable
+ */
 function Window_Status() {
 	this.initialize.apply(this, arguments);
 }
@@ -16,7 +15,9 @@ function Window_Status() {
 Window_Status.prototype = Object.create(Window_Selectable.prototype);
 Window_Status.prototype.constructor = Window_Status;
 
-/* 初始化 */
+/**
+ * 初始化 / Initialize
+ */
 Window_Status.prototype.initialize = function () {
 	var width = Graphics.boxWidth;
 	var height = Graphics.boxHeight;
@@ -26,7 +27,10 @@ Window_Status.prototype.initialize = function () {
 	this.activate();
 };
 
-/* 设置角色 */
+/**
+ * 设置角色 / Set Actor
+ * @param {Game_Actor} actor - 要设置的角色对象 / The actor object to set
+ */
 Window_Status.prototype.setActor = function (actor) {
 	if (this._actor !== actor) {
 		this._actor = actor;
@@ -34,7 +38,9 @@ Window_Status.prototype.setActor = function (actor) {
 	}
 };
 
-/* 刷新 */
+/**
+ * 刷新 / Refresh
+ */
 Window_Status.prototype.refresh = function () {
 	this.contents.clear();
 	if (this._actor) {
@@ -49,32 +55,47 @@ Window_Status.prototype.refresh = function () {
 	}
 };
 
-/* 绘制块 1 */
+/**
+ * 绘制块 1 / Draw Block 1
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawBlock1 = function (y) {
 	this.drawActorName(this._actor, 6, y);
 	this.drawActorClass(this._actor, 192, y);
 	this.drawActorNickname(this._actor, 432, y);
 };
 
-/* 绘制块 2 */
+/**
+ * 绘制块 2 / Draw Block 2
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawBlock2 = function (y) {
 	this.drawActorFace(this._actor, 12, y);
 	this.drawBasicInfo(204, y);
 	this.drawExpInfo(456, y);
 };
 
-/* 绘制块 3 */
+/**
+ * 绘制块 3 / Draw Block 3
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawBlock3 = function (y) {
 	this.drawParameters(48, y);
 	this.drawEquipments(432, y);
 };
 
-/* 绘制块 4 */
+/**
+ * 绘制块 4 / Draw Block 4
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawBlock4 = function (y) {
 	this.drawProfile(6, y);
 };
 
-/* 绘制水平线 */
+/**
+ * 绘制水平线 / Draw Horizontal Line
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawHorzLine = function (y) {
 	var lineY = y + this.lineHeight() / 2 - 1;
 	this.contents.paintOpacity = 48;
@@ -82,12 +103,19 @@ Window_Status.prototype.drawHorzLine = function (y) {
 	this.contents.paintOpacity = 255;
 };
 
-/* 线颜色 */
+/**
+ * 线颜色 / Line Color
+ * @returns {string} 线条颜色 / The line color
+ */
 Window_Status.prototype.lineColor = function () {
 	return this.normalColor();
 };
 
-/* 绘制基本信息 */
+/**
+ * 绘制基本信息 / Draw Basic Info
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawBasicInfo = function (x, y) {
 	var lineHeight = this.lineHeight();
 	this.drawActorLevel(this._actor, x, y + lineHeight * 0);
@@ -96,7 +124,11 @@ Window_Status.prototype.drawBasicInfo = function (x, y) {
 	this.drawActorMp(this._actor, x, y + lineHeight * 3);
 };
 
-/* 绘制能力值 */
+/**
+ * 绘制能力值 / Draw Parameters
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawParameters = function (x, y) {
 	var lineHeight = this.lineHeight();
 	for (var i = 0; i < 6; i++) {
@@ -109,7 +141,11 @@ Window_Status.prototype.drawParameters = function (x, y) {
 	}
 };
 
-/* 绘制经验信息 */
+/**
+ * 绘制经验信息 / Draw Experience Info
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawExpInfo = function (x, y) {
 	var lineHeight = this.lineHeight();
 	var expTotal = TextManager.expTotal.format(TextManager.exp);
@@ -128,7 +164,11 @@ Window_Status.prototype.drawExpInfo = function (x, y) {
 	this.drawText(value2, x, y + lineHeight * 3, 270, "right");
 };
 
-/* 绘制装备 */
+/**
+ * 绘制装备 / Draw Equipments
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawEquipments = function (x, y) {
 	var equips = this._actor.equips();
 	var count = Math.min(equips.length, this.maxEquipmentLines());
@@ -137,12 +177,19 @@ Window_Status.prototype.drawEquipments = function (x, y) {
 	}
 };
 
-/* 绘制简介 */
+/**
+ * 绘制简介 / Draw Profile
+ * @param {number} x - x 坐标 / The x coordinate
+ * @param {number} y - y 坐标 / The y coordinate
+ */
 Window_Status.prototype.drawProfile = function (x, y) {
 	this.drawTextEx(this._actor.profile(), x, y);
 };
 
-/* 最大装备行 */
+/**
+ * 最大装备行 / Maximum Equipment Lines
+ * @returns {number} 最大装备行数 / The maximum number of equipment lines
+ */
 Window_Status.prototype.maxEquipmentLines = function () {
 	return 6;
 };
