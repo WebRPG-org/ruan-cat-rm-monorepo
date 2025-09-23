@@ -2,23 +2,29 @@
 // Spriteset_Battle.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵组_战斗
-// Spriteset_Battle
-//
-// 战斗画面上的一组精灵。
-// The set of sprites on the battle screen.
+/**
+ * 精灵组_战斗
+ * 战斗画面上的一组精灵。
+ * Spriteset_Battle
+ * The set of sprites on the battle screen.
+ */
 function Spriteset_Battle() {
 	this.initialize.apply(this, arguments);
 }
 Spriteset_Battle.prototype = Object.create(Spriteset_Base.prototype);
 Spriteset_Battle.prototype.constructor = Spriteset_Battle;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Spriteset_Battle.prototype.initialize = function () {
 	Spriteset_Base.prototype.initialize.call(this);
 	this._battlebackLocated = false;
 };
-/* 创建下方的图层 */
+/**
+ * 创建下方的图层
+ * Create lower layer
+ */
 Spriteset_Battle.prototype.createLowerLayer = function () {
 	Spriteset_Base.prototype.createLowerLayer.call(this);
 	this.createBackground();
@@ -27,19 +33,28 @@ Spriteset_Battle.prototype.createLowerLayer = function () {
 	this.createEnemies();
 	this.createActors();
 };
-/* 创建背景 */
+/**
+ * 创建背景
+ * Create background
+ */
 Spriteset_Battle.prototype.createBackground = function () {
 	this._backgroundSprite = new Sprite();
 	this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
 	this._baseSprite.addChild(this._backgroundSprite);
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Spriteset_Battle.prototype.update = function () {
 	Spriteset_Base.prototype.update.call(this);
 	this.updateActors();
 	this.updateBattleback();
 };
-/* 创建战斗场地 */
+/**
+ * 创建战斗场地
+ * Create battle field
+ */
 Spriteset_Battle.prototype.createBattleField = function () {
 	var width = Graphics.boxWidth;
 	var height = Graphics.boxHeight;
@@ -51,7 +66,10 @@ Spriteset_Battle.prototype.createBattleField = function () {
 	this._battleField.y = y;
 	this._baseSprite.addChild(this._battleField);
 };
-/* 创建战斗背景 */
+/**
+ * 创建战斗背景
+ * Create battleback
+ */
 Spriteset_Battle.prototype.createBattleback = function () {
 	var margin = 32;
 	var x = -this._battleField.x - margin;
@@ -67,14 +85,20 @@ Spriteset_Battle.prototype.createBattleback = function () {
 	this._battleField.addChild(this._back1Sprite);
 	this._battleField.addChild(this._back2Sprite);
 };
-/* 更新战斗背景 */
+/**
+ * 更新战斗背景
+ * Update battleback
+ */
 Spriteset_Battle.prototype.updateBattleback = function () {
 	if (!this._battlebackLocated) {
 		this.locateBattleback();
 		this._battlebackLocated = true;
 	}
 };
-/* 放置战斗背景 */
+/**
+ * 放置战斗背景
+ * Locate battleback
+ */
 Spriteset_Battle.prototype.locateBattleback = function () {
 	var width = this._battleField.width;
 	var height = this._battleField.height;
@@ -87,15 +111,27 @@ Spriteset_Battle.prototype.locateBattleback = function () {
 		sprite2.origin.y = sprite1.y + sprite2.bitmap.height - height;
 	}
 };
-/* 战斗背景 1 位图 */
+/**
+ * 战斗背景 1 位图
+ * @returns {Bitmap} 战斗背景1位图 - Battleback 1 bitmap
+ * Battleback 1 bitmap
+ */
 Spriteset_Battle.prototype.battleback1Bitmap = function () {
 	return ImageManager.loadBattleback1(this.battleback1Name());
 };
-/* 战斗背景 2 位图 */
+/**
+ * 战斗背景 2 位图
+ * @returns {Bitmap} 战斗背景2位图 - Battleback 2 bitmap
+ * Battleback 2 bitmap
+ */
 Spriteset_Battle.prototype.battleback2Bitmap = function () {
 	return ImageManager.loadBattleback2(this.battleback2Name());
 };
-/* 战斗背景 1 名称 */
+/**
+ * 战斗背景 1 名称
+ * @returns {string} 战斗背景1名称 - Battleback 1 name
+ * Battleback 1 name
+ */
 Spriteset_Battle.prototype.battleback1Name = function () {
 	if (BattleManager.isBattleTest()) {
 		return $dataSystem.battleback1Name;
@@ -107,7 +143,11 @@ Spriteset_Battle.prototype.battleback1Name = function () {
 		return "";
 	}
 };
-/* 战斗背景 2 名称 */
+/**
+ * 战斗背景 2 名称
+ * @returns {string} 战斗背景2名称 - Battleback 2 name
+ * Battleback 2 name
+ */
 Spriteset_Battle.prototype.battleback2Name = function () {
 	if (BattleManager.isBattleTest()) {
 		return $dataSystem.battleback2Name;
@@ -119,7 +159,11 @@ Spriteset_Battle.prototype.battleback2Name = function () {
 		return "";
 	}
 };
-/* 主世界战斗背景 1 名称 */
+/**
+ * 主世界战斗背景 1 名称
+ * @returns {string} 主世界战斗背景1名称 - Overworld battleback 1 name
+ * Overworld battleback 1 name
+ */
 Spriteset_Battle.prototype.overworldBattleback1Name = function () {
 	if ($gameMap.battleback1Name() === "") return "";
 	if ($gamePlayer.isInVehicle()) {
@@ -128,7 +172,11 @@ Spriteset_Battle.prototype.overworldBattleback1Name = function () {
 		return this.normalBattleback1Name();
 	}
 };
-/* 主世界战斗背景 2 名称 */
+/**
+ * 主世界战斗背景 2 名称
+ * @returns {string} 主世界战斗背景2名称 - Overworld battleback 2 name
+ * Overworld battleback 2 name
+ */
 Spriteset_Battle.prototype.overworldBattleback2Name = function () {
 	if ($gameMap.battleback2Name() === "") return "";
 	if ($gamePlayer.isInVehicle()) {
@@ -137,7 +185,11 @@ Spriteset_Battle.prototype.overworldBattleback2Name = function () {
 		return this.normalBattleback2Name();
 	}
 };
-/* 普通战斗背景 1 名称 */
+/**
+ * 普通战斗背景 1 名称
+ * @returns {string} 普通战斗背景1名称 - Normal battleback 1 name
+ * Normal battleback 1 name
+ */
 Spriteset_Battle.prototype.normalBattleback1Name = function () {
 	return (
 		this.terrainBattleback1Name(this.autotileType(1)) ||
@@ -145,7 +197,11 @@ Spriteset_Battle.prototype.normalBattleback1Name = function () {
 		this.defaultBattleback1Name()
 	);
 };
-/* 普通战斗背景 2 名称 */
+/**
+ * 普通战斗背景 2 名称
+ * @returns {string} 普通战斗背景2名称 - Normal battleback 2 name
+ * Normal battleback 2 name
+ */
 Spriteset_Battle.prototype.normalBattleback2Name = function () {
 	return (
 		this.terrainBattleback2Name(this.autotileType(1)) ||
@@ -153,7 +209,12 @@ Spriteset_Battle.prototype.normalBattleback2Name = function () {
 		this.defaultBattleback2Name()
 	);
 };
-/* 地形战斗背景 1 名称 */
+/**
+ * 地形战斗背景 1 名称
+ * @param {number} type - 类型 - Type
+ * @returns {string} 地形战斗背景1名称 - Terrain battleback 1 name
+ * Terrain battleback 1 name
+ */
 Spriteset_Battle.prototype.terrainBattleback1Name = function (type) {
 	switch (type) {
 		case 24:
@@ -181,7 +242,12 @@ Spriteset_Battle.prototype.terrainBattleback1Name = function (type) {
 			return null;
 	}
 };
-/* 地形战斗背景 2 名称 */
+/**
+ * 地形战斗背景 2 名称
+ * @param {number} type - 类型 - Type
+ * @returns {string} 地形战斗背景2名称 - Terrain battleback 2 name
+ * Terrain battleback 2 name
+ */
 Spriteset_Battle.prototype.terrainBattleback2Name = function (type) {
 	switch (type) {
 		case 20:
@@ -212,27 +278,51 @@ Spriteset_Battle.prototype.terrainBattleback2Name = function (type) {
 			return "PoisonSwamp";
 	}
 };
-/* 默认战斗背景 1 名称 */
+/**
+ * 默认战斗背景 1 名称
+ * @returns {string} 默认战斗背景1名称 - Default battleback 1 name
+ * Default battleback 1 name
+ */
 Spriteset_Battle.prototype.defaultBattleback1Name = function () {
 	return "Grassland";
 };
-/* 默认战斗背景 2 名称 */
+/**
+ * 默认战斗背景 2 名称
+ * @returns {string} 默认战斗背景2名称 - Default battleback 2 name
+ * Default battleback 2 name
+ */
 Spriteset_Battle.prototype.defaultBattleback2Name = function () {
 	return "Grassland";
 };
-/* 飞艇战斗背景 1 名称 */
+/**
+ * 飞艇战斗背景 1 名称
+ * @returns {string} 飞艇战斗背景1名称 - Ship battleback 1 name
+ * Ship battleback 1 name
+ */
 Spriteset_Battle.prototype.shipBattleback1Name = function () {
 	return "Ship";
 };
-/* 飞艇战斗背景 2 名称 */
+/**
+ * 飞艇战斗背景 2 名称
+ * @returns {string} 飞艇战斗背景2名称 - Ship battleback 2 name
+ * Ship battleback 2 name
+ */
 Spriteset_Battle.prototype.shipBattleback2Name = function () {
 	return "Ship";
 };
-/* 自动图块类型 */
+/**
+ * 自动图块类型
+ * @param {number} z - Z坐标 - Z coordinate
+ * @returns {number} 自动图块类型 - Autotile type
+ * Autotile type
+ */
 Spriteset_Battle.prototype.autotileType = function (z) {
 	return $gameMap.autotileType($gamePlayer.x, $gamePlayer.y, z);
 };
-/* 创建敌人 */
+/**
+ * 创建敌人
+ * Create enemies
+ */
 Spriteset_Battle.prototype.createEnemies = function () {
 	var enemies = $gameTroop.members();
 	var sprites = [];
@@ -245,8 +335,11 @@ Spriteset_Battle.prototype.createEnemies = function () {
 	}
 	this._enemySprites = sprites;
 };
-/* 比较敌人精灵
+/**
+ * 比较敌人精灵
  * 排序用，坐标 Y 越大越前面，当坐标 Y 一样时则精灵 ID 越大越前面。
+ * Compare enemy sprite
+ * For sorting, the larger Y coordinate is in front, when Y coordinates are the same, the larger sprite ID is in front.
  */
 Spriteset_Battle.prototype.compareEnemySprite = function (a, b) {
 	if (a.y !== b.y) {
@@ -255,7 +348,10 @@ Spriteset_Battle.prototype.compareEnemySprite = function (a, b) {
 		return b.spriteId - a.spriteId;
 	}
 };
-/* 创建角色 */
+/**
+ * 创建角色
+ * Create actors
+ */
 Spriteset_Battle.prototype.createActors = function () {
 	this._actorSprites = [];
 	for (var i = 0; i < $gameParty.maxBattleMembers(); i++) {
@@ -263,36 +359,59 @@ Spriteset_Battle.prototype.createActors = function () {
 		this._battleField.addChild(this._actorSprites[i]);
 	}
 };
-/* 更新角色 */
+/**
+ * 更新角色
+ * Update actors
+ */
 Spriteset_Battle.prototype.updateActors = function () {
 	var members = $gameParty.battleMembers();
 	for (var i = 0; i < this._actorSprites.length; i++) {
 		this._actorSprites[i].setBattler(members[i]);
 	}
 };
-/* 战斗精灵 */
+/**
+ * 战斗精灵
+ * @returns {Array} 战斗精灵数组 - Array of battler sprites
+ * Battler sprites
+ */
 Spriteset_Battle.prototype.battlerSprites = function () {
 	return this._enemySprites.concat(this._actorSprites);
 };
-/* 是否动画播放中 */
+/**
+ * 是否动画播放中
+ * @returns {boolean} 是否有动画正在播放 - Whether any animation is playing
+ * Is animation playing
+ */
 Spriteset_Battle.prototype.isAnimationPlaying = function () {
 	return this.battlerSprites().some(function (sprite) {
 		return sprite.isAnimationPlaying();
 	});
 };
-/* 是否效果中 */
+/**
+ * 是否效果中
+ * @returns {boolean} 是否有效果正在执行 - Whether any effect is being executed
+ * Is effecting
+ */
 Spriteset_Battle.prototype.isEffecting = function () {
 	return this.battlerSprites().some(function (sprite) {
 		return sprite.isEffecting();
 	});
 };
-/* 是否有人在移动中 */
+/**
+ * 是否有人在移动中
+ * @returns {boolean} 是否有人在移动中 - Whether anyone is moving
+ * Is anyone moving
+ */
 Spriteset_Battle.prototype.isAnyoneMoving = function () {
 	return this.battlerSprites().some(function (sprite) {
 		return sprite.isMoving();
 	});
 };
-/* 是否繁忙 */
+/**
+ * 是否繁忙
+ * @returns {boolean} 是否繁忙 - Whether is busy
+ * Is busy
+ */
 Spriteset_Battle.prototype.isBusy = function () {
 	return this.isAnimationPlaying() || this.isAnyoneMoving();
 };

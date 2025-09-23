@@ -2,24 +2,30 @@
 // Sprite_Destination.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵_目的地
-// Sprite_Destination
-//
-//显示触摸输入的目的地的精灵。
-// The sprite for displaying the destination place of the touch input.
+/**
+ * 精灵_目的地
+ * 显示触摸输入的目的地的精灵。
+ * Sprite_Destination
+ * The sprite for displaying the destination place of the touch input.
+ */
 function Sprite_Destination() {
 	this.initialize.apply(this, arguments);
 }
 Sprite_Destination.prototype = Object.create(Sprite.prototype);
 Sprite_Destination.prototype.constructor = Sprite_Destination;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Sprite_Destination.prototype.initialize = function () {
 	Sprite.prototype.initialize.call(this);
 	this.createBitmap();
 	this._frameCount = 0;
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Sprite_Destination.prototype.update = function () {
 	Sprite.prototype.update.call(this);
 	if ($gameTemp.isDestinationValid()) {
@@ -31,7 +37,10 @@ Sprite_Destination.prototype.update = function () {
 		this.visible = false;
 	}
 };
-/* 创建位图 */
+/**
+ * 创建位图
+ * Create bitmap
+ */
 Sprite_Destination.prototype.createBitmap = function () {
 	var tileWidth = $gameMap.tileWidth();
 	var tileHeight = $gameMap.tileHeight();
@@ -41,7 +50,10 @@ Sprite_Destination.prototype.createBitmap = function () {
 	this.anchor.y = 0.5;
 	this.blendMode = Graphics.BLEND_ADD;
 };
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update position
+ */
 Sprite_Destination.prototype.updatePosition = function () {
 	var tileWidth = $gameMap.tileWidth();
 	var tileHeight = $gameMap.tileHeight();
@@ -50,7 +62,10 @@ Sprite_Destination.prototype.updatePosition = function () {
 	this.x = ($gameMap.adjustX(x) + 0.5) * tileWidth;
 	this.y = ($gameMap.adjustY(y) + 0.5) * tileHeight;
 };
-/* 更新动画 */
+/**
+ * 更新动画
+ * Update animation
+ */
 Sprite_Destination.prototype.updateAnimation = function () {
 	this._frameCount++;
 	this._frameCount %= 20;

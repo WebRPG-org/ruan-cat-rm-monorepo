@@ -2,12 +2,12 @@
 // Sprite_Animation.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵_动画
-// Sprite_Animation
-//
-// 显示动画的精灵。
-// The sprite for displaying an animation.
+/**
+ * 精灵_动画
+ * 显示动画的精灵。
+ * Sprite_Animation
+ * The sprite for displaying an animation.
+ */
 function Sprite_Animation() {
 	this.initialize.apply(this, arguments);
 }
@@ -15,13 +15,19 @@ Sprite_Animation.prototype = Object.create(Sprite.prototype);
 Sprite_Animation.prototype.constructor = Sprite_Animation;
 Sprite_Animation._checker1 = {};
 Sprite_Animation._checker2 = {};
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Sprite_Animation.prototype.initialize = function () {
 	Sprite.prototype.initialize.call(this);
 	this._reduceArtifacts = true;
 	this.initMembers();
 };
-/* 初始化成员 */
+/**
+ * 初始化成员
+ * Initialize members
+ */
 Sprite_Animation.prototype.initMembers = function () {
 	this._target = null;
 	this._animation = null;
@@ -40,7 +46,14 @@ Sprite_Animation.prototype.initMembers = function () {
 	this._duplicated = false;
 	this.z = 8;
 };
-/* 设置 */
+/**
+ * 设置
+ * @param {Object} target - 目标对象 - Target object
+ * @param {Object} animation - 动画对象 - Animation object
+ * @param {boolean} mirror - 镜像标志 - Mirror flag
+ * @param {number} delay - 延迟时间 - Delay time
+ * Setup
+ */
 Sprite_Animation.prototype.setup = function (target, animation, mirror, delay) {
 	this._target = target;
 	this._animation = animation;
@@ -54,22 +67,34 @@ Sprite_Animation.prototype.setup = function (target, animation, mirror, delay) {
 		this.createSprites();
 	}
 };
-/* 移除 */
+/**
+ * 移除
+ * Remove
+ */
 Sprite_Animation.prototype.remove = function () {
 	if (this.parent && this.parent.removeChild(this)) {
 		this._target.setBlendColor([0, 0, 0, 0]);
 		this._target.show();
 	}
 };
-/* 设置倍率 */
+/**
+ * 设置倍率
+ * Setup rate
+ */
 Sprite_Animation.prototype.setupRate = function () {
 	this._rate = 4;
 };
-/* 设置持续时间 */
+/**
+ * 设置持续时间
+ * Setup duration
+ */
 Sprite_Animation.prototype.setupDuration = function () {
 	this._duration = this._animation.frames.length * this._rate + 1;
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Sprite_Animation.prototype.update = function () {
 	Sprite.prototype.update.call(this);
 	this.updateMain();
@@ -79,7 +104,10 @@ Sprite_Animation.prototype.update = function () {
 	Sprite_Animation._checker1 = {};
 	Sprite_Animation._checker2 = {};
 };
-/* 更新闪烁 */
+/**
+ * 更新闪烁
+ * Update flash
+ */
 Sprite_Animation.prototype.updateFlash = function () {
 	if (this._flashDuration > 0) {
 		var d = this._flashDuration--;
@@ -87,7 +115,10 @@ Sprite_Animation.prototype.updateFlash = function () {
 		this._target.setBlendColor(this._flashColor);
 	}
 };
-/* 更新画面闪烁 */
+/**
+ * 更新画面闪烁
+ * Update screen flash
+ */
 Sprite_Animation.prototype.updateScreenFlash = function () {
 	if (this._screenFlashDuration > 0) {
 		var d = this._screenFlashDuration--;
@@ -99,7 +130,11 @@ Sprite_Animation.prototype.updateScreenFlash = function () {
 		}
 	}
 };
-/* 绝对坐标 X */
+/**
+ * 绝对坐标 X
+ * @returns {number} 绝对X坐标 - Absolute X coordinate
+ * Absolute X
+ */
 Sprite_Animation.prototype.absoluteX = function () {
 	var x = 0;
 	var object = this;
@@ -109,7 +144,11 @@ Sprite_Animation.prototype.absoluteX = function () {
 	}
 	return x;
 };
-/* 绝对坐标 Y */
+/**
+ * 绝对坐标 Y
+ * @returns {number} 绝对Y坐标 - Absolute Y coordinate
+ * Absolute Y
+ */
 Sprite_Animation.prototype.absoluteY = function () {
 	var y = 0;
 	var object = this;
@@ -119,7 +158,10 @@ Sprite_Animation.prototype.absoluteY = function () {
 	}
 	return y;
 };
-/* 更新隐藏 */
+/**
+ * 更新隐藏
+ * Update hiding
+ */
 Sprite_Animation.prototype.updateHiding = function () {
 	if (this._hidingDuration > 0) {
 		this._hidingDuration--;
@@ -128,11 +170,18 @@ Sprite_Animation.prototype.updateHiding = function () {
 		}
 	}
 };
-/* 是否播放中 */
+/**
+ * 是否播放中
+ * @returns {boolean} 是否正在播放 - Whether is playing
+ * Is playing
+ */
 Sprite_Animation.prototype.isPlaying = function () {
 	return this._duration > 0;
 };
-/* 加载位图 */
+/**
+ * 加载位图
+ * Load bitmaps
+ */
 Sprite_Animation.prototype.loadBitmaps = function () {
 	var name1 = this._animation.animation1Name;
 	var name2 = this._animation.animation2Name;
@@ -141,11 +190,18 @@ Sprite_Animation.prototype.loadBitmaps = function () {
 	this._bitmap1 = ImageManager.loadAnimation(name1, hue1);
 	this._bitmap2 = ImageManager.loadAnimation(name2, hue2);
 };
-/* 是否准备好 */
+/**
+ * 是否准备好
+ * @returns {boolean} 是否准备好 - Whether is ready
+ * Is ready
+ */
 Sprite_Animation.prototype.isReady = function () {
 	return this._bitmap1 && this._bitmap1.isReady() && this._bitmap2 && this._bitmap2.isReady();
 };
-/* 创建精灵 */
+/**
+ * 创建精灵
+ * Create sprites
+ */
 Sprite_Animation.prototype.createSprites = function () {
 	if (!Sprite_Animation._checker2[this._animation]) {
 		this.createCellSprites();
@@ -163,7 +219,10 @@ Sprite_Animation.prototype.createSprites = function () {
 		}
 	}
 };
-/* 创建单元精灵 */
+/**
+ * 创建单元精灵
+ * Create cell sprites
+ */
 Sprite_Animation.prototype.createCellSprites = function () {
 	this._cellSprites = [];
 	for (var i = 0; i < 16; i++) {
@@ -174,12 +233,18 @@ Sprite_Animation.prototype.createCellSprites = function () {
 		this.addChild(sprite);
 	}
 };
-/* 创建画面闪烁精灵 */
+/**
+ * 创建画面闪烁精灵
+ * Create screen flash sprite
+ */
 Sprite_Animation.prototype.createScreenFlashSprite = function () {
 	this._screenFlashSprite = new ScreenSprite();
 	this.addChild(this._screenFlashSprite);
 };
-/* 更新主函数 */
+/**
+ * 更新主函数
+ * Update main
+ */
 Sprite_Animation.prototype.updateMain = function () {
 	if (this.isPlaying() && this.isReady()) {
 		if (this._delay > 0) {
@@ -193,7 +258,10 @@ Sprite_Animation.prototype.updateMain = function () {
 		}
 	}
 };
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update position
+ */
 Sprite_Animation.prototype.updatePosition = function () {
 	if (this._animation.position === 3) {
 		this.x = this.parent.width / 2;
@@ -214,7 +282,10 @@ Sprite_Animation.prototype.updatePosition = function () {
 		}
 	}
 };
-/* 更新帧 */
+/**
+ * 更新帧
+ * Update frame
+ */
 Sprite_Animation.prototype.updateFrame = function () {
 	if (this._duration > 0) {
 		var frameIndex = this.currentFrameIndex();
@@ -226,11 +297,19 @@ Sprite_Animation.prototype.updateFrame = function () {
 		}, this);
 	}
 };
-/* 当前帧索引 */
+/**
+ * 当前帧索引
+ * @returns {number} 当前帧索引 - Current frame index
+ * Current frame index
+ */
 Sprite_Animation.prototype.currentFrameIndex = function () {
 	return this._animation.frames.length - Math.floor((this._duration + this._rate - 1) / this._rate);
 };
-/* 更新所有单元精灵 */
+/**
+ * 更新所有单元精灵
+ * @param {Array} frame - 帧数据 - Frame data
+ * Update all cell sprites
+ */
 Sprite_Animation.prototype.updateAllCellSprites = function (frame) {
 	for (var i = 0; i < this._cellSprites.length; i++) {
 		var sprite = this._cellSprites[i];
@@ -241,7 +320,12 @@ Sprite_Animation.prototype.updateAllCellSprites = function (frame) {
 		}
 	}
 };
-/* 更新单元精灵 */
+/**
+ * 更新单元精灵
+ * @param {Sprite} sprite - 精灵对象 - Sprite object
+ * @param {Array} cell - 单元数据 - Cell data
+ * Update cell sprite
+ */
 Sprite_Animation.prototype.updateCellSprite = function (sprite, cell) {
 	var pattern = cell[0];
 	if (pattern >= 0) {
@@ -270,7 +354,11 @@ Sprite_Animation.prototype.updateCellSprite = function (sprite, cell) {
 		sprite.visible = false;
 	}
 };
-/* 处理时间安排数据 */
+/**
+ * 处理时间安排数据
+ * @param {Object} timing - 时间数据 - Timing data
+ * Process timing data
+ */
 Sprite_Animation.prototype.processTimingData = function (timing) {
 	var duration = timing.flashDuration * this._rate;
 	switch (timing.flashScope) {
@@ -288,12 +376,22 @@ Sprite_Animation.prototype.processTimingData = function (timing) {
 		AudioManager.playSe(timing.se);
 	}
 };
-/* 开始闪烁 */
+/**
+ * 开始闪烁
+ * @param {Array} color - 颜色数组 - Color array
+ * @param {number} duration - 持续时间 - Duration
+ * Start flash
+ */
 Sprite_Animation.prototype.startFlash = function (color, duration) {
 	this._flashColor = color.clone();
 	this._flashDuration = duration;
 };
-/* 开始画面闪烁 */
+/**
+ * 开始画面闪烁
+ * @param {Array} color - 颜色数组 - Color array
+ * @param {number} duration - 持续时间 - Duration
+ * Start screen flash
+ */
 Sprite_Animation.prototype.startScreenFlash = function (color, duration) {
 	this._screenFlashDuration = duration;
 	if (this._screenFlashSprite) {
@@ -301,7 +399,11 @@ Sprite_Animation.prototype.startScreenFlash = function (color, duration) {
 		this._screenFlashSprite.opacity = color[3];
 	}
 };
-/* 开始隐藏 */
+/**
+ * 开始隐藏
+ * @param {number} duration - 持续时间 - Duration
+ * Start hiding
+ */
 Sprite_Animation.prototype.startHiding = function (duration) {
 	this._hidingDuration = duration;
 	this._target.hide();

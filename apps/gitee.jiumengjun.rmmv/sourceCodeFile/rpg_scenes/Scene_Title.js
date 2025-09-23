@@ -1,9 +1,9 @@
-//=============================================================================
-// 场景_标题
-// Scene_Title
-//
-// 标题场景的场景类。
-// The scene class of the title screen.
+/**
+ * 场景_标题
+ * 标题场景的场景类。
+ * Scene_Title
+ * The scene class of the title screen.
+ */
 
 function Scene_Title() {
 	this.initialize.apply(this, arguments);
@@ -12,12 +12,18 @@ function Scene_Title() {
 Scene_Title.prototype = Object.create(Scene_Base.prototype);
 Scene_Title.prototype.constructor = Scene_Title;
 
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Scene_Title.prototype.initialize = function () {
 	Scene_Base.prototype.initialize.call(this);
 };
 
-/* 创建 */
+/**
+ * 创建
+ * Create
+ */
 Scene_Title.prototype.create = function () {
 	Scene_Base.prototype.create.call(this);
 	this.createBackground();
@@ -26,7 +32,10 @@ Scene_Title.prototype.create = function () {
 	this.createCommandWindow();
 };
 
-/* 开始 */
+/**
+ * 开始
+ * Start
+ */
 Scene_Title.prototype.start = function () {
 	Scene_Base.prototype.start.call(this);
 	SceneManager.clearStack();
@@ -36,7 +45,10 @@ Scene_Title.prototype.start = function () {
 	this.startFadeIn(this.fadeSpeed(), false);
 };
 
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Scene_Title.prototype.update = function () {
 	if (!this.isBusy()) {
 		this._commandWindow.open();
@@ -44,18 +56,28 @@ Scene_Title.prototype.update = function () {
 	Scene_Base.prototype.update.call(this);
 };
 
-/* 是否繁忙 */
+/**
+ * 是否繁忙
+ * @returns {boolean} 是否繁忙 - Whether busy
+ * Is busy
+ */
 Scene_Title.prototype.isBusy = function () {
 	return this._commandWindow.isClosing() || Scene_Base.prototype.isBusy.call(this);
 };
 
-/* 结束 */
+/**
+ * 结束
+ * Terminate
+ */
 Scene_Title.prototype.terminate = function () {
 	Scene_Base.prototype.terminate.call(this);
 	SceneManager.snapForBackground();
 };
 
-/* 创建背景 */
+/**
+ * 创建背景
+ * Create background
+ */
 Scene_Title.prototype.createBackground = function () {
 	this._backSprite1 = new Sprite(ImageManager.loadTitle1($dataSystem.title1Name));
 	this._backSprite2 = new Sprite(ImageManager.loadTitle2($dataSystem.title2Name));
@@ -63,7 +85,10 @@ Scene_Title.prototype.createBackground = function () {
 	this.addChild(this._backSprite2);
 };
 
-/* 创建前景 */
+/**
+ * 创建前景
+ * Create foreground
+ */
 Scene_Title.prototype.createForeground = function () {
 	this._gameTitleSprite = new Sprite(new Bitmap(Graphics.width, Graphics.height));
 	this.addChild(this._gameTitleSprite);
@@ -72,7 +97,10 @@ Scene_Title.prototype.createForeground = function () {
 	}
 };
 
-/* 绘制游戏标题 */
+/**
+ * 绘制游戏标题
+ * Draw game title
+ */
 Scene_Title.prototype.drawGameTitle = function () {
 	var x = 20;
 	var y = Graphics.height / 4;
@@ -84,8 +112,12 @@ Scene_Title.prototype.drawGameTitle = function () {
 	this._gameTitleSprite.bitmap.drawText(text, x, y, maxWidth, 48, "center");
 };
 
-/* 中心精灵
+/**
+ * 中心精灵
  * 将精灵放置在画面中心。
+ * Center sprite
+ * Places the sprite at the center of the screen.
+ * @param {Sprite} sprite - 精灵对象 - Sprite object
  */
 Scene_Title.prototype.centerSprite = function (sprite) {
 	sprite.x = Graphics.width / 2;
@@ -94,7 +126,10 @@ Scene_Title.prototype.centerSprite = function (sprite) {
 	sprite.anchor.y = 0.5;
 };
 
-/* 创建指令窗口 */
+/**
+ * 创建指令窗口
+ * Create command window
+ */
 Scene_Title.prototype.createCommandWindow = function () {
 	this._commandWindow = new Window_TitleCommand();
 	this._commandWindow.setHandler("newGame", this.commandNewGame.bind(this));
@@ -103,7 +138,10 @@ Scene_Title.prototype.createCommandWindow = function () {
 	this.addWindow(this._commandWindow);
 };
 
-/* 开始游戏的指令 */
+/**
+ * 开始游戏的指令
+ * Command new game
+ */
 Scene_Title.prototype.commandNewGame = function () {
 	DataManager.setupNewGame();
 	this._commandWindow.close();
@@ -111,19 +149,28 @@ Scene_Title.prototype.commandNewGame = function () {
 	SceneManager.goto(Scene_Map);
 };
 
-/* 继续游戏的指令 */
+/**
+ * 继续游戏的指令
+ * Command continue
+ */
 Scene_Title.prototype.commandContinue = function () {
 	this._commandWindow.close();
 	SceneManager.push(Scene_Load);
 };
 
-/* 设置的指令 */
+/**
+ * 设置的指令
+ * Command options
+ */
 Scene_Title.prototype.commandOptions = function () {
 	this._commandWindow.close();
 	SceneManager.push(Scene_Options);
 };
 
-/* 播放标题音乐 */
+/**
+ * 播放标题音乐
+ * Play title music
+ */
 Scene_Title.prototype.playTitleMusic = function () {
 	AudioManager.playBgm($dataSystem.titleBgm);
 	AudioManager.stopBgs();

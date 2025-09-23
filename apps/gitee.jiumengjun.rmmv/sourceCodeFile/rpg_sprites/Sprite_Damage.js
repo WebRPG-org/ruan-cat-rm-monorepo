@@ -2,18 +2,21 @@
 // Sprite_Damage.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵_伤害
-// Sprite_Damage
-//
-// 显示弹出伤害的精灵。
-// The sprite for displaying a popup damage.
+/**
+ * 精灵_伤害
+ * 显示弹出伤害的精灵。
+ * Sprite_Damage
+ * The sprite for displaying a popup damage.
+ */
 function Sprite_Damage() {
 	this.initialize.apply(this, arguments);
 }
 Sprite_Damage.prototype = Object.create(Sprite.prototype);
 Sprite_Damage.prototype.constructor = Sprite_Damage;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Sprite_Damage.prototype.initialize = function () {
 	Sprite.prototype.initialize.call(this);
 	this._duration = 90;
@@ -21,7 +24,11 @@ Sprite_Damage.prototype.initialize = function () {
 	this._flashDuration = 0;
 	this._damageBitmap = ImageManager.loadSystem("Damage");
 };
-/* 设置 */
+/**
+ * 设置
+ * @param {Object} target - 目标对象 - Target object
+ * Setup
+ */
 Sprite_Damage.prototype.setup = function (target) {
 	var result = target.result();
 	if (result.missed || result.evaded) {
@@ -35,20 +42,34 @@ Sprite_Damage.prototype.setup = function (target) {
 		this.setupCriticalEffect();
 	}
 };
-/* 设置暴击效果 */
+/**
+ * 设置暴击效果
+ * Setup critical effect
+ */
 Sprite_Damage.prototype.setupCriticalEffect = function () {
 	this._flashColor = [255, 0, 0, 160];
 	this._flashDuration = 60;
 };
-/* 数字宽度 */
+/**
+ * 数字宽度
+ * @returns {number} 数字宽度 - Digit width
+ * Digit width
+ */
 Sprite_Damage.prototype.digitWidth = function () {
 	return this._damageBitmap ? this._damageBitmap.width / 10 : 0;
 };
-/* 数字高度 */
+/**
+ * 数字高度
+ * @returns {number} 数字高度 - Digit height
+ * Digit height
+ */
 Sprite_Damage.prototype.digitHeight = function () {
 	return this._damageBitmap ? this._damageBitmap.height / 5 : 0;
 };
-/* 创建未命中 */
+/**
+ * 创建未命中
+ * Create miss
+ */
 Sprite_Damage.prototype.createMiss = function () {
 	var w = this.digitWidth();
 	var h = this.digitHeight();
@@ -56,7 +77,12 @@ Sprite_Damage.prototype.createMiss = function () {
 	sprite.setFrame(0, 4 * h, 4 * w, h);
 	sprite.dy = 0;
 };
-/* 创建数字 */
+/**
+ * 创建数字
+ * @param {number} baseRow - 基础行数 - Base row
+ * @param {number} value - 数值 - Value
+ * Create digits
+ */
 Sprite_Damage.prototype.createDigits = function (baseRow, value) {
 	var string = Math.abs(value).toString();
 	var row = baseRow + (value < 0 ? 1 : 0);
@@ -70,7 +96,11 @@ Sprite_Damage.prototype.createDigits = function (baseRow, value) {
 		sprite.dy = -i;
 	}
 };
-/* 创建子精灵 */
+/**
+ * 创建子精灵
+ * @returns {Sprite} 精灵对象 - Sprite object
+ * Create child sprite
+ */
 Sprite_Damage.prototype.createChildSprite = function () {
 	var sprite = new Sprite();
 	sprite.bitmap = this._damageBitmap;
@@ -81,7 +111,10 @@ Sprite_Damage.prototype.createChildSprite = function () {
 	this.addChild(sprite);
 	return sprite;
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Sprite_Damage.prototype.update = function () {
 	Sprite.prototype.update.call(this);
 	if (this._duration > 0) {
@@ -93,7 +126,11 @@ Sprite_Damage.prototype.update = function () {
 	this.updateFlash();
 	this.updateOpacity();
 };
-/* 更新子元素 */
+/**
+ * 更新子元素
+ * @param {Sprite} sprite - 精灵对象 - Sprite object
+ * Update child
+ */
 Sprite_Damage.prototype.updateChild = function (sprite) {
 	sprite.dy += 0.5;
 	sprite.ry += sprite.dy;
@@ -104,20 +141,30 @@ Sprite_Damage.prototype.updateChild = function (sprite) {
 	sprite.y = Math.round(sprite.ry);
 	sprite.setBlendColor(this._flashColor);
 };
-/* 更新闪烁 */
+/**
+ * 更新闪烁
+ * Update flash
+ */
 Sprite_Damage.prototype.updateFlash = function () {
 	if (this._flashDuration > 0) {
 		var d = this._flashDuration--;
 		this._flashColor[3] *= (d - 1) / d;
 	}
 };
-/* 更新不透明度 */
+/**
+ * 更新不透明度
+ * Update opacity
+ */
 Sprite_Damage.prototype.updateOpacity = function () {
 	if (this._duration < 10) {
 		this.opacity = (255 * this._duration) / 10;
 	}
 };
-/* 是否播放中 */
+/**
+ * 是否播放中
+ * @returns {boolean} 是否正在播放 - Whether is playing
+ * Is playing
+ */
 Sprite_Damage.prototype.isPlaying = function () {
 	return this._duration > 0;
 };

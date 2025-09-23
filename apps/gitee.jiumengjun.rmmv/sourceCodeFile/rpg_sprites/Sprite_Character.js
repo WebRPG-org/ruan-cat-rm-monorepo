@@ -2,12 +2,12 @@
 // Sprite_Character.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵_人物
-// Sprite_Character
-//
-// 显示角色的精灵。
-// The sprite for displaying a character.
+/**
+ * 精灵_人物
+ * 显示角色的精灵。
+ * Sprite_Character
+ * The sprite for displaying a character.
+ */
 
 function Sprite_Character() {
 	this.initialize.apply(this, arguments);
@@ -16,14 +16,21 @@ function Sprite_Character() {
 Sprite_Character.prototype = Object.create(Sprite_Base.prototype);
 Sprite_Character.prototype.constructor = Sprite_Character;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {Object} character - 角色对象 - Character object
+ * Initialize
+ */
 Sprite_Character.prototype.initialize = function (character) {
 	Sprite_Base.prototype.initialize.call(this);
 	this.initMembers();
 	this.setCharacter(character);
 };
 
-/* 初始化成员 */
+/**
+ * 初始化成员
+ * Initialize members
+ */
 Sprite_Character.prototype.initMembers = function () {
 	this.anchor.x = 0.5;
 	this.anchor.y = 1;
@@ -34,12 +41,19 @@ Sprite_Character.prototype.initMembers = function () {
 	this._lowerBody = null;
 };
 
-/* 设置人物 */
+/**
+ * 设置人物
+ * @param {Object} character - 角色对象 - Character object
+ * Set character
+ */
 Sprite_Character.prototype.setCharacter = function (character) {
 	this._character = character;
 };
 
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Sprite_Character.prototype.update = function () {
 	Sprite_Base.prototype.update.call(this);
 	this.updateBitmap();
@@ -50,7 +64,10 @@ Sprite_Character.prototype.update = function () {
 	this.updateOther();
 };
 
-/* 更新可见性 */
+/**
+ * 更新可见性
+ * Update visibility
+ */
 Sprite_Character.prototype.updateVisibility = function () {
 	Sprite_Base.prototype.updateVisibility.call(this);
 	if (this._character.isTransparent()) {
@@ -58,19 +75,31 @@ Sprite_Character.prototype.updateVisibility = function () {
 	}
 };
 
-/* 是否图块 */
+/**
+ * 是否图块
+ * @returns {boolean} 是否为图块 - Whether is tile
+ * Is tile
+ */
 Sprite_Character.prototype.isTile = function () {
 	return this._character.tileId > 0;
 };
 
-/* 图块组位图 */
+/**
+ * 图块组位图
+ * @param {number} tileId - 图块ID - Tile ID
+ * @returns {Bitmap} 位图对象 - Bitmap object
+ * Tileset bitmap
+ */
 Sprite_Character.prototype.tilesetBitmap = function (tileId) {
 	var tileset = $gameMap.tileset();
 	var setNumber = 5 + Math.floor(tileId / 256);
 	return ImageManager.loadTileset(tileset.tilesetNames[setNumber]);
 };
 
-/* 更新位图 */
+/**
+ * 更新位图
+ * Update bitmap
+ */
 Sprite_Character.prototype.updateBitmap = function () {
 	if (this.isImageChanged()) {
 		this._tilesetId = $gameMap.tilesetId();
@@ -85,7 +114,11 @@ Sprite_Character.prototype.updateBitmap = function () {
 	}
 };
 
-/* 是否图像改变 */
+/**
+ * 是否图像改变
+ * @returns {boolean} 是否图像改变 - Whether image changed
+ * Is image changed
+ */
 Sprite_Character.prototype.isImageChanged = function () {
 	return (
 		this._tilesetId !== $gameMap.tilesetId() ||
@@ -95,18 +128,27 @@ Sprite_Character.prototype.isImageChanged = function () {
 	);
 };
 
-/* 设置图块位图 */
+/**
+ * 设置图块位图
+ * Set tile bitmap
+ */
 Sprite_Character.prototype.setTileBitmap = function () {
 	this.bitmap = this.tilesetBitmap(this._tileId);
 };
 
-/* 设置人物位图 */
+/**
+ * 设置人物位图
+ * Set character bitmap
+ */
 Sprite_Character.prototype.setCharacterBitmap = function () {
 	this.bitmap = ImageManager.loadCharacter(this._characterName);
 	this._isBigCharacter = ImageManager.isBigCharacter(this._characterName);
 };
 
-/* 更新帧 */
+/**
+ * 更新帧
+ * Update frame
+ */
 Sprite_Character.prototype.updateFrame = function () {
 	if (this._tileId > 0) {
 		this.updateTileFrame();
@@ -115,7 +157,10 @@ Sprite_Character.prototype.updateFrame = function () {
 	}
 };
 
-/* 更新图块帧 */
+/**
+ * 更新图块帧
+ * Update tile frame
+ */
 Sprite_Character.prototype.updateTileFrame = function () {
 	var pw = this.patternWidth();
 	var ph = this.patternHeight();
@@ -124,7 +169,10 @@ Sprite_Character.prototype.updateTileFrame = function () {
 	this.setFrame(sx, sy, pw, ph);
 };
 
-/* 更新行走图帧 */
+/**
+ * 更新行走图帧
+ * Update character frame
+ */
 Sprite_Character.prototype.updateCharacterFrame = function () {
 	var pw = this.patternWidth();
 	var ph = this.patternHeight();
@@ -141,7 +189,11 @@ Sprite_Character.prototype.updateCharacterFrame = function () {
 	}
 };
 
-/* 行走图块位置 X */
+/**
+ * 行走图块位置 X
+ * @returns {number} 行走图块位置X坐标 - Character block X position
+ * Character block X
+ */
 Sprite_Character.prototype.characterBlockX = function () {
 	if (this._isBigCharacter) {
 		return 0;
@@ -151,7 +203,11 @@ Sprite_Character.prototype.characterBlockX = function () {
 	}
 };
 
-/* 行走图块位置 Y */
+/**
+ * 行走图块位置 Y
+ * @returns {number} 行走图块位置Y坐标 - Character block Y position
+ * Character block Y
+ */
 Sprite_Character.prototype.characterBlockY = function () {
 	if (this._isBigCharacter) {
 		return 0;
@@ -161,17 +217,29 @@ Sprite_Character.prototype.characterBlockY = function () {
 	}
 };
 
-/* 行走图图案位置 X */
+/**
+ * 行走图图案位置 X
+ * @returns {number} 行走图图案位置X坐标 - Character pattern X position
+ * Character pattern X
+ */
 Sprite_Character.prototype.characterPatternX = function () {
 	return this._character.pattern();
 };
 
-/* 行走图图案位置 Y */
+/**
+ * 行走图图案位置 Y
+ * @returns {number} 行走图图案位置Y坐标 - Character pattern Y position
+ * Character pattern Y
+ */
 Sprite_Character.prototype.characterPatternY = function () {
 	return (this._character.direction() - 2) / 2;
 };
 
-/* 图案宽度 */
+/**
+ * 图案宽度
+ * @returns {number} 图案宽度 - Pattern width
+ * Pattern width
+ */
 Sprite_Character.prototype.patternWidth = function () {
 	if (this._tileId > 0) {
 		return $gameMap.tileWidth();
@@ -182,7 +250,11 @@ Sprite_Character.prototype.patternWidth = function () {
 	}
 };
 
-/* 图案高度 */
+/**
+ * 图案高度
+ * @returns {number} 图案高度 - Pattern height
+ * Pattern height
+ */
 Sprite_Character.prototype.patternHeight = function () {
 	if (this._tileId > 0) {
 		return $gameMap.tileHeight();
@@ -193,7 +265,10 @@ Sprite_Character.prototype.patternHeight = function () {
 	}
 };
 
-/* 更新半身精灵 */
+/**
+ * 更新半身精灵
+ * Update half body sprites
+ */
 Sprite_Character.prototype.updateHalfBodySprites = function () {
 	if (this._bushDepth > 0) {
 		this.createHalfBodySprites();
@@ -212,7 +287,10 @@ Sprite_Character.prototype.updateHalfBodySprites = function () {
 	}
 };
 
-/* 创建半身精灵 */
+/**
+ * 创建半身精灵
+ * Create half body sprites
+ */
 Sprite_Character.prototype.createHalfBodySprites = function () {
 	if (!this._upperBody) {
 		this._upperBody = new Sprite();
@@ -229,14 +307,20 @@ Sprite_Character.prototype.createHalfBodySprites = function () {
 	}
 };
 
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update position
+ */
 Sprite_Character.prototype.updatePosition = function () {
 	this.x = this._character.screenX();
 	this.y = this._character.screenY();
 	this.z = this._character.screenZ();
 };
 
-/* 更新动画 */
+/**
+ * 更新动画
+ * Update animation
+ */
 Sprite_Character.prototype.updateAnimation = function () {
 	this.setupAnimation();
 	if (!this.isAnimationPlaying()) {
@@ -247,14 +331,20 @@ Sprite_Character.prototype.updateAnimation = function () {
 	}
 };
 
-/* 更新其它 */
+/**
+ * 更新其它
+ * Update other
+ */
 Sprite_Character.prototype.updateOther = function () {
 	this.opacity = this._character.opacity();
 	this.blendMode = this._character.blendMode();
 	this._bushDepth = this._character.bushDepth();
 };
 
-/* 设置动画 */
+/**
+ * 设置动画
+ * Setup animation
+ */
 Sprite_Character.prototype.setupAnimation = function () {
 	if (this._character.animationId() > 0) {
 		var animation = $dataAnimations[this._character.animationId()];
@@ -263,7 +353,10 @@ Sprite_Character.prototype.setupAnimation = function () {
 	}
 };
 
-/* 设置气泡图标 */
+/**
+ * 设置气泡图标
+ * Setup balloon
+ */
 Sprite_Character.prototype.setupBalloon = function () {
 	if (this._character.balloonId() > 0) {
 		this.startBalloon();
@@ -271,7 +364,10 @@ Sprite_Character.prototype.setupBalloon = function () {
 	}
 };
 
-/* 开始气泡图标 */
+/**
+ * 开始气泡图标
+ * Start balloon
+ */
 Sprite_Character.prototype.startBalloon = function () {
 	if (!this._balloonSprite) {
 		this._balloonSprite = new Sprite_Balloon();
@@ -280,7 +376,10 @@ Sprite_Character.prototype.startBalloon = function () {
 	this.parent.addChild(this._balloonSprite);
 };
 
-/* 更新气泡图标 */
+/**
+ * 更新气泡图标
+ * Update balloon
+ */
 Sprite_Character.prototype.updateBalloon = function () {
 	this.setupBalloon();
 	if (this._balloonSprite) {
@@ -292,7 +391,10 @@ Sprite_Character.prototype.updateBalloon = function () {
 	}
 };
 
-/* 结束气泡图标 */
+/**
+ * 结束气泡图标
+ * End balloon
+ */
 Sprite_Character.prototype.endBalloon = function () {
 	if (this._balloonSprite) {
 		this.parent.removeChild(this._balloonSprite);
@@ -300,7 +402,11 @@ Sprite_Character.prototype.endBalloon = function () {
 	}
 };
 
-/* 是否气泡图标播放中 */
+/**
+ * 是否气泡图标播放中
+ * @returns {boolean} 是否气泡图标播放中 - Whether balloon is playing
+ * Is balloon playing
+ */
 Sprite_Character.prototype.isBalloonPlaying = function () {
 	return !!this._balloonSprite;
 };

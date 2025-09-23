@@ -2,22 +2,28 @@
 // Spriteset_Map.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵组_地图
-// Spriteset_Map
-//
-// 地图画面上的一组精灵。
-// The set of sprites on the map screen.
+/**
+ * 精灵组_地图
+ * 地图画面上的一组精灵。
+ * Spriteset_Map
+ * The set of sprites on the map screen.
+ */
 function Spriteset_Map() {
 	this.initialize.apply(this, arguments);
 }
 Spriteset_Map.prototype = Object.create(Spriteset_Base.prototype);
 Spriteset_Map.prototype.constructor = Spriteset_Map;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Spriteset_Map.prototype.initialize = function () {
 	Spriteset_Base.prototype.initialize.call(this);
 };
-/* 创建下方的图层 */
+/**
+ * 创建下方的图层
+ * Create lower layer
+ */
 Spriteset_Map.prototype.createLowerLayer = function () {
 	Spriteset_Base.prototype.createLowerLayer.call(this);
 	this.createParallax();
@@ -27,7 +33,10 @@ Spriteset_Map.prototype.createLowerLayer = function () {
 	this.createDestination();
 	this.createWeather();
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Spriteset_Map.prototype.update = function () {
 	Spriteset_Base.prototype.update.call(this);
 	this.updateTileset();
@@ -36,7 +45,10 @@ Spriteset_Map.prototype.update = function () {
 	this.updateShadow();
 	this.updateWeather();
 };
-/* 隐藏人物 */
+/**
+ * 隐藏人物
+ * Hide characters
+ */
 Spriteset_Map.prototype.hideCharacters = function () {
 	for (var i = 0; i < this._characterSprites.length; i++) {
 		var sprite = this._characterSprites[i];
@@ -45,13 +57,19 @@ Spriteset_Map.prototype.hideCharacters = function () {
 		}
 	}
 };
-/* 创建远景 */
+/**
+ * 创建远景
+ * Create parallax
+ */
 Spriteset_Map.prototype.createParallax = function () {
 	this._parallax = new TilingSprite();
 	this._parallax.move(0, 0, Graphics.width, Graphics.height);
 	this._baseSprite.addChild(this._parallax);
 };
-/* 创建图块地图 */
+/**
+ * 创建图块地图
+ * Create tilemap
+ */
 Spriteset_Map.prototype.createTilemap = function () {
 	if (Graphics.isWebGL()) {
 		this._tilemap = new ShaderTilemap();
@@ -66,7 +84,10 @@ Spriteset_Map.prototype.createTilemap = function () {
 	this.loadTileset();
 	this._baseSprite.addChild(this._tilemap);
 };
-/* 加载图块组 */
+/**
+ * 加载图块组
+ * Load tileset
+ */
 Spriteset_Map.prototype.loadTileset = function () {
 	this._tileset = $gameMap.tileset();
 	if (this._tileset) {
@@ -82,7 +103,10 @@ Spriteset_Map.prototype.loadTileset = function () {
 		this._tilemap.flags = newTilesetFlags;
 	}
 };
-/* 创建人物 */
+/**
+ * 创建人物
+ * Create characters
+ */
 Spriteset_Map.prototype.createCharacters = function () {
 	this._characterSprites = [];
 	$gameMap.events().forEach(function (event) {
@@ -99,7 +123,10 @@ Spriteset_Map.prototype.createCharacters = function () {
 		this._tilemap.addChild(this._characterSprites[i]);
 	}
 };
-/* 创建影子 */
+/**
+ * 创建影子
+ * Create shadow
+ */
 Spriteset_Map.prototype.createShadow = function () {
 	this._shadowSprite = new Sprite();
 	this._shadowSprite.bitmap = ImageManager.loadSystem("Shadow1");
@@ -108,24 +135,33 @@ Spriteset_Map.prototype.createShadow = function () {
 	this._shadowSprite.z = 6;
 	this._tilemap.addChild(this._shadowSprite);
 };
-/* 创建目的地 */
+/**
+ * 创建目的地
+ * Create destination
+ */
 Spriteset_Map.prototype.createDestination = function () {
 	this._destinationSprite = new Sprite_Destination();
 	this._destinationSprite.z = 9;
 	this._tilemap.addChild(this._destinationSprite);
 };
-/* 创建天气 */
+/**
+ * 创建天气
+ * Create weather
+ */
 Spriteset_Map.prototype.createWeather = function () {
 	this._weather = new Weather();
 	this.addChild(this._weather);
 };
-/* 更新图块组 */
+/**
+ * 更新图块组
+ * Update tileset
+ */
 Spriteset_Map.prototype.updateTileset = function () {
 	if (this._tileset !== $gameMap.tileset()) {
 		this.loadTileset();
 	}
 };
-/*
+/**
  * 简单修复画布远景图问题，销毁旧视远景图并且重新添加到树中。
  * Simple fix for canvas parallax issue, destroy old parallax and readd to  the tree.
  */
@@ -137,7 +173,10 @@ Spriteset_Map.prototype._canvasReAddParallax = function () {
 	this._parallax.bitmap = ImageManager.loadParallax(this._parallaxName);
 	this._baseSprite.addChildAt(this._parallax, index);
 };
-/* 更新远景 */
+/**
+ * 更新远景
+ * Update parallax
+ */
 Spriteset_Map.prototype.updateParallax = function () {
 	if (this._parallaxName !== $gameMap.parallaxName()) {
 		this._parallaxName = $gameMap.parallaxName();
@@ -152,19 +191,28 @@ Spriteset_Map.prototype.updateParallax = function () {
 		this._parallax.origin.y = $gameMap.parallaxOy();
 	}
 };
-/* 更新图块地图 */
+/**
+ * 更新图块地图
+ * Update tilemap
+ */
 Spriteset_Map.prototype.updateTilemap = function () {
 	this._tilemap.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
 	this._tilemap.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
 };
-/* 更新影子 */
+/**
+ * 更新影子
+ * Update shadow
+ */
 Spriteset_Map.prototype.updateShadow = function () {
 	var airship = $gameMap.airship();
 	this._shadowSprite.x = airship.shadowX();
 	this._shadowSprite.y = airship.shadowY();
 	this._shadowSprite.opacity = airship.shadowOpacity();
 };
-/* 更新天气 */
+/**
+ * 更新天气
+ * Update weather
+ */
 Spriteset_Map.prototype.updateWeather = function () {
 	this._weather.type = $gameScreen.weatherType();
 	this._weather.power = $gameScreen.weatherPower();

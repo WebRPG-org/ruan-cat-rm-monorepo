@@ -2,24 +2,30 @@
 // Sprite_StateOverlay.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵_状态覆盖
-// Sprite_StateOverlay
-//
-// 显示状态的覆盖图像的精灵。
-// The sprite for displaying an overlay image for a state.
+/**
+ * 精灵_状态覆盖
+ * 显示状态的覆盖图像的精灵。
+ * Sprite_StateOverlay
+ * The sprite for displaying an overlay image for a state.
+ */
 function Sprite_StateOverlay() {
 	this.initialize.apply(this, arguments);
 }
 Sprite_StateOverlay.prototype = Object.create(Sprite_Base.prototype);
 Sprite_StateOverlay.prototype.constructor = Sprite_StateOverlay;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Sprite_StateOverlay.prototype.initialize = function () {
 	Sprite_Base.prototype.initialize.call(this);
 	this.initMembers();
 	this.loadBitmap();
 };
-/* 初始化成员 */
+/**
+ * 初始化成员
+ * Initialize members
+ */
 Sprite_StateOverlay.prototype.initMembers = function () {
 	this._battler = null;
 	this._overlayIndex = 0;
@@ -28,16 +34,26 @@ Sprite_StateOverlay.prototype.initMembers = function () {
 	this.anchor.x = 0.5;
 	this.anchor.y = 1;
 };
-/* 加载位图 */
+/**
+ * 加载位图
+ * Load bitmap
+ */
 Sprite_StateOverlay.prototype.loadBitmap = function () {
 	this.bitmap = ImageManager.loadSystem("States");
 	this.setFrame(0, 0, 0, 0);
 };
-/* 设置 */
+/**
+ * 设置
+ * @param {Object} battler - 战斗者对象 - Battler object
+ * Setup
+ */
 Sprite_StateOverlay.prototype.setup = function (battler) {
 	this._battler = battler;
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Sprite_StateOverlay.prototype.update = function () {
 	Sprite_Base.prototype.update.call(this);
 	this._animationCount++;
@@ -47,11 +63,18 @@ Sprite_StateOverlay.prototype.update = function () {
 		this._animationCount = 0;
 	}
 };
-/* 动画等待帧数 */
+/**
+ * 动画等待帧数
+ * @returns {number} 动画等待帧数 - Animation wait frames
+ * Animation wait
+ */
 Sprite_StateOverlay.prototype.animationWait = function () {
 	return 8;
 };
-/* 更新图案 */
+/**
+ * 更新图案
+ * Update pattern
+ */
 Sprite_StateOverlay.prototype.updatePattern = function () {
 	this._pattern++;
 	this._pattern %= 8;
@@ -59,7 +82,10 @@ Sprite_StateOverlay.prototype.updatePattern = function () {
 		this._overlayIndex = this._battler.stateOverlayIndex();
 	}
 };
-/* 更新帧 */
+/**
+ * 更新帧
+ * Update frame
+ */
 Sprite_StateOverlay.prototype.updateFrame = function () {
 	if (this._overlayIndex > 0) {
 		var w = 96;

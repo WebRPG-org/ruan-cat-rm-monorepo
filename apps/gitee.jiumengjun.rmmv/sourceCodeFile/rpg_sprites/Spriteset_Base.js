@@ -2,18 +2,21 @@
 // Spriteset_Base.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 精灵组_基础
-// Spriteset_Base
-//
-// Spriteset_Map 和 Spriteset_Battle 的父类。
-// The superclass of Spriteset_Map and Spriteset_Battle.
+/**
+ * 精灵组_基础
+ * Spriteset_Map 和 Spriteset_Battle 的父类。
+ * Spriteset_Base
+ * The superclass of Spriteset_Map and Spriteset_Battle.
+ */
 function Spriteset_Base() {
 	this.initialize.apply(this, arguments);
 }
 Spriteset_Base.prototype = Object.create(Sprite.prototype);
 Spriteset_Base.prototype.constructor = Spriteset_Base;
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Spriteset_Base.prototype.initialize = function () {
 	Sprite.prototype.initialize.call(this);
 	this.setFrame(0, 0, Graphics.width, Graphics.height);
@@ -24,24 +27,36 @@ Spriteset_Base.prototype.initialize = function () {
 	this.createUpperLayer();
 	this.update();
 };
-/* 创建下方的图层 */
+/**
+ * 创建下方的图层
+ * Create lower layer
+ */
 Spriteset_Base.prototype.createLowerLayer = function () {
 	this.createBaseSprite();
 };
-/* 创建上方的图层 */
+/**
+ * 创建上方的图层
+ * Create upper layer
+ */
 Spriteset_Base.prototype.createUpperLayer = function () {
 	this.createPictures();
 	this.createTimer();
 	this.createScreenSprites();
 };
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Spriteset_Base.prototype.update = function () {
 	Sprite.prototype.update.call(this);
 	this.updateScreenSprites();
 	this.updateToneChanger();
 	this.updatePosition();
 };
-/* 更新基础精灵 */
+/**
+ * 更新基础精灵
+ * Update base sprite
+ */
 Spriteset_Base.prototype.createBaseSprite = function () {
 	this._baseSprite = new Sprite();
 	this._baseSprite.setFrame(0, 0, this.width, this.height);
@@ -50,7 +65,10 @@ Spriteset_Base.prototype.createBaseSprite = function () {
 	this.addChild(this._baseSprite);
 	this._baseSprite.addChild(this._blackScreen);
 };
-/* 创建色调变换器 */
+/**
+ * 创建色调变换器
+ * Create tone changer
+ */
 Spriteset_Base.prototype.createToneChanger = function () {
 	if (Graphics.isWebGL()) {
 		this.createWebGLToneChanger();
@@ -58,7 +76,10 @@ Spriteset_Base.prototype.createToneChanger = function () {
 		this.createCanvasToneChanger();
 	}
 };
-/* 创建 WebGL 色调变换器 */
+/**
+ * 创建 WebGL 色调变换器
+ * Create WebGL tone changer
+ */
 Spriteset_Base.prototype.createWebGLToneChanger = function () {
 	var margin = 48;
 	var width = Graphics.width + margin * 2;
@@ -67,12 +88,18 @@ Spriteset_Base.prototype.createWebGLToneChanger = function () {
 	this._baseSprite.filters = [this._toneFilter];
 	this._baseSprite.filterArea = new Rectangle(-margin, -margin, width, height);
 };
-/* 创建 Canvas 色调变换器 */
+/**
+ * 创建 Canvas 色调变换器
+ * Create Canvas tone changer
+ */
 Spriteset_Base.prototype.createCanvasToneChanger = function () {
 	this._toneSprite = new ToneSprite();
 	this.addChild(this._toneSprite);
 };
-/* 创建图片 */
+/**
+ * 创建图片
+ * Create pictures
+ */
 Spriteset_Base.prototype.createPictures = function () {
 	var width = Graphics.boxWidth;
 	var height = Graphics.boxHeight;
@@ -85,13 +112,19 @@ Spriteset_Base.prototype.createPictures = function () {
 	}
 	this.addChild(this._pictureContainer);
 };
-/* 创建计时器 */
+/**
+ * 创建计时器
+ * Create timer
+ */
 Spriteset_Base.prototype.createTimer = function () {
 	this._timerSprite = new Sprite_Timer();
 	this.addChild(this._timerSprite);
 };
-/* 创建画面精灵
+/**
+ * 创建画面精灵
  * 闪烁和渐变效果的两个精灵。
+ * Create screen sprites
+ * Two sprites for flash and fade effects.
  */
 Spriteset_Base.prototype.createScreenSprites = function () {
 	this._flashSprite = new ScreenSprite();
@@ -99,14 +132,20 @@ Spriteset_Base.prototype.createScreenSprites = function () {
 	this.addChild(this._flashSprite);
 	this.addChild(this._fadeSprite);
 };
-/* 更新画面精灵 */
+/**
+ * 更新画面精灵
+ * Update screen sprites
+ */
 Spriteset_Base.prototype.updateScreenSprites = function () {
 	var color = $gameScreen.flashColor();
 	this._flashSprite.setColor(color[0], color[1], color[2]);
 	this._flashSprite.opacity = color[3];
 	this._fadeSprite.opacity = 255 - $gameScreen.brightness();
 };
-/* 更新色调变换器 */
+/**
+ * 更新色调变换器
+ * Update tone changer
+ */
 Spriteset_Base.prototype.updateToneChanger = function () {
 	var tone = $gameScreen.tone();
 	if (!this._tone.equals(tone)) {
@@ -118,19 +157,28 @@ Spriteset_Base.prototype.updateToneChanger = function () {
 		}
 	}
 };
-/* 更新 WebGL 色调变换器 */
+/**
+ * 更新 WebGL 色调变换器
+ * Update WebGL tone changer
+ */
 Spriteset_Base.prototype.updateWebGLToneChanger = function () {
 	var tone = this._tone;
 	this._toneFilter.reset();
 	this._toneFilter.adjustTone(tone[0], tone[1], tone[2]);
 	this._toneFilter.adjustSaturation(-tone[3]);
 };
-/* 更新 Canvas 色调变换器 */
+/**
+ * 更新 Canvas 色调变换器
+ * Update Canvas tone changer
+ */
 Spriteset_Base.prototype.updateCanvasToneChanger = function () {
 	var tone = this._tone;
 	this._toneSprite.setTone(tone[0], tone[1], tone[2], tone[3]);
 };
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update position
+ */
 Spriteset_Base.prototype.updatePosition = function () {
 	var screen = $gameScreen;
 	var scale = screen.zoomScale();
