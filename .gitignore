@@ -63,3 +63,6 @@ vercel.null.def.json
 
 # 不应该提交到仓库中
 *.code-workspace
+
+# 忽略 claude 的 statusline 日志文件
+.claude/statusline.log
