@@ -16,7 +16,10 @@ function Window_GameEnd() {
 Window_GameEnd.prototype = Object.create(Window_Command.prototype);
 Window_GameEnd.prototype.constructor = Window_GameEnd;
 
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Window_GameEnd.prototype.initialize = function () {
 	Window_Command.prototype.initialize.call(this, 0, 0);
 	this.updatePlacement();
@@ -24,18 +27,28 @@ Window_GameEnd.prototype.initialize = function () {
 	this.open();
 };
 
-/* 窗口宽 */
+/**
+ * 窗口宽
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_GameEnd.prototype.windowWidth = function () {
 	return 240;
 };
 
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update placement
+ */
 Window_GameEnd.prototype.updatePlacement = function () {
 	this.x = (Graphics.boxWidth - this.width) / 2;
 	this.y = (Graphics.boxHeight - this.height) / 2;
 };
 
-/* 制作指令列表 */
+/**
+ * 制作指令列表
+ * Make command list
+ */
 Window_GameEnd.prototype.makeCommandList = function () {
 	this.addCommand(TextManager.toTitle, "toTitle");
 	this.addCommand(TextManager.cancel, "cancel");

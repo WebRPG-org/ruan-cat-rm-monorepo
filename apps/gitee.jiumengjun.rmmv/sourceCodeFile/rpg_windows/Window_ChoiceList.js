@@ -16,7 +16,11 @@ function Window_ChoiceList() {
 Window_ChoiceList.prototype = Object.create(Window_Command.prototype);
 Window_ChoiceList.prototype.constructor = Window_ChoiceList;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {Window_Message} messageWindow - 消息窗口对象 - Message window object
+ * Initialize
+ */
 Window_ChoiceList.prototype.initialize = function (messageWindow) {
 	this._messageWindow = messageWindow;
 	Window_Command.prototype.initialize.call(this, 0, 0);
@@ -25,7 +29,10 @@ Window_ChoiceList.prototype.initialize = function (messageWindow) {
 	this._background = 0;
 };
 
-/* 开始 */
+/**
+ * 开始
+ * Start
+ */
 Window_ChoiceList.prototype.start = function () {
 	this.updatePlacement();
 	this.updateBackground();
@@ -35,12 +42,18 @@ Window_ChoiceList.prototype.start = function () {
 	this.activate();
 };
 
-/* 选择默认 */
+/**
+ * 选择默认
+ * Select default
+ */
 Window_ChoiceList.prototype.selectDefault = function () {
 	this.select($gameMessage.choiceDefaultType());
 };
 
-/* 更新位置 */
+/**
+ * 更新位置
+ * Update placement
+ */
 Window_ChoiceList.prototype.updatePlacement = function () {
 	var positionType = $gameMessage.choicePositionType();
 	var messageY = this._messageWindow.y;
@@ -64,19 +77,30 @@ Window_ChoiceList.prototype.updatePlacement = function () {
 	}
 };
 
-/* 更新背景 */
+/**
+ * 更新背景
+ * Update background
+ */
 Window_ChoiceList.prototype.updateBackground = function () {
 	this._background = $gameMessage.choiceBackground();
 	this.setBackgroundType(this._background);
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_ChoiceList.prototype.windowWidth = function () {
 	var width = this.maxChoiceWidth() + this.padding * 2;
 	return Math.min(width, Graphics.boxWidth);
 };
 
-/* 可见的行数 */
+/**
+ * 可见的行数
+ * @returns {number} 可见行数 - Number of visible rows
+ * Number of visible rows
+ */
 Window_ChoiceList.prototype.numVisibleRows = function () {
 	var messageY = this._messageWindow.y;
 	var messageHeight = this._messageWindow.height;
@@ -93,7 +117,11 @@ Window_ChoiceList.prototype.numVisibleRows = function () {
 	return numLines;
 };
 
-/* 最大选项宽度 */
+/**
+ * 最大选项宽度
+ * @returns {number} 最大选项宽度 - Maximum choice width
+ * Maximum choice width
+ */
 Window_ChoiceList.prototype.maxChoiceWidth = function () {
 	var maxWidth = 96;
 	var choices = $gameMessage.choices();
@@ -106,17 +134,29 @@ Window_ChoiceList.prototype.maxChoiceWidth = function () {
 	return maxWidth;
 };
 
-/* 文本宽扩展 */
+/**
+ * 文本宽扩展
+ * @param {string} text - 文本内容 - Text content
+ * @returns {number} 文本宽度 - Text width
+ * Text width extended
+ */
 Window_ChoiceList.prototype.textWidthEx = function (text) {
 	return this.drawTextEx(text, 0, this.contents.height);
 };
 
-/* 内容高度 */
+/**
+ * 内容高度
+ * @returns {number} 内容高度 - Contents height
+ * Contents height
+ */
 Window_ChoiceList.prototype.contentsHeight = function () {
 	return this.maxItems() * this.itemHeight();
 };
 
-/* 制作指令列表 */
+/**
+ * 制作指令列表
+ * Make command list
+ */
 Window_ChoiceList.prototype.makeCommandList = function () {
 	var choices = $gameMessage.choices();
 	for (var i = 0; i < choices.length; i++) {
@@ -124,30 +164,48 @@ Window_ChoiceList.prototype.makeCommandList = function () {
 	}
 };
 
-/* 绘制项目 */
+/**
+ * 绘制项目
+ * @param {number} index - 索引 - Index
+ * Draw item
+ */
 Window_ChoiceList.prototype.drawItem = function (index) {
 	var rect = this.itemRectForText(index);
 	this.drawTextEx(this.commandName(index), rect.x, rect.y);
 };
 
-/* 是否取消启用 */
+/**
+ * 是否取消启用
+ * @returns {boolean} 是否取消启用 - Whether cancel is enabled
+ * Is cancel enabled
+ */
 Window_ChoiceList.prototype.isCancelEnabled = function () {
 	return $gameMessage.choiceCancelType() !== -1;
 };
 
-/* 是否确定触发 */
+/**
+ * 是否确定触发
+ * @returns {boolean} 是否确定触发 - Whether ok is triggered
+ * Is ok triggered
+ */
 Window_ChoiceList.prototype.isOkTriggered = function () {
 	return Input.isTriggered("ok");
 };
 
-/* 呼叫确定处理者 */
+/**
+ * 呼叫确定处理者
+ * Call ok handler
+ */
 Window_ChoiceList.prototype.callOkHandler = function () {
 	$gameMessage.onChoice(this.index());
 	this._messageWindow.terminateMessage();
 	this.close();
 };
 
-/* 呼叫取消处理者 */
+/**
+ * 呼叫取消处理者
+ * Call cancel handler
+ */
 Window_ChoiceList.prototype.callCancelHandler = function () {
 	$gameMessage.onChoice($gameMessage.choiceCancelType());
 	this._messageWindow.terminateMessage();

@@ -16,7 +16,10 @@ function Window_ActorCommand() {
 Window_ActorCommand.prototype = Object.create(Window_Command.prototype);
 Window_ActorCommand.prototype.constructor = Window_ActorCommand;
 
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Window_ActorCommand.prototype.initialize = function () {
 	var y = Graphics.boxHeight - this.windowHeight();
 	Window_Command.prototype.initialize.call(this, 0, y);
@@ -25,17 +28,28 @@ Window_ActorCommand.prototype.initialize = function () {
 	this._actor = null;
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_ActorCommand.prototype.windowWidth = function () {
 	return 192;
 };
 
-/* 可见的行数 */
+/**
+ * 可见的行数
+ * @returns {number} 可见行数 - Number of visible rows
+ * Number of visible rows
+ */
 Window_ActorCommand.prototype.numVisibleRows = function () {
 	return 4;
 };
 
-/* 制作指令列表 */
+/**
+ * 制作指令列表
+ * Make command list
+ */
 Window_ActorCommand.prototype.makeCommandList = function () {
 	if (this._actor) {
 		this.addAttackCommand();
@@ -45,12 +59,18 @@ Window_ActorCommand.prototype.makeCommandList = function () {
 	}
 };
 
-/* 增加攻击指令 */
+/**
+ * 增加攻击指令
+ * Add attack command
+ */
 Window_ActorCommand.prototype.addAttackCommand = function () {
 	this.addCommand(TextManager.attack, "attack", this._actor.canAttack());
 };
 
-/* 增加技能指令 */
+/**
+ * 增加技能指令
+ * Add skill commands
+ */
 Window_ActorCommand.prototype.addSkillCommands = function () {
 	var skillTypes = this._actor.addedSkillTypes();
 	skillTypes.sort(function (a, b) {
@@ -62,17 +82,27 @@ Window_ActorCommand.prototype.addSkillCommands = function () {
 	}, this);
 };
 
-/* 增加防御指令 */
+/**
+ * 增加防御指令
+ * Add guard command
+ */
 Window_ActorCommand.prototype.addGuardCommand = function () {
 	this.addCommand(TextManager.guard, "guard", this._actor.canGuard());
 };
 
-/* 增加物品指令 */
+/**
+ * 增加物品指令
+ * Add item command
+ */
 Window_ActorCommand.prototype.addItemCommand = function () {
 	this.addCommand(TextManager.item, "item");
 };
 
-/* 设置 */
+/**
+ * 设置
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * Setup
+ */
 Window_ActorCommand.prototype.setup = function (actor) {
 	this._actor = actor;
 	this.clearCommandList();
@@ -83,7 +113,10 @@ Window_ActorCommand.prototype.setup = function (actor) {
 	this.open();
 };
 
-/* 处理确定 */
+/**
+ * 处理确定
+ * Process OK
+ */
 Window_ActorCommand.prototype.processOk = function () {
 	if (this._actor) {
 		if (ConfigManager.commandRemember) {
@@ -95,7 +128,10 @@ Window_ActorCommand.prototype.processOk = function () {
 	Window_Command.prototype.processOk.call(this);
 };
 
-/* 选择上一个 */
+/**
+ * 选择上一个
+ * Select last
+ */
 Window_ActorCommand.prototype.selectLast = function () {
 	this.select(0);
 	if (this._actor && ConfigManager.commandRemember) {

@@ -16,7 +16,12 @@ function Window_BattleActor() {
 Window_BattleActor.prototype = Object.create(Window_BattleStatus.prototype);
 Window_BattleActor.prototype.constructor = Window_BattleActor;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Initialize
+ */
 Window_BattleActor.prototype.initialize = function (x, y) {
 	Window_BattleStatus.prototype.initialize.call(this);
 	this.x = x;
@@ -25,25 +30,39 @@ Window_BattleActor.prototype.initialize = function (x, y) {
 	this.hide();
 };
 
-/* 显示 */
+/**
+ * 显示
+ * Show
+ */
 Window_BattleActor.prototype.show = function () {
 	this.select(0);
 	Window_BattleStatus.prototype.show.call(this);
 };
 
-/* 隐藏 */
+/**
+ * 隐藏
+ * Hide
+ */
 Window_BattleActor.prototype.hide = function () {
 	Window_BattleStatus.prototype.hide.call(this);
 	$gameParty.select(null);
 };
 
-/* 选择 */
+/**
+ * 选择
+ * @param {number} index - 索引 - Index
+ * Select
+ */
 Window_BattleActor.prototype.select = function (index) {
 	Window_BattleStatus.prototype.select.call(this, index);
 	$gameParty.select(this.actor());
 };
 
-/* 角色 */
+/**
+ * 角色
+ * @returns {Game_Actor} 角色对象 - Actor object
+ * Actor
+ */
 Window_BattleActor.prototype.actor = function () {
 	return $gameParty.members()[this.index()];
 };

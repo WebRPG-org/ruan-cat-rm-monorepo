@@ -23,7 +23,14 @@ function Window_Base() {
 Window_Base.prototype = Object.create(Window.prototype);
 Window_Base.prototype.constructor = Window_Base;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {number} height - 高度 - Height
+ * Initialize
+ */
 Window_Base.prototype.initialize = function (x, y, width, height) {
 	Window.prototype.initialize.call(this);
 	this.loadWindowskin();
@@ -37,19 +44,26 @@ Window_Base.prototype.initialize = function (x, y, width, height) {
 	this._dimmerSprite = null;
 };
 
-Window_Base._iconWidth = 32; // 图标宽度
-Window_Base._iconHeight = 32; // 图标高度
-Window_Base._faceWidth = 144; // 脸图宽度
-Window_Base._faceHeight = 144; // 脸图高度
+Window_Base._iconWidth = 32; // 图标宽度 - Icon width
+Window_Base._iconHeight = 32; // 图标高度 - Icon height
+Window_Base._faceWidth = 144; // 脸图宽度 - Face width
+Window_Base._faceHeight = 144; // 脸图高度 - Face height
 
-/* 行高度
+/**
+ * 行高度
  * 菜单每一个选项的高度
+ * @returns {number} 行高度 - Line height
+ * Line height
  */
 Window_Base.prototype.lineHeight = function () {
 	return 36;
 };
 
-/* 标准字体 */
+/**
+ * 标准字体
+ * @returns {string} 字体名称 - Font name
+ * Standard font face
+ */
 Window_Base.prototype.standardFontFace = function () {
 	if ($gameSystem.isChinese()) {
 		return "SimHei, Heiti TC, sans-serif";
@@ -60,85 +74,136 @@ Window_Base.prototype.standardFontFace = function () {
 	}
 };
 
-/* 标准字体大小 */
+/**
+ * 标准字体大小
+ * @returns {number} 字体大小 - Font size
+ * Standard font size
+ */
 Window_Base.prototype.standardFontSize = function () {
 	return 28;
 };
 
-/* 标准填充（内边距）
+/**
+ * 标准填充（内边距）
  * 内容与背景上下左右四边的距离
+ * @returns {number} 标准填充 - Standard padding
+ * Standard padding
  */
 Window_Base.prototype.standardPadding = function () {
 	return 18;
 };
 
-/* 文本填充（内边距）
+/**
+ * 文本填充（内边距）
  * 文本与内容左右两边的距离
+ * @returns {number} 文本填充 - Text padding
+ * Text padding
  */
 Window_Base.prototype.textPadding = function () {
 	return 6;
 };
 
-/* 标准背景不透明度 */
+/**
+ * 标准背景不透明度
+ * @returns {number} 背景不透明度 - Background opacity
+ * Standard back opacity
+ */
 Window_Base.prototype.standardBackOpacity = function () {
 	return 192;
 };
 
-/* 读取窗口皮肤 */
+/**
+ * 读取窗口皮肤
+ * Load windowskin
+ */
 Window_Base.prototype.loadWindowskin = function () {
 	this.windowskin = ImageManager.loadSystem("Window");
 };
 
-/* 更新填充（内边距） */
+/**
+ * 更新填充（内边距）
+ * Update padding
+ */
 Window_Base.prototype.updatePadding = function () {
 	this.padding = this.standardPadding();
 };
 
-/* 更新背景不透明度 */
+/**
+ * 更新背景不透明度
+ * Update back opacity
+ */
 Window_Base.prototype.updateBackOpacity = function () {
 	this.backOpacity = this.standardBackOpacity();
 };
 
-/* 内容宽度 */
+/**
+ * 内容宽度
+ * @returns {number} 内容宽度 - Contents width
+ * Contents width
+ */
 Window_Base.prototype.contentsWidth = function () {
 	return this.width - this.standardPadding() * 2;
 };
 
-/* 内容高度 */
+/**
+ * 内容高度
+ * @returns {number} 内容高度 - Contents height
+ * Contents height
+ */
 Window_Base.prototype.contentsHeight = function () {
 	return this.height - this.standardPadding() * 2;
 };
 
-/* 合适的高度 */
+/**
+ * 合适的高度
+ * @param {number} numLines - 行数 - Number of lines
+ * @returns {number} 适合的高度 - Fitting height
+ * Fitting height
+ */
 Window_Base.prototype.fittingHeight = function (numLines) {
 	return numLines * this.lineHeight() + this.standardPadding() * 2;
 };
 
-/* 更新色调 */
+/**
+ * 更新色调
+ * Update tone
+ */
 Window_Base.prototype.updateTone = function () {
 	var tone = $gameSystem.windowTone();
 	this.setTone(tone[0], tone[1], tone[2]);
 };
 
-/* 创建内容 */
+/**
+ * 创建内容
+ * Create contents
+ */
 Window_Base.prototype.createContents = function () {
 	this.contents = new Bitmap(this.contentsWidth(), this.contentsHeight());
 	this.resetFontSettings();
 };
 
-/* 重设字体设置 */
+/**
+ * 重设字体设置
+ * Reset font settings
+ */
 Window_Base.prototype.resetFontSettings = function () {
 	this.contents.fontFace = this.standardFontFace();
 	this.contents.fontSize = this.standardFontSize();
 	this.resetTextColor();
 };
 
-/* 重设字体颜色 */
+/**
+ * 重设字体颜色
+ * Reset text color
+ */
 Window_Base.prototype.resetTextColor = function () {
 	this.changeTextColor(this.normalColor());
 };
 
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Window_Base.prototype.update = function () {
 	Window.prototype.update.call(this);
 	this.updateTone();
@@ -147,7 +212,10 @@ Window_Base.prototype.update = function () {
 	this.updateBackgroundDimmer();
 };
 
-/* 更新打开 */
+/**
+ * 更新打开
+ * Update open
+ */
 Window_Base.prototype.updateOpen = function () {
 	if (this._opening) {
 		this.openness += 32;
@@ -157,7 +225,10 @@ Window_Base.prototype.updateOpen = function () {
 	}
 };
 
-/* 更新关闭 */
+/**
+ * 更新关闭
+ * Update close
+ */
 Window_Base.prototype.updateClose = function () {
 	if (this._closing) {
 		this.openness -= 32;
@@ -167,7 +238,10 @@ Window_Base.prototype.updateClose = function () {
 	}
 };
 
-/* 打开 */
+/**
+ * 打开
+ * Open
+ */
 Window_Base.prototype.open = function () {
 	if (!this.isOpen()) {
 		this._opening = true;
@@ -175,7 +249,10 @@ Window_Base.prototype.open = function () {
 	this._closing = false;
 };
 
-/* 关闭 */
+/**
+ * 关闭
+ * Close
+ */
 Window_Base.prototype.close = function () {
 	if (!this.isClosed()) {
 		this._closing = true;
@@ -183,155 +260,272 @@ Window_Base.prototype.close = function () {
 	this._opening = false;
 };
 
-/* 是否打开中 */
+/**
+ * 是否打开中
+ * @returns {boolean} 是否打开中 - Whether is opening
+ * Is opening
+ */
 Window_Base.prototype.isOpening = function () {
 	return this._opening;
 };
 
-/* 是否关闭中 */
+/**
+ * 是否关闭中
+ * @returns {boolean} 是否关闭中 - Whether is closing
+ * Is closing
+ */
 Window_Base.prototype.isClosing = function () {
 	return this._closing;
 };
 
-/* 显示 */
+/**
+ * 显示
+ * Show
+ */
 Window_Base.prototype.show = function () {
 	this.visible = true;
 };
 
-/* 隐藏 */
+/**
+ * 隐藏
+ * Hide
+ */
 Window_Base.prototype.hide = function () {
 	this.visible = false;
 };
 
-/* 活动 */
+/**
+ * 活动
+ * Activate
+ */
 Window_Base.prototype.activate = function () {
 	this.active = true;
 };
 
-/* 不活动 */
+/**
+ * 不活动
+ * Deactivate
+ */
 Window_Base.prototype.deactivate = function () {
 	this.active = false;
 };
 
-/* 文本颜色 */
+/**
+ * 文本颜色
+ * @param {number} n - 颜色索引 - Color index
+ * @returns {string} 颜色值 - Color value
+ * Text color
+ */
 Window_Base.prototype.textColor = function (n) {
 	var px = 96 + (n % 8) * 12 + 6;
 	var py = 144 + Math.floor(n / 8) * 12 + 6;
 	return this.windowskin.getPixel(px, py);
 };
 
-/* 普通颜色 */
+/**
+ * 普通颜色
+ * @returns {string} 普通颜色值 - Normal color value
+ * Normal color
+ */
 Window_Base.prototype.normalColor = function () {
 	return this.textColor(0);
 };
 
-/* 系统颜色 */
+/**
+ * 系统颜色
+ * @returns {string} 系统颜色值 - System color value
+ * System color
+ */
 Window_Base.prototype.systemColor = function () {
 	return this.textColor(16);
 };
 
-/* 危机颜色 */
+/**
+ * 危机颜色
+ * @returns {string} 危机颜色值 - Crisis color value
+ * Crisis color
+ */
 Window_Base.prototype.crisisColor = function () {
 	return this.textColor(17);
 };
 
-/* 死亡颜色 */
+/**
+ * 死亡颜色
+ * @returns {string} 死亡颜色值 - Death color value
+ * Death color
+ */
 Window_Base.prototype.deathColor = function () {
 	return this.textColor(18);
 };
 
-/* 计量条背景颜色 */
+/**
+ * 计量条背景颜色
+ * @returns {string} 计量条背景颜色值 - Gauge background color value
+ * Gauge back color
+ */
 Window_Base.prototype.gaugeBackColor = function () {
 	return this.textColor(19);
 };
 
-/* HP 计量条颜色 1 */
+/**
+ * HP 计量条颜色 1
+ * @returns {string} HP 计量条颜色 1 值 - HP gauge color 1 value
+ * HP gauge color 1
+ */
 Window_Base.prototype.hpGaugeColor1 = function () {
 	return this.textColor(20);
 };
 
-/* HP 计量条颜色 2 */
+/**
+ * HP 计量条颜色 2
+ * @returns {string} HP 计量条颜色 2 值 - HP gauge color 2 value
+ * HP gauge color 2
+ */
 Window_Base.prototype.hpGaugeColor2 = function () {
 	return this.textColor(21);
 };
 
-/* MP 计量条颜色 1 */
+/**
+ * MP 计量条颜色 1
+ * @returns {string} MP 计量条颜色 1 值 - MP gauge color 1 value
+ * MP gauge color 1
+ */
 Window_Base.prototype.mpGaugeColor1 = function () {
 	return this.textColor(22);
 };
 
-/* MP 计量条颜色 1 */
+/**
+ * MP 计量条颜色 2
+ * @returns {string} MP 计量条颜色 2 值 - MP gauge color 2 value
+ * MP gauge color 2
+ */
 Window_Base.prototype.mpGaugeColor2 = function () {
 	return this.textColor(23);
 };
 
-/* MP 消耗颜色 */
+/**
+ * MP 消耗颜色
+ * @returns {string} MP 消耗颜色值 - MP cost color value
+ * MP cost color
+ */
 Window_Base.prototype.mpCostColor = function () {
 	return this.textColor(23);
 };
 
-/* 能力上升颜色
+/**
+ * 能力上升颜色
  * 这里指选中的装备与身上装备高对比能力值时上升的颜色
+ * @returns {string} 能力上升颜色值 - Power up color value
+ * Power up color
  */
 Window_Base.prototype.powerUpColor = function () {
 	return this.textColor(24);
 };
 
-/* 能力下降颜色
+/**
+ * 能力下降颜色
  * 这里指选中的装备与身上装备高对比能力值时下降的颜色
+ * @returns {string} 能力下降颜色值 - Power down color value
+ * Power down color
  */
 Window_Base.prototype.powerDownColor = function () {
 	return this.textColor(25);
 };
 
-/* TP计量条颜色1 */
+/**
+ * TP计量条颜色1
+ * @returns {string} TP计量条颜色1值 - TP gauge color 1 value
+ * TP gauge color 1
+ */
 Window_Base.prototype.tpGaugeColor1 = function () {
 	return this.textColor(28);
 };
 
-/* TP计量条颜色2 */
+/**
+ * TP计量条颜色2
+ * @returns {string} TP计量条颜色2值 - TP gauge color 2 value
+ * TP gauge color 2
+ */
 Window_Base.prototype.tpGaugeColor2 = function () {
 	return this.textColor(29);
 };
 
-/* TP消耗颜色 */
+/**
+ * TP消耗颜色
+ * @returns {string} TP消耗颜色值 - TP cost color value
+ * TP cost color
+ */
 Window_Base.prototype.tpCostColor = function () {
 	return this.textColor(29);
 };
 
-/* 待定颜色（选中选项的那个背景框） */
+/**
+ * 待定颜色（选中选项的那个背景框）
+ * @returns {string} 待定颜色值 - Pending color value
+ * Pending color
+ */
 Window_Base.prototype.pendingColor = function () {
 	return this.windowskin.getPixel(120, 120);
 };
 
-/* 半透明的不透明度 */
+/**
+ * 半透明的不透明度
+ * @returns {number} 半透明不透明度 - Translucent opacity
+ * Translucent opacity
+ */
 Window_Base.prototype.translucentOpacity = function () {
 	return 160;
 };
 
-/* 改变文本颜色 */
+/**
+ * 改变文本颜色
+ * @param {string} color - 颜色值 - Color value
+ * Change text color
+ */
 Window_Base.prototype.changeTextColor = function (color) {
 	this.contents.textColor = color;
 };
 
-/* 改变绘制不透明度
- * @param {Boolean} enabled 指令是否启用
+/**
+ * 改变绘制不透明度
+ * @param {boolean} enabled - 指令是否启用 - Whether command is enabled
+ * Change paint opacity
  */
 Window_Base.prototype.changePaintOpacity = function (enabled) {
 	this.contents.paintOpacity = enabled ? 255 : this.translucentOpacity();
 };
 
-/* 绘制文本 */
+/**
+ * 绘制文本
+ * @param {string} text - 文本内容 - Text content
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} maxWidth - 最大宽度 - Maximum width
+ * @param {string} align - 对齐方式 - Alignment
+ * Draw text
+ */
 Window_Base.prototype.drawText = function (text, x, y, maxWidth, align) {
 	this.contents.drawText(text, x, y, maxWidth, this.lineHeight(), align);
 };
 
-/* 文本宽度 */
+/**
+ * 文本宽度
+ * @param {string} text - 文本内容 - Text content
+ * @returns {number} 文本宽度 - Text width
+ * Text width
+ */
 Window_Base.prototype.textWidth = function (text) {
 	return this.contents.measureTextWidth(text);
 };
 
-/* 绘制文本（扩展） */
+/**
+ * 绘制文本（扩展）
+ * @param {string} text - 文本内容 - Text content
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @returns {number} 文本宽度 - Text width
+ * Draw text (extended)
+ */
 Window_Base.prototype.drawTextEx = function (text, x, y) {
 	if (text) {
 		var textState = { index: 0, x: x, y: y, left: x };
@@ -347,7 +541,12 @@ Window_Base.prototype.drawTextEx = function (text, x, y) {
 	}
 };
 
-/* 转换转义字符 */
+/**
+ * 转换转义字符
+ * @param {string} text - 文本内容 - Text content
+ * @returns {string} 转换后的文本 - Converted text
+ * Convert escape characters
+ */
 Window_Base.prototype.convertEscapeCharacters = function (text) {
 	// \ 替换为 \x1b（ASCII 表对应的是转义符 ESC）
 	text = text.replace(/\\/g, "\x1b");
@@ -386,19 +585,33 @@ Window_Base.prototype.convertEscapeCharacters = function (text) {
 	return text;
 };
 
-/* 角色名称 */
+/**
+ * 角色名称
+ * @param {number} n - 角色ID - Actor ID
+ * @returns {string} 角色名称 - Actor name
+ * Actor name
+ */
 Window_Base.prototype.actorName = function (n) {
 	var actor = n >= 1 ? $gameActors.actor(n) : null;
 	return actor ? actor.name() : "";
 };
 
-/* 队伍成员名称 */
+/**
+ * 队伍成员名称
+ * @param {number} n - 队伍成员索引 - Party member index
+ * @returns {string} 队伍成员名称 - Party member name
+ * Party member name
+ */
 Window_Base.prototype.partyMemberName = function (n) {
 	var actor = n >= 1 ? $gameParty.members()[n - 1] : null;
 	return actor ? actor.name() : "";
 };
 
-/* 处理字符 */
+/**
+ * 处理字符
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process character
+ */
 Window_Base.prototype.processCharacter = function (textState) {
 	switch (textState.text[textState.index]) {
 		case "\n":
@@ -416,7 +629,11 @@ Window_Base.prototype.processCharacter = function (textState) {
 	}
 };
 
-/* 处理普通字符 */
+/**
+ * 处理普通字符
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process normal character
+ */
 Window_Base.prototype.processNormalCharacter = function (textState) {
 	var c = textState.text[textState.index++];
 	var w = this.textWidth(c);
@@ -424,7 +641,11 @@ Window_Base.prototype.processNormalCharacter = function (textState) {
 	textState.x += w;
 };
 
-/* 处理新行 */
+/**
+ * 处理新行
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process new line
+ */
 Window_Base.prototype.processNewLine = function (textState) {
 	textState.x = textState.left;
 	textState.y += textState.height;
@@ -432,12 +653,21 @@ Window_Base.prototype.processNewLine = function (textState) {
 	textState.index++;
 };
 
-/* 处理新页 */
+/**
+ * 处理新页
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process new page
+ */
 Window_Base.prototype.processNewPage = function (textState) {
 	textState.index++;
 };
 
-/* 获取转义码 */
+/**
+ * 获取转义码
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * @returns {string} 转义码 - Escape code
+ * Obtain escape code
+ */
 Window_Base.prototype.obtainEscapeCode = function (textState) {
 	textState.index++;
 	// 匹配开头是 $ . | ^ ! > < { } \ 或 1 个或多个字母（不区分大小写）
@@ -451,7 +681,12 @@ Window_Base.prototype.obtainEscapeCode = function (textState) {
 	}
 };
 
-/* 获取转义参数 */
+/**
+ * 获取转义参数
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * @returns {string|number} 转义参数 - Escape parameter
+ * Obtain escape param
+ */
 Window_Base.prototype.obtainEscapeParam = function (textState) {
 	var arr = /^\[\d+\]/.exec(textState.text.slice(textState.index));
 	if (arr) {
@@ -462,7 +697,12 @@ Window_Base.prototype.obtainEscapeParam = function (textState) {
 	}
 };
 
-/* 处理转义符 */
+/**
+ * 处理转义符
+ * @param {string} code - 转义码 - Escape code
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process escape character
+ */
 Window_Base.prototype.processEscapeCharacter = function (code, textState) {
 	switch (code) {
 		case "C":
@@ -480,27 +720,44 @@ Window_Base.prototype.processEscapeCharacter = function (code, textState) {
 	}
 };
 
-/* 处理绘制图标 */
+/**
+ * 处理绘制图标
+ * @param {number} iconIndex - 图标索引 - Icon index
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * Process draw icon
+ */
 Window_Base.prototype.processDrawIcon = function (iconIndex, textState) {
 	this.drawIcon(iconIndex, textState.x + 2, textState.y + 2);
 	textState.x += Window_Base._iconWidth + 4;
 };
 
-/* 使字体更大 */
+/**
+ * 使字体更大
+ * Make font bigger
+ */
 Window_Base.prototype.makeFontBigger = function () {
 	if (this.contents.fontSize <= 96) {
 		this.contents.fontSize += 12;
 	}
 };
 
-/* 使字体更小 */
+/**
+ * 使字体更小
+ * Make font smaller
+ */
 Window_Base.prototype.makeFontSmaller = function () {
 	if (this.contents.fontSize >= 24) {
 		this.contents.fontSize -= 12;
 	}
 };
 
-/* 计算文本高度 */
+/**
+ * 计算文本高度
+ * @param {Object} textState - 文本状态对象 - Text state object
+ * @param {boolean} all - 是否全部 - Whether all
+ * @returns {number} 文本高度 - Text height
+ * Calculate text height
+ */
 Window_Base.prototype.calcTextHeight = function (textState, all) {
 	var lastFontSize = this.contents.fontSize;
 	var textHeight = 0;
@@ -533,7 +790,13 @@ Window_Base.prototype.calcTextHeight = function (textState, all) {
 	return textHeight;
 };
 
-/* 绘制图标 */
+/**
+ * 绘制图标
+ * @param {number} iconIndex - 图标索引 - Icon index
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Draw icon
+ */
 Window_Base.prototype.drawIcon = function (iconIndex, x, y) {
 	var bitmap = ImageManager.loadSystem("IconSet");
 	var pw = Window_Base._iconWidth;
@@ -543,8 +806,16 @@ Window_Base.prototype.drawIcon = function (iconIndex, x, y) {
 	this.contents.blt(bitmap, sx, sy, pw, ph, x, y);
 };
 
-/* 绘制脸图
+/**
+ * 绘制脸图
  * 当长宽小于脸图长宽时，截取脸图中间部分；当长宽大于脸图长宽时，脸图居中显示。
+ * @param {string} faceName - 脸图名称 - Face name
+ * @param {number} faceIndex - 脸图索引 - Face index
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {number} height - 高度 - Height
+ * Draw face
  */
 Window_Base.prototype.drawFace = function (faceName, faceIndex, x, y, width, height) {
 	width = width || Window_Base._faceWidth;
@@ -560,8 +831,14 @@ Window_Base.prototype.drawFace = function (faceName, faceIndex, x, y, width, hei
 	var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
 	this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy);
 };
-/* 绘制人物
+/**
+ * 绘制人物
  * 人物行走图的正面朝向的图，例如存档界面里绘制的人物图。
+ * @param {string} characterName - 人物行走图名称 - Character name
+ * @param {number} characterIndex - 人物索引 - Character index
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Draw character
  */
 Window_Base.prototype.drawCharacter = function (characterName, characterIndex, x, y) {
 	var bitmap = ImageManager.loadCharacter(characterName);
@@ -574,7 +851,16 @@ Window_Base.prototype.drawCharacter = function (characterName, characterIndex, x
 	this.contents.blt(bitmap, sx, sy, pw, ph, x - pw / 2, y - ph);
 };
 
-/* 绘制计量条（HP、MP、TP的计量条） */
+/**
+ * 绘制计量条（HP、MP、TP的计量条）
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {number} rate - 比率 - Rate
+ * @param {string} color1 - 颜色1 - Color 1
+ * @param {string} color2 - 颜色2 - Color 2
+ * Draw gauge
+ */
 Window_Base.prototype.drawGauge = function (x, y, width, rate, color1, color2) {
 	var fillW = Math.floor(width * rate);
 	var gaugeY = y + this.lineHeight() - 8;
@@ -582,8 +868,12 @@ Window_Base.prototype.drawGauge = function (x, y, width, rate, color1, color2) {
 	this.contents.gradientFillRect(x, gaugeY, fillW, 6, color1, color2);
 };
 
-/* HP 颜色
+/**
+ * HP 颜色
  * 普通、频死、死亡三种状态下HP的数值的颜色不同。
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @returns {string} HP颜色值 - HP color value
+ * HP color
  */
 Window_Base.prototype.hpColor = function (actor) {
 	if (actor.isDead()) {
@@ -595,48 +885,99 @@ Window_Base.prototype.hpColor = function (actor) {
 	}
 };
 
-/* MP 颜色 */
+/**
+ * MP 颜色
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @returns {string} MP颜色值 - MP color value
+ * MP color
+ */
 Window_Base.prototype.mpColor = function (actor) {
 	return this.normalColor();
 };
 
-/* TP 颜色 */
+/**
+ * TP 颜色
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @returns {string} TP颜色值 - TP color value
+ * TP color
+ */
 Window_Base.prototype.tpColor = function (actor) {
 	return this.normalColor();
 };
 
-/* 绘制角色行走图 */
+/**
+ * 绘制角色行走图
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Draw actor character
+ */
 Window_Base.prototype.drawActorCharacter = function (actor, x, y) {
 	this.drawCharacter(actor.characterName(), actor.characterIndex(), x, y);
 };
 
-/* 绘制角色脸图 */
+/**
+ * 绘制角色脸图
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {number} height - 高度 - Height
+ * Draw actor face
+ */
 Window_Base.prototype.drawActorFace = function (actor, x, y, width, height) {
 	this.drawFace(actor.faceName(), actor.faceIndex(), x, y, width, height);
 };
 
-/* 绘制角色名字 */
+/**
+ * 绘制角色名字
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor name
+ */
 Window_Base.prototype.drawActorName = function (actor, x, y, width) {
 	width = width || 168;
 	this.changeTextColor(this.hpColor(actor));
 	this.drawText(actor.name(), x, y, width);
 };
 
-/* 绘制角色职业 */
+/**
+ * 绘制角色职业
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor class
+ */
 Window_Base.prototype.drawActorClass = function (actor, x, y, width) {
 	width = width || 168;
 	this.resetTextColor();
 	this.drawText(actor.currentClass().name, x, y, width);
 };
 
-/* 绘制角色昵称 */
+/**
+ * 绘制角色昵称
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor nickname
+ */
 Window_Base.prototype.drawActorNickname = function (actor, x, y, width) {
 	width = width || 270;
 	this.resetTextColor();
 	this.drawText(actor.nickname(), x, y, width);
 };
 
-/* 绘制角色等级 */
+/**
+ * 绘制角色等级
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Draw actor level
+ */
 Window_Base.prototype.drawActorLevel = function (actor, x, y) {
 	this.changeTextColor(this.systemColor());
 	this.drawText(TextManager.levelA, x, y, 48);
@@ -644,7 +985,14 @@ Window_Base.prototype.drawActorLevel = function (actor, x, y) {
 	this.drawText(actor.level, x + 84, y, 36, "right");
 };
 
-/* 绘制角色图标（状态的图标，如中毒） */
+/**
+ * 绘制角色图标（状态的图标，如中毒）
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor icons
+ */
 Window_Base.prototype.drawActorIcons = function (actor, x, y, width) {
 	width = width || 144;
 	var icons = actor.allIcons().slice(0, Math.floor(width / Window_Base._iconWidth));
@@ -653,7 +1001,17 @@ Window_Base.prototype.drawActorIcons = function (actor, x, y, width) {
 	}
 };
 
-/* 绘制当前值与最大值（HP 和 MP 的值，如 1/100） */
+/**
+ * 绘制当前值与最大值（HP 和 MP 的值，如 1/100）
+ * @param {number} current - 当前值 - Current value
+ * @param {number} max - 最大值 - Maximum value
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {string} color1 - 颜色1 - Color 1
+ * @param {string} color2 - 颜色2 - Color 2
+ * Draw current and max
+ */
 Window_Base.prototype.drawCurrentAndMax = function (current, max, x, y, width, color1, color2) {
 	var labelWidth = this.textWidth("HP");
 	var valueWidth = this.textWidth("0000");
@@ -673,7 +1031,14 @@ Window_Base.prototype.drawCurrentAndMax = function (current, max, x, y, width, c
 	}
 };
 
-/* 绘制角色 HP */
+/**
+ * 绘制角色 HP
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor HP
+ */
 Window_Base.prototype.drawActorHp = function (actor, x, y, width) {
 	width = width || 186;
 	var color1 = this.hpGaugeColor1();
@@ -684,7 +1049,14 @@ Window_Base.prototype.drawActorHp = function (actor, x, y, width) {
 	this.drawCurrentAndMax(actor.hp, actor.mhp, x, y, width, this.hpColor(actor), this.normalColor());
 };
 
-/* 绘制角色 MP */
+/**
+ * 绘制角色 MP
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor MP
+ */
 Window_Base.prototype.drawActorMp = function (actor, x, y, width) {
 	width = width || 186;
 	var color1 = this.mpGaugeColor1();
@@ -695,7 +1067,14 @@ Window_Base.prototype.drawActorMp = function (actor, x, y, width) {
 	this.drawCurrentAndMax(actor.mp, actor.mmp, x, y, width, this.mpColor(actor), this.normalColor());
 };
 
-/* 绘制角色 TP */
+/**
+ * 绘制角色 TP
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor TP
+ */
 Window_Base.prototype.drawActorTp = function (actor, x, y, width) {
 	width = width || 96;
 	var color1 = this.tpGaugeColor1();
@@ -707,7 +1086,14 @@ Window_Base.prototype.drawActorTp = function (actor, x, y, width) {
 	this.drawText(actor.tp, x + width - 64, y, 64, "right");
 };
 
-/* 绘制角色简单的状态（名字、等级、图标、职业、HP、MP） */
+/**
+ * 绘制角色简单的状态（名字、等级、图标、职业、HP、MP）
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw actor simple status
+ */
 Window_Base.prototype.drawActorSimpleStatus = function (actor, x, y, width) {
 	var lineHeight = this.lineHeight();
 	var x2 = x + 180;
@@ -720,7 +1106,14 @@ Window_Base.prototype.drawActorSimpleStatus = function (actor, x, y, width) {
 	this.drawActorMp(actor, x2, y + lineHeight * 2, width2);
 };
 
-/* 绘制物品名字 */
+/**
+ * 绘制物品名字
+ * @param {Game_Item} item - 物品对象 - Item object
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw item name
+ */
 Window_Base.prototype.drawItemName = function (item, x, y, width) {
 	width = width || 312;
 	if (item) {
@@ -731,7 +1124,15 @@ Window_Base.prototype.drawItemName = function (item, x, y, width) {
 	}
 };
 
-/* 绘制货币值 */
+/**
+ * 绘制货币值
+ * @param {number} value - 数值 - Value
+ * @param {string} unit - 单位 - Unit
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * Draw currency value
+ */
 Window_Base.prototype.drawCurrencyValue = function (value, unit, x, y, width) {
 	var unitWidth = Math.min(80, this.textWidth(unit));
 	this.resetTextColor();
@@ -740,9 +1141,12 @@ Window_Base.prototype.drawCurrencyValue = function (value, unit, x, y, width) {
 	this.drawText(unit, x + width - unitWidth, y, unitWidth, "right");
 };
 
-/* 参数改变文本颜色
+/**
+ * 参数改变文本颜色
  * 装备界面或商店界面比较装备能力值时会使用
- * @param {Number} change 能力值是否改变（正数：能力值上升颜色，负数：能力值下降颜色，0：能力值不变的普通颜色）
+ * @param {number} change - 能力值是否改变（正数：能力值上升颜色，负数：能力值下降颜色，0：能力值不变的普通颜色） - Whether parameter changed (positive: power up color, negative: power down color, 0: normal color)
+ * @returns {string} 颜色值 - Color value
+ * Parameter change text color
  */
 Window_Base.prototype.paramchangeTextColor = function (change) {
 	if (change > 0) {
@@ -754,8 +1158,10 @@ Window_Base.prototype.paramchangeTextColor = function (change) {
 	}
 };
 
-/* 设置背景类型
- * @param {Number} type 类型（0：窗口，1：暗淡，2：透明）
+/**
+ * 设置背景类型
+ * @param {number} type - 类型（0：窗口，1：暗淡，2：透明） - Type (0: window, 1: dim, 2: transparent)
+ * Set background type
  */
 Window_Base.prototype.setBackgroundType = function (type) {
 	if (type === 0) {
@@ -770,7 +1176,10 @@ Window_Base.prototype.setBackgroundType = function (type) {
 	}
 };
 
-/* 设置暗淡背景 */
+/**
+ * 设置暗淡背景
+ * Show background dimmer
+ */
 Window_Base.prototype.showBackgroundDimmer = function () {
 	if (!this._dimmerSprite) {
 		this._dimmerSprite = new Sprite();
@@ -785,21 +1194,30 @@ Window_Base.prototype.showBackgroundDimmer = function () {
 	this.updateBackgroundDimmer();
 };
 
-/* 隐藏暗淡背景 */
+/**
+ * 隐藏暗淡背景
+ * Hide background dimmer
+ */
 Window_Base.prototype.hideBackgroundDimmer = function () {
 	if (this._dimmerSprite) {
 		this._dimmerSprite.visible = false;
 	}
 };
 
-/* 更新暗淡背景 */
+/**
+ * 更新暗淡背景
+ * Update background dimmer
+ */
 Window_Base.prototype.updateBackgroundDimmer = function () {
 	if (this._dimmerSprite) {
 		this._dimmerSprite.opacity = this.openness;
 	}
 };
 
-/* 刷新暗淡位图 */
+/**
+ * 刷新暗淡位图
+ * Refresh dimmer bitmap
+ */
 Window_Base.prototype.refreshDimmerBitmap = function () {
 	if (this._dimmerSprite) {
 		var bitmap = this._dimmerSprite.bitmap;
@@ -816,17 +1234,30 @@ Window_Base.prototype.refreshDimmerBitmap = function () {
 	}
 };
 
-/* 暗淡颜色 1 */
+/**
+ * 暗淡颜色 1
+ * @returns {string} 暗淡颜色1值 - Dim color 1 value
+ * Dim color 1
+ */
 Window_Base.prototype.dimColor1 = function () {
 	return "rgba(0, 0, 0, 0.6)";
 };
 
-/* 暗淡颜色 2 */
+/**
+ * 暗淡颜色 2
+ * @returns {string} 暗淡颜色2值 - Dim color 2 value
+ * Dim color 2
+ */
 Window_Base.prototype.dimColor2 = function () {
 	return "rgba(0, 0, 0, 0)";
 };
 
-/* 画布 X 坐标转换到本地 X 坐标 */
+/**
+ * 画布 X 坐标转换到本地 X 坐标
+ * @param {number} x - 画布X坐标 - Canvas X coordinate
+ * @returns {number} 本地X坐标 - Local X coordinate
+ * Canvas X to local X
+ */
 Window_Base.prototype.canvasToLocalX = function (x) {
 	var node = this;
 	while (node) {
@@ -836,7 +1267,12 @@ Window_Base.prototype.canvasToLocalX = function (x) {
 	return x;
 };
 
-/* 画布 Y 坐标转换到本地 Y 坐标 */
+/**
+ * 画布 Y 坐标转换到本地 Y 坐标
+ * @param {number} y - 画布Y坐标 - Canvas Y coordinate
+ * @returns {number} 本地Y坐标 - Local Y coordinate
+ * Canvas Y to local Y
+ */
 Window_Base.prototype.canvasToLocalY = function (y) {
 	var node = this;
 	while (node) {
@@ -846,7 +1282,10 @@ Window_Base.prototype.canvasToLocalY = function (y) {
 	return y;
 };
 
-/* 储存脸图图像 */
+/**
+ * 储存脸图图像
+ * Reserve face images
+ */
 Window_Base.prototype.reserveFaceImages = function () {
 	$gameParty.members().forEach(function (actor) {
 		ImageManager.reserveFace(actor.faceName());

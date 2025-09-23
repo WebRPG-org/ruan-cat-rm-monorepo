@@ -16,7 +16,12 @@ function Window_BattleEnemy() {
 Window_BattleEnemy.prototype = Object.create(Window_Selectable.prototype);
 Window_BattleEnemy.prototype.constructor = Window_BattleEnemy;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Initialize
+ */
 Window_BattleEnemy.prototype.initialize = function (x, y) {
 	this._enemies = [];
 	var width = this.windowWidth();
@@ -26,43 +31,75 @@ Window_BattleEnemy.prototype.initialize = function (x, y) {
 	this.hide();
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_BattleEnemy.prototype.windowWidth = function () {
 	return Graphics.boxWidth - 192;
 };
 
-/* 窗口高度 */
+/**
+ * 窗口高度
+ * @returns {number} 窗口高度 - Window height
+ * Window height
+ */
 Window_BattleEnemy.prototype.windowHeight = function () {
 	return this.fittingHeight(this.numVisibleRows());
 };
 
-/* 可见的行数 */
+/**
+ * 可见的行数
+ * @returns {number} 可见行数 - Number of visible rows
+ * Number of visible rows
+ */
 Window_BattleEnemy.prototype.numVisibleRows = function () {
 	return 4;
 };
 
-/* 最大行数 */
+/**
+ * 最大行数
+ * @returns {number} 最大行数 - Maximum columns
+ * Maximum columns
+ */
 Window_BattleEnemy.prototype.maxCols = function () {
 	return 2;
 };
 
-/* 最大项目数 */
+/**
+ * 最大项目数
+ * @returns {number} 最大项目数 - Maximum items
+ * Maximum items
+ */
 Window_BattleEnemy.prototype.maxItems = function () {
 	return this._enemies.length;
 };
 
-/* 敌人 */
+/**
+ * 敌人
+ * @returns {Game_Enemy} 敌人对象 - Enemy object
+ * Enemy
+ */
 Window_BattleEnemy.prototype.enemy = function () {
 	return this._enemies[this.index()];
 };
 
-/* 敌人索引 */
+/**
+ * 敌人索引
+ * @returns {number} 敌人索引 - Enemy index
+ * Enemy index
+ */
 Window_BattleEnemy.prototype.enemyIndex = function () {
 	var enemy = this.enemy();
 	return enemy ? enemy.index() : -1;
 };
 
-/* 绘制项目 */
+/**
+ * 绘制项目
+ * @param {number} index - 索引 - Index
+ * Draw item
+ */
 Window_BattleEnemy.prototype.drawItem = function (index) {
 	this.resetTextColor();
 	var name = this._enemies[index].name();
@@ -70,26 +107,39 @@ Window_BattleEnemy.prototype.drawItem = function (index) {
 	this.drawText(name, rect.x, rect.y, rect.width);
 };
 
-/* 显示 */
+/**
+ * 显示
+ * Show
+ */
 Window_BattleEnemy.prototype.show = function () {
 	this.refresh();
 	this.select(0);
 	Window_Selectable.prototype.show.call(this);
 };
 
-/* 隐藏 */
+/**
+ * 隐藏
+ * Hide
+ */
 Window_BattleEnemy.prototype.hide = function () {
 	Window_Selectable.prototype.hide.call(this);
 	$gameTroop.select(null);
 };
 
-/* 刷新 */
+/**
+ * 刷新
+ * Refresh
+ */
 Window_BattleEnemy.prototype.refresh = function () {
 	this._enemies = $gameTroop.aliveMembers();
 	Window_Selectable.prototype.refresh.call(this);
 };
 
-/* 选择 */
+/**
+ * 选择
+ * @param {number} index - 索引 - Index
+ * Select
+ */
 Window_BattleEnemy.prototype.select = function (index) {
 	Window_Selectable.prototype.select.call(this, index);
 	$gameTroop.select(this.enemy());
