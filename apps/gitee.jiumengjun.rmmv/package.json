@@ -20,14 +20,14 @@
 	"license": "ISC",
 	"homepage": "https://rmmv-api-doc.ruan-cat.com",
 	"dependencies": {
-		"typedoc": "^0.28.12",
-		"typedoc-plugin-markdown": "^4.8.1",
+		"typedoc": "^0.28.13",
+		"typedoc-plugin-markdown": "^4.9.0",
 		"vitepress-demo-plugin": "^1.4.7"
 	},
 	"devDependencies": {
 		"@ruan-cat/vitepress-preset-config": "^2.3.0",
 		"@types/jsdoc-to-markdown": "^7.0.6",
-		"@types/node": "^20.19.14",
+		"@types/node": "^20.19.17",
 		"jsdoc-to-markdown": "^9.1.2",
 		"tsx": "^4.20.5",
 		"vitepress": "^1.6.4",
