@@ -2,13 +2,12 @@
 // Window_NumberInput.js
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// 窗口_数值输入
-// Window_NumberInput
-//
-// 用于事件指令[数值输入处理]的窗口。
-// The window used for the event command [Input Number].
-
+/**
+ * 数值输入窗口类，用于事件指令[数值输入处理]
+ * Window for inputting numbers, used for the event command [Input Number]
+ * @class
+ * @extends Window_Selectable
+ */
 function Window_NumberInput() {
 	this.initialize.apply(this, arguments);
 }
@@ -16,7 +15,11 @@ function Window_NumberInput() {
 Window_NumberInput.prototype = Object.create(Window_Selectable.prototype);
 Window_NumberInput.prototype.constructor = Window_NumberInput;
 
-/* 初始化 */
+/**
+ * 初始化数值输入窗口
+ * Initialize the number input window
+ * @param {Window_Message} messageWindow - 消息窗口对象 - The message window object
+ */
 Window_NumberInput.prototype.initialize = function (messageWindow) {
 	this._messageWindow = messageWindow;
 	Window_Selectable.prototype.initialize.call(this, 0, 0, 0, 0);
@@ -27,7 +30,10 @@ Window_NumberInput.prototype.initialize = function (messageWindow) {
 	this.deactivate();
 };
 
-/* 开始 */
+/**
+ * 开始数值输入
+ * Start number input
+ */
 Window_NumberInput.prototype.start = function () {
 	this._maxDigits = $gameMessage.numInputMaxDigits();
 	this._number = $gameVariables.value($gameMessage.numInputVariableId());
@@ -42,7 +48,10 @@ Window_NumberInput.prototype.start = function () {
 	this.select(0);
 };
 
-/* 更新位置 */
+/**
+ * 更新窗口位置
+ * Update window placement
+ */
 Window_NumberInput.prototype.updatePlacement = function () {
 	var messageY = this._messageWindow.y;
 	var spacing = 8;
@@ -56,37 +65,64 @@ Window_NumberInput.prototype.updatePlacement = function () {
 	}
 };
 
-/* 窗口宽度 */
+/**
+ * 获取窗口宽度
+ * Get window width
+ * @returns {number} 窗口宽度 - Window width
+ */
 Window_NumberInput.prototype.windowWidth = function () {
 	return this.maxCols() * this.itemWidth() + this.padding * 2;
 };
 
-/* 窗口高度 */
+/**
+ * 获取窗口高度
+ * Get window height
+ * @returns {number} 窗口高度 - Window height
+ */
 Window_NumberInput.prototype.windowHeight = function () {
 	return this.fittingHeight(1);
 };
 
-/* 最大列数 */
+/**
+ * 获取最大列数
+ * Get maximum number of columns
+ * @returns {number} 最大列数 - Maximum number of columns
+ */
 Window_NumberInput.prototype.maxCols = function () {
 	return this._maxDigits;
 };
 
-/* 最大项目数 */
+/**
+ * 获取最大项目数
+ * Get maximum number of items
+ * @returns {number} 最大项目数 - Maximum number of items
+ */
 Window_NumberInput.prototype.maxItems = function () {
 	return this._maxDigits;
 };
 
-/* 间距 */
+/**
+ * 获取项目间距
+ * Get item spacing
+ * @returns {number} 项目间距 - Item spacing
+ */
 Window_NumberInput.prototype.spacing = function () {
 	return 0;
 };
 
-/* 项目宽度 */
+/**
+ * 获取项目宽度
+ * Get item width
+ * @returns {number} 项目宽度 - Item width
+ */
 Window_NumberInput.prototype.itemWidth = function () {
 	return 32;
 };
 
-/* 创建按钮 */
+/**
+ * 创建按钮
+ * Create buttons
+ */
 Window_NumberInput.prototype.createButtons = function () {
 	var bitmap = ImageManager.loadSystem("ButtonSet");
 	var buttonWidth = 48;
@@ -108,7 +144,10 @@ Window_NumberInput.prototype.createButtons = function () {
 	this._buttons[2].setClickHandler(this.onButtonOk.bind(this));
 };
 
-/* 放置按钮 */
+/**
+ * 放置按钮
+ * Place buttons
+ */
 Window_NumberInput.prototype.placeButtons = function () {
 	var numButtons = this._buttons.length;
 	var spacing = 16;
@@ -125,7 +164,10 @@ Window_NumberInput.prototype.placeButtons = function () {
 	}
 };
 
-/* 更新按钮可见性 */
+/**
+ * 更新按钮可见性
+ * Update button visibility
+ */
 Window_NumberInput.prototype.updateButtonsVisiblity = function () {
 	if (TouchInput.date > Input.date) {
 		this.showButtons();
@@ -134,21 +176,31 @@ Window_NumberInput.prototype.updateButtonsVisiblity = function () {
 	}
 };
 
-/* 显示按钮 */
+/**
+ * 显示按钮
+ * Show buttons
+ */
 Window_NumberInput.prototype.showButtons = function () {
 	for (var i = 0; i < this._buttons.length; i++) {
 		this._buttons[i].visible = true;
 	}
 };
 
-/* 隐藏按钮 */
+/**
+ * 隐藏按钮
+ * Hide buttons
+ */
 Window_NumberInput.prototype.hideButtons = function () {
 	for (var i = 0; i < this._buttons.length; i++) {
 		this._buttons[i].visible = false;
 	}
 };
 
-/* 按钮 Y 坐标 */
+/**
+ * 获取按钮的Y坐标
+ * Get button Y coordinate
+ * @returns {number} 按钮的Y坐标 - Button Y coordinate
+ */
 Window_NumberInput.prototype.buttonY = function () {
 	var spacing = 8;
 	if (this._messageWindow.y >= Graphics.boxHeight / 2) {
@@ -158,13 +210,19 @@ Window_NumberInput.prototype.buttonY = function () {
 	}
 };
 
-/* 更新 */
+/**
+ * 更新窗口
+ * Update window
+ */
 Window_NumberInput.prototype.update = function () {
 	Window_Selectable.prototype.update.call(this);
 	this.processDigitChange();
 };
 
-/* 处理数字改变 */
+/**
+ * 处理数字改变
+ * Process digit change
+ */
 Window_NumberInput.prototype.processDigitChange = function () {
 	if (this.isOpenAndActive()) {
 		if (Input.isRepeated("up")) {
@@ -175,7 +233,11 @@ Window_NumberInput.prototype.processDigitChange = function () {
 	}
 };
 
-/* 改变数字 */
+/**
+ * 改变数字
+ * Change digit
+ * @param {boolean} up - 是否向上增加 - Whether to increase upward
+ */
 Window_NumberInput.prototype.changeDigit = function (up) {
 	var index = this.index();
 	var place = Math.pow(10, this._maxDigits - 1 - index);
@@ -191,27 +253,46 @@ Window_NumberInput.prototype.changeDigit = function (up) {
 	SoundManager.playCursor();
 };
 
-/* 是否触摸确定启用 */
+/**
+ * 检查触摸确定是否启用
+ * Check if touch OK is enabled
+ * @returns {boolean} 触摸确定是否启用 - Whether touch OK is enabled
+ */
 Window_NumberInput.prototype.isTouchOkEnabled = function () {
 	return false;
 };
 
-/* 是否确定启用 */
+/**
+ * 检查确定是否启用
+ * Check if OK is enabled
+ * @returns {boolean} 确定是否启用 - Whether OK is enabled
+ */
 Window_NumberInput.prototype.isOkEnabled = function () {
 	return true;
 };
 
-/* 是否取消启用 */
+/**
+ * 检查取消是否启用
+ * Check if cancel is enabled
+ * @returns {boolean} 取消是否启用 - Whether cancel is enabled
+ */
 Window_NumberInput.prototype.isCancelEnabled = function () {
 	return false;
 };
 
-/* 是否确定触发 */
+/**
+ * 检查确定是否被触发
+ * Check if OK is triggered
+ * @returns {boolean} 确定是否被触发 - Whether OK is triggered
+ */
 Window_NumberInput.prototype.isOkTriggered = function () {
 	return Input.isTriggered("ok");
 };
 
-/* 处理确定 */
+/**
+ * 处理确定操作
+ * Process OK operation
+ */
 Window_NumberInput.prototype.processOk = function () {
 	SoundManager.playOk();
 	$gameVariables.setValue($gameMessage.numInputVariableId(), this._number);
@@ -221,7 +302,11 @@ Window_NumberInput.prototype.processOk = function () {
 	this.close();
 };
 
-/* 绘制项目 */
+/**
+ * 绘制项目
+ * Draw item
+ * @param {number} index - 项目索引 - Item index
+ */
 Window_NumberInput.prototype.drawItem = function (index) {
 	var rect = this.itemRect(index);
 	var align = "center";
@@ -231,17 +316,26 @@ Window_NumberInput.prototype.drawItem = function (index) {
 	this.drawText(c, rect.x, rect.y, rect.width, align);
 };
 
-/* 当按钮-向上 */
+/**
+ * 当向上按钮被按下时
+ * When up button is pressed
+ */
 Window_NumberInput.prototype.onButtonUp = function () {
 	this.changeDigit(true);
 };
 
-/* 当按钮-向下 */
+/**
+ * 当向下按钮被按下时
+ * When down button is pressed
+ */
 Window_NumberInput.prototype.onButtonDown = function () {
 	this.changeDigit(false);
 };
 
-/* 当按钮-确定 */
+/**
+ * 当确定按钮被按下时
+ * When OK button is pressed
+ */
 Window_NumberInput.prototype.onButtonOk = function () {
 	this.processOk();
 	this.hideButtons();
