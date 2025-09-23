@@ -16,7 +16,10 @@ function Window_MapName() {
 Window_MapName.prototype = Object.create(Window_Base.prototype);
 Window_MapName.prototype.constructor = Window_MapName;
 
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Window_MapName.prototype.initialize = function () {
 	var wight = this.windowWidth();
 	var height = this.windowHeight();
@@ -27,17 +30,28 @@ Window_MapName.prototype.initialize = function () {
 	this.refresh();
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_MapName.prototype.windowWidth = function () {
 	return 360;
 };
 
-/* 窗口高度 */
+/**
+ * 窗口高度
+ * @returns {number} 窗口高度 - Window height
+ * Window height
+ */
 Window_MapName.prototype.windowHeight = function () {
 	return this.fittingHeight(1);
 };
 
-/* 更新 */
+/**
+ * 更新
+ * Update
+ */
 Window_MapName.prototype.update = function () {
 	Window_Base.prototype.update.call(this);
 	if (this._showCount > 0 && $gameMap.isNameDisplayEnabled()) {
@@ -48,28 +62,43 @@ Window_MapName.prototype.update = function () {
 	}
 };
 
-/* 更新淡入 */
+/**
+ * 更新淡入
+ * Update fade in
+ */
 Window_MapName.prototype.updateFadeIn = function () {
 	this.contentsOpacity += 16;
 };
 
-/* 更新淡出 */
+/**
+ * 更新淡出
+ * Update fade out
+ */
 Window_MapName.prototype.updateFadeOut = function () {
 	this.contentsOpacity -= 16;
 };
 
-/* 打开 */
+/**
+ * 打开
+ * Open
+ */
 Window_MapName.prototype.open = function () {
 	this.refresh();
 	this._showCount = 150;
 };
 
-/* 关闭 */
+/**
+ * 关闭
+ * Close
+ */
 Window_MapName.prototype.close = function () {
 	this._showCount = 0;
 };
 
-/* 刷新 */
+/**
+ * 刷新
+ * Refresh
+ */
 Window_MapName.prototype.refresh = function () {
 	this.contents.clear();
 	if ($gameMap.displayName()) {
@@ -79,7 +108,14 @@ Window_MapName.prototype.refresh = function () {
 	}
 };
 
-/* 绘制背景 */
+/**
+ * 绘制背景
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * @param {number} width - 宽度 - Width
+ * @param {number} height - 高度 - Height
+ * Draw background
+ */
 Window_MapName.prototype.drawBackground = function (x, y, width, height) {
 	var color1 = this.dimColor1();
 	var color2 = this.dimColor2();

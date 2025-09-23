@@ -16,13 +16,19 @@ function Window_MenuActor() {
 Window_MenuActor.prototype = Object.create(Window_MenuStatus.prototype);
 Window_MenuActor.prototype.constructor = Window_MenuActor;
 
-/* 初始化 */
+/**
+ * 初始化
+ * Initialize
+ */
 Window_MenuActor.prototype.initialize = function () {
 	Window_MenuStatus.prototype.initialize.call(this, 0, 0);
 	this.hide();
 };
 
-/* 处理确定 */
+/**
+ * 处理确定
+ * Process OK
+ */
 Window_MenuActor.prototype.processOk = function () {
 	if (!this.cursorAll()) {
 		$gameParty.setTargetActor($gameParty.members()[this.index()]);
@@ -30,12 +36,19 @@ Window_MenuActor.prototype.processOk = function () {
 	this.callOkHandler();
 };
 
-/* 选择上一个 */
+/**
+ * 选择上一个
+ * Select last
+ */
 Window_MenuActor.prototype.selectLast = function () {
 	this.select($gameParty.targetActor().index() || 0);
 };
 
-/* 选择该项目 */
+/**
+ * 选择该项目
+ * @param {RPG_BaseItem} item - 物品对象 - Item object
+ * Select for item
+ */
 Window_MenuActor.prototype.selectForItem = function (item) {
 	var actor = $gameParty.menuActor();
 	var action = new Game_Action(actor);

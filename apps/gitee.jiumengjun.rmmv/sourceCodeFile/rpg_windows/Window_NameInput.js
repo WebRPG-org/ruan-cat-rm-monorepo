@@ -568,7 +568,11 @@ Window_NameInput.JAPAN3 = [
 	"決定",
 ]; // 日文 3
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {Window_NameEdit} editWindow - 名字编辑窗口 - Name edit window
+ * Initialize
+ */
 Window_NameInput.prototype.initialize = function (editWindow) {
 	var x = editWindow.x;
 	var y = editWindow.y + editWindow.height + 8;
@@ -583,12 +587,20 @@ Window_NameInput.prototype.initialize = function (editWindow) {
 	this.activate();
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口高度
+ * @returns {number} 窗口高度 - Window height
+ * Window height
+ */
 Window_NameInput.prototype.windowHeight = function () {
 	return this.fittingHeight(9);
 };
 
-/* 表 */
+/**
+ * 表
+ * @returns {Array.<Array.<string>>} 字符表 - Character table
+ * Table
+ */
 Window_NameInput.prototype.table = function () {
 	if ($gameSystem.isJapanese()) {
 		return [Window_NameInput.JAPAN1, Window_NameInput.JAPAN2, Window_NameInput.JAPAN3];
@@ -599,32 +611,57 @@ Window_NameInput.prototype.table = function () {
 	}
 };
 
-/* 最大列数 */
+/**
+ * 最大列数
+ * @returns {number} 最大列数 - Maximum columns
+ * Maximum columns
+ */
 Window_NameInput.prototype.maxCols = function () {
 	return 10;
 };
 
-/* 最大项目数 */
+/**
+ * 最大项目数
+ * @returns {number} 最大项目数 - Maximum items
+ * Maximum items
+ */
 Window_NameInput.prototype.maxItems = function () {
 	return 90;
 };
 
-/* 字符 */
+/**
+ * 字符
+ * @returns {string} 字符 - Character
+ * Character
+ */
 Window_NameInput.prototype.character = function () {
 	return this._index < 88 ? this.table()[this._page][this._index] : "";
 };
 
-/* 是否页面切换 */
+/**
+ * 是否页面切换
+ * @returns {boolean} 是否页面切换 - Whether page change
+ * Is page change
+ */
 Window_NameInput.prototype.isPageChange = function () {
 	return this._index === 88;
 };
 
-/* 是否确定 */
+/**
+ * 是否确定
+ * @returns {boolean} 是否确定 - Whether OK
+ * Is OK
+ */
 Window_NameInput.prototype.isOk = function () {
 	return this._index === 89;
 };
 
-/* 项目矩形区域 */
+/**
+ * 项目矩形区域
+ * @param {number} index - 索引 - Index
+ * @returns {Object} 矩形区域 - Rectangle area
+ * Item rectangle
+ */
 Window_NameInput.prototype.itemRect = function (index) {
 	return {
 		x: (index % 10) * 42 + Math.floor((index % 10) / 5) * 24,
@@ -634,7 +671,10 @@ Window_NameInput.prototype.itemRect = function (index) {
 	};
 };
 
-/* 刷新 */
+/**
+ * 刷新
+ * Refresh
+ */
 Window_NameInput.prototype.refresh = function () {
 	var table = this.table();
 	this.contents.clear();
@@ -647,32 +687,51 @@ Window_NameInput.prototype.refresh = function () {
 	}
 };
 
-/* 更新光标 */
+/**
+ * 更新光标
+ * Update cursor
+ */
 Window_NameInput.prototype.updateCursor = function () {
 	var rect = this.itemRect(this._index);
 	this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
 };
 
-/* 是否光标可移动 */
+/**
+ * 是否光标可移动
+ * @returns {boolean} 是否光标可移动 - Whether cursor movable
+ * Is cursor movable
+ */
 Window_NameInput.prototype.isCursorMovable = function () {
 	return this.active;
 };
 
-/* 光标向下 */
+/**
+ * 光标向下
+ * @param {boolean} wrap - 是否环绕 - Whether wrap
+ * Cursor down
+ */
 Window_NameInput.prototype.cursorDown = function (wrap) {
 	if (this._index < 80 || wrap) {
 		this._index = (this._index + 10) % 90;
 	}
 };
 
-/* 光标向上 */
+/**
+ * 光标向上
+ * @param {boolean} wrap - 是否环绕 - Whether wrap
+ * Cursor up
+ */
 Window_NameInput.prototype.cursorUp = function (wrap) {
 	if (this._index >= 10 || wrap) {
 		this._index = (this._index + 80) % 90;
 	}
 };
 
-/* 光标向右 */
+/**
+ * 光标向右
+ * @param {boolean} wrap - 是否环绕 - Whether wrap
+ * Cursor right
+ */
 Window_NameInput.prototype.cursorRight = function (wrap) {
 	if (this._index % 10 < 9) {
 		this._index++;
@@ -681,7 +740,11 @@ Window_NameInput.prototype.cursorRight = function (wrap) {
 	}
 };
 
-/* 光标向左 */
+/**
+ * 光标向左
+ * @param {boolean} wrap - 是否环绕 - Whether wrap
+ * Cursor left
+ */
 Window_NameInput.prototype.cursorLeft = function (wrap) {
 	if (this._index % 10 > 0) {
 		this._index--;
@@ -690,19 +753,28 @@ Window_NameInput.prototype.cursorLeft = function (wrap) {
 	}
 };
 
-/* 光标下翻页 */
+/**
+ * 光标下翻页
+ * Cursor pagedown
+ */
 Window_NameInput.prototype.cursorPagedown = function () {
 	this._page = (this._page + 1) % this.table().length;
 	this.refresh();
 };
 
-/* 光标上翻页 */
+/**
+ * 光标上翻页
+ * Cursor pageup
+ */
 Window_NameInput.prototype.cursorPageup = function () {
 	this._page = (this._page + this.table().length - 1) % this.table().length;
 	this.refresh();
 };
 
-/* 处理光标移 */
+/**
+ * 处理光标移
+ * Process cursor move
+ */
 Window_NameInput.prototype.processCursorMove = function () {
 	var lastPage = this._page;
 	Window_Selectable.prototype.processCursorMove.call(this);
@@ -712,7 +784,10 @@ Window_NameInput.prototype.processCursorMove = function () {
 	}
 };
 
-/* 处理处理 */
+/**
+ * 处理处理
+ * Process handling
+ */
 Window_NameInput.prototype.processHandling = function () {
 	if (this.isOpen() && this.active) {
 		if (Input.isTriggered("shift")) {
@@ -727,18 +802,28 @@ Window_NameInput.prototype.processHandling = function () {
 	}
 };
 
-/* 是否取消启用 */
+/**
+ * 是否取消启用
+ * @returns {boolean} 是否取消启用 - Whether cancel enabled
+ * Is cancel enabled
+ */
 Window_NameInput.prototype.isCancelEnabled = function () {
 	return true;
 };
 
-/* 处理取消 */
+/**
+ * 处理取消
+ * Process cancel
+ */
 Window_NameInput.prototype.processCancel = function () {
 	this.processBack();
 };
 
-/* 处理跳转
+/**
+ * 处理跳转
  * 光标跳转到 OK 处。
+ * Process jump
+ * Cursor jumps to OK position.
  */
 Window_NameInput.prototype.processJump = function () {
 	if (this._index !== 89) {
@@ -747,14 +832,20 @@ Window_NameInput.prototype.processJump = function () {
 	}
 };
 
-/* 处理回退 */
+/**
+ * 处理回退
+ * Process back
+ */
 Window_NameInput.prototype.processBack = function () {
 	if (this._editWindow.back()) {
 		SoundManager.playCancel();
 	}
 };
 
-/* 处理确定 */
+/**
+ * 处理确定
+ * Process OK
+ */
 Window_NameInput.prototype.processOk = function () {
 	if (this.character()) {
 		this.onNameAdd();
@@ -766,7 +857,10 @@ Window_NameInput.prototype.processOk = function () {
 	}
 };
 
-/* 当名字增加 */
+/**
+ * 当名字增加
+ * When name add
+ */
 Window_NameInput.prototype.onNameAdd = function () {
 	if (this._editWindow.add(this.character())) {
 		SoundManager.playOk();
@@ -775,7 +869,10 @@ Window_NameInput.prototype.onNameAdd = function () {
 	}
 };
 
-/* 当名字确定 */
+/**
+ * 当名字确定
+ * When name OK
+ */
 Window_NameInput.prototype.onNameOk = function () {
 	if (this._editWindow.name() === "") {
 		if (this._editWindow.restoreDefault()) {

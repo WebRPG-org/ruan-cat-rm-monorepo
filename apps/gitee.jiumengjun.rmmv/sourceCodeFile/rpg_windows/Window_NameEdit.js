@@ -16,7 +16,12 @@ function Window_NameEdit() {
 Window_NameEdit.prototype = Object.create(Window_Base.prototype);
 Window_NameEdit.prototype.constructor = Window_NameEdit;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {Game_Actor} actor - 角色对象 - Actor object
+ * @param {number} maxLength - 最大长度 - Maximum length
+ * Initialize
+ */
 Window_NameEdit.prototype.initialize = function (actor, maxLength) {
 	var width = this.windowWidth();
 	var height = this.windowHeight();
@@ -33,22 +38,38 @@ Window_NameEdit.prototype.initialize = function (actor, maxLength) {
 	ImageManager.reserveFace(actor.faceName());
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_NameEdit.prototype.windowWidth = function () {
 	return 480;
 };
 
-/* 窗口高度 */
+/**
+ * 窗口高度
+ * @returns {number} 窗口高度 - Window height
+ * Window height
+ */
 Window_NameEdit.prototype.windowHeight = function () {
 	return this.fittingHeight(4);
 };
 
-/* 名字 */
+/**
+ * 名字
+ * @returns {string} 名字 - Name
+ * Name
+ */
 Window_NameEdit.prototype.name = function () {
 	return this._name;
 };
 
-/* 恢复默认 */
+/**
+ * 恢复默认
+ * @returns {boolean} 是否成功 - Whether successful
+ * Restore default
+ */
 Window_NameEdit.prototype.restoreDefault = function () {
 	this._name = this._defaultName;
 	this._index = this._name.length;
@@ -56,7 +77,12 @@ Window_NameEdit.prototype.restoreDefault = function () {
 	return this._name.length > 0;
 };
 
-/* 增加 */
+/**
+ * 增加
+ * @param {string} ch - 字符 - Character
+ * @returns {boolean} 是否成功 - Whether successful
+ * Add
+ */
 Window_NameEdit.prototype.add = function (ch) {
 	if (this._index < this._maxLength) {
 		this._name += ch;
@@ -68,7 +94,11 @@ Window_NameEdit.prototype.add = function (ch) {
 	}
 };
 
-/* 回退 */
+/**
+ * 回退
+ * @returns {boolean} 是否成功 - Whether successful
+ * Back
+ */
 Window_NameEdit.prototype.back = function () {
 	if (this._index > 0) {
 		this._index--;
@@ -80,25 +110,42 @@ Window_NameEdit.prototype.back = function () {
 	}
 };
 
-/* 脸图宽度 */
+/**
+ * 脸图宽度
+ * @returns {number} 脸图宽度 - Face width
+ * Face width
+ */
 Window_NameEdit.prototype.faceWidth = function () {
 	return 144;
 };
 
-/* 字符宽度 */
+/**
+ * 字符宽度
+ * @returns {number} 字符宽度 - Character width
+ * Character width
+ */
 Window_NameEdit.prototype.charWidth = function () {
 	var text = $gameSystem.isJapanese() ? "\uff21" : "A";
 	return this.textWidth(text);
 };
 
-/* 左边 */
+/**
+ * 左边
+ * @returns {number} 左边位置 - Left position
+ * Left
+ */
 Window_NameEdit.prototype.left = function () {
 	var nameCenter = (this.contentsWidth() + this.faceWidth()) / 2;
 	var nameWidth = (this._maxLength + 1) * this.charWidth();
 	return Math.min(nameCenter - nameWidth / 2, this.contentsWidth() - nameWidth);
 };
 
-/* 项目矩形区域 */
+/**
+ * 项目矩形区域
+ * @param {number} index - 索引 - Index
+ * @returns {Object} 矩形区域对象 - Rectangle object
+ * Item rectangle
+ */
 Window_NameEdit.prototype.itemRect = function (index) {
 	return {
 		x: this.left() + index * this.charWidth(),
@@ -108,7 +155,12 @@ Window_NameEdit.prototype.itemRect = function (index) {
 	};
 };
 
-/* 下划线矩形区域 */
+/**
+ * 下划线矩形区域
+ * @param {number} index - 索引 - Index
+ * @returns {Object} 矩形区域对象 - Rectangle object
+ * Underline rectangle
+ */
 Window_NameEdit.prototype.underlineRect = function (index) {
 	var rect = this.itemRect(index);
 	rect.x++;
@@ -118,12 +170,20 @@ Window_NameEdit.prototype.underlineRect = function (index) {
 	return rect;
 };
 
-/* 下划线颜色 */
+/**
+ * 下划线颜色
+ * @returns {string} 颜色值 - Color value
+ * Underline color
+ */
 Window_NameEdit.prototype.underlineColor = function () {
 	return this.normalColor();
 };
 
-/* 绘制下划线 */
+/**
+ * 绘制下划线
+ * @param {number} index - 索引 - Index
+ * Draw underline
+ */
 Window_NameEdit.prototype.drawUnderline = function (index) {
 	var rect = this.underlineRect(index);
 	var color = this.underlineColor();
@@ -132,14 +192,21 @@ Window_NameEdit.prototype.drawUnderline = function (index) {
 	this.contents.paintOpacity = 255;
 };
 
-/* 绘制字符 */
+/**
+ * 绘制字符
+ * @param {number} index - 索引 - Index
+ * Draw character
+ */
 Window_NameEdit.prototype.drawChar = function (index) {
 	var rect = this.itemRect(index);
 	this.resetTextColor();
 	this.drawText(this._name[index] || "", rect.x, rect.y);
 };
 
-/* 刷新 */
+/**
+ * 刷新
+ * Refresh
+ */
 Window_NameEdit.prototype.refresh = function () {
 	this.contents.clear();
 	this.drawActorFace(this._actor, 0, 0);

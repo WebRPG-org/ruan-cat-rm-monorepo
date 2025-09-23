@@ -16,7 +16,12 @@ function Window_MenuStatus() {
 Window_MenuStatus.prototype = Object.create(Window_Selectable.prototype);
 Window_MenuStatus.prototype.constructor = Window_MenuStatus;
 
-/* 初始化 */
+/**
+ * 初始化
+ * @param {number} x - X坐标 - X coordinate
+ * @param {number} y - Y坐标 - Y coordinate
+ * Initialize
+ */
 Window_MenuStatus.prototype.initialize = function (x, y) {
 	var width = this.windowWidth();
 	var height = this.windowHeight();
@@ -26,47 +31,78 @@ Window_MenuStatus.prototype.initialize = function (x, y) {
 	this.refresh();
 };
 
-/* 窗口宽度 */
+/**
+ * 窗口宽度
+ * @returns {number} 窗口宽度 - Window width
+ * Window width
+ */
 Window_MenuStatus.prototype.windowWidth = function () {
 	return Graphics.boxWidth - 240;
 };
 
-/* 窗口高度 */
+/**
+ * 窗口高度
+ * @returns {number} 窗口高度 - Window height
+ * Window height
+ */
 Window_MenuStatus.prototype.windowHeight = function () {
 	return Graphics.boxHeight;
 };
 
-/* 最大项目数 */
+/**
+ * 最大项目数
+ * @returns {number} 最大项目数 - Maximum items
+ * Maximum items
+ */
 Window_MenuStatus.prototype.maxItems = function () {
 	return $gameParty.size();
 };
 
-/* 项目高度 */
+/**
+ * 项目高度
+ * @returns {number} 项目高度 - Item height
+ * Item height
+ */
 Window_MenuStatus.prototype.itemHeight = function () {
 	var clientHeight = this.height - this.padding * 2;
 	return Math.floor(clientHeight / this.numVisibleRows());
 };
 
-/* 可见的行数 */
+/**
+ * 可见的行数
+ * @returns {number} 可见行数 - Number of visible rows
+ * Number of visible rows
+ */
 Window_MenuStatus.prototype.numVisibleRows = function () {
 	return 4;
 };
 
-/* 加载图像 */
+/**
+ * 加载图像
+ * Load images
+ */
 Window_MenuStatus.prototype.loadImages = function () {
 	$gameParty.members().forEach(function (actor) {
 		ImageManager.reserveFace(actor.faceName());
 	}, this);
 };
 
-/* 绘制项目 */
+/**
+ * 绘制项目
+ * @param {number} index - 索引 - Index
+ * Draw item
+ */
 Window_MenuStatus.prototype.drawItem = function (index) {
 	this.drawItemBackground(index);
 	this.drawItemImage(index);
 	this.drawItemStatus(index);
 };
 
-/* 绘制项目背景 */
+/**
+ * 绘制项目背景
+ * @param {number} index - 索引 - Index
+ * Draw item background
+ */
 Window_MenuStatus.prototype.drawItemBackground = function (index) {
 	if (index === this._pendingIndex) {
 		var rect = this.itemRect(index);
@@ -77,7 +113,11 @@ Window_MenuStatus.prototype.drawItemBackground = function (index) {
 	}
 };
 
-/* 绘制项目图像 */
+/**
+ * 绘制项目图像
+ * @param {number} index - 索引 - Index
+ * Draw item image
+ */
 Window_MenuStatus.prototype.drawItemImage = function (index) {
 	var actor = $gameParty.members()[index];
 	var rect = this.itemRect(index);
@@ -86,7 +126,11 @@ Window_MenuStatus.prototype.drawItemImage = function (index) {
 	this.changePaintOpacity(true);
 };
 
-/* 绘制项目状态 */
+/**
+ * 绘制项目状态
+ * @param {number} index - 索引 - Index
+ * Draw item status
+ */
 Window_MenuStatus.prototype.drawItemStatus = function (index) {
 	var actor = $gameParty.members()[index];
 	var rect = this.itemRect(index);
@@ -96,13 +140,20 @@ Window_MenuStatus.prototype.drawItemStatus = function (index) {
 	this.drawActorSimpleStatus(actor, x, y, width);
 };
 
-/* 处理确定 */
+/**
+ * 处理确定
+ * Process OK
+ */
 Window_MenuStatus.prototype.processOk = function () {
 	Window_Selectable.prototype.processOk.call(this);
 	$gameParty.setMenuActor($gameParty.members()[this.index()]);
 };
 
-/* 是否当前项目启用 */
+/**
+ * 是否当前项目启用
+ * @returns {boolean} 是否启用 - Whether enabled
+ * Is current item enabled
+ */
 Window_MenuStatus.prototype.isCurrentItemEnabled = function () {
 	if (this._formationMode) {
 		var actor = $gameParty.members()[this.index()];
@@ -112,29 +163,48 @@ Window_MenuStatus.prototype.isCurrentItemEnabled = function () {
 	}
 };
 
-/* 选择上一个 */
+/**
+ * 选择上一个
+ * Select last
+ */
 Window_MenuStatus.prototype.selectLast = function () {
 	this.select($gameParty.menuActor().index() || 0);
 };
 
-/* 整队模式 */
+/**
+ * 整队模式
+ * @returns {boolean} 是否整队模式 - Whether formation mode
+ * Formation mode
+ */
 Window_MenuStatus.prototype.formationMode = function () {
 	return this._formationMode;
 };
 
-/* 设置整队模式 */
+/**
+ * 设置整队模式
+ * @param {boolean} formationMode - 是否整队模式 - Whether formation mode
+ * Set formation mode
+ */
 Window_MenuStatus.prototype.setFormationMode = function (formationMode) {
 	this._formationMode = formationMode;
 };
 
-/* 待定索引
+/**
+ * 待定索引
  * pending 指那个背景光标闪烁的选项。
+ * @returns {number} 待定索引 - Pending index
+ * Pending index
+ * pending refers to the item with the blinking background cursor.
  */
 Window_MenuStatus.prototype.pendingIndex = function () {
 	return this._pendingIndex;
 };
 
-/* 设置待定索引 */
+/**
+ * 设置待定索引
+ * @param {number} index - 索引 - Index
+ * Set pending index
+ */
 Window_MenuStatus.prototype.setPendingIndex = function (index) {
 	var lastPendingIndex = this._pendingIndex;
 	this._pendingIndex = index;
