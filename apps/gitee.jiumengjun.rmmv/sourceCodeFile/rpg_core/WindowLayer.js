@@ -3,10 +3,21 @@
 //=============================================================================
 
 /**
+ * @fileoverview 窗口图层类，用于管理和渲染多个游戏窗口。
+ * Window layer class for managing and rendering multiple game windows.
+ *
+ * @author RPG Maker MV
+ * @version 1.6.2
+ * @since 2015
+ */
+
+/**
  * 包含游戏窗口的层。
  * The layer which contains game windows.
  *
  * @class WindowLayer
+ * @description 窗口图层类，用于管理和渲染多个游戏窗口，支持Canvas和WebGL渲染。
+ * Window layer class for managing and rendering multiple game windows, supporting both Canvas and WebGL rendering.
  * @extends PIXI.Container
  */
 function WindowLayer() {
@@ -37,9 +48,31 @@ WindowLayer.prototype.initialize = function () {
 	this.on("removed", this.onRemoveAsAChild);
 };
 
+/**
+ * 初始化窗口图层对象。
+ * Initializes the window layer object.
+ *
+ * @memberof WindowLayer
+ * @method initialize
+ * @description 初始化窗口图层对象，创建遮罩和渲染所需的资源。
+ * Initializes the window layer object, creates masks and rendering resources.
+ * @returns {void} 无返回值 No return value
+ */
+
 WindowLayer.prototype.onRemoveAsAChild = function () {
 	this.removeChildren();
 };
+
+/**
+ * 作为子对象被移除时的处理。
+ * Handles when removed as a child.
+ *
+ * @memberof WindowLayer
+ * @method onRemoveAsAChild
+ * @description 当窗口图层作为子对象被移除时，清除所有子对象以防止内存泄漏。
+ * When the window layer is removed as a child, clears all children to prevent memory leaks.
+ * @returns {void} 无返回值 No return value
+ */
 
 WindowLayer.voidFilter = new PIXI.filters.VoidFilter();
 
@@ -47,7 +80,10 @@ WindowLayer.voidFilter = new PIXI.filters.VoidFilter();
  * 窗口层的宽度（像素）。
  * The width of the window layer in pixels.
  *
- * @type {Number}
+ * @memberof WindowLayer
+ * @property {Number} width - 窗口层的宽度（像素） The width of the window layer in pixels
+ * @description 窗口图层的宽度属性，以像素为单位。
+ * The width property of the window layer in pixels.
  */
 Object.defineProperty(WindowLayer.prototype, "width", {
 	get: function () {
@@ -63,7 +99,10 @@ Object.defineProperty(WindowLayer.prototype, "width", {
  * 窗口层的高度（像素）。
  * The height of the window layer in pixels.
  *
- * @type {Number}
+ * @memberof WindowLayer
+ * @property {Number} height - 窗口层的高度（像素） The height of the window layer in pixels
+ * @description 窗口图层的高度属性，以像素为单位。
+ * The height property of the window layer in pixels.
  */
 Object.defineProperty(WindowLayer.prototype, "height", {
 	get: function () {
@@ -79,11 +118,15 @@ Object.defineProperty(WindowLayer.prototype, "height", {
  * 同时设置 x、y、宽度和高度。
  * Sets the x, y, width, and height all at once.
  *
+ * @memberof WindowLayer
  * @method move
- * @param {Number} x 窗口层的x坐标 The x coordinate of the window layer
- * @param {Number} y 窗口层的y坐标 The y coordinate of the window layer
- * @param {Number} width 窗口层的宽度 The width of the window layer
- * @param {Number} height 窗口层的高度 The height of the window layer
+ * @description 同时设置窗口图层的位置和大小。
+ * Sets the position and size of the window layer at once.
+ * @param {Number} x - 窗口层的x坐标 The x coordinate of the window layer
+ * @param {Number} y - 窗口层的y坐标 The y coordinate of the window layer
+ * @param {Number} width - 窗口层的宽度 The width of the window layer
+ * @param {Number} height - 窗口层的高度 The height of the window layer
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype.move = function (x, y, width, height) {
 	this.x = x;
@@ -96,7 +139,11 @@ WindowLayer.prototype.move = function (x, y, width, height) {
  * 每帧更新窗口层。
  * Updates the window layer for each frame.
  *
+ * @memberof WindowLayer
  * @method update
+ * @description 每帧更新窗口图层，更新所有子窗口对象。
+ * Updates the window layer each frame, updates all child window objects.
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype.update = function () {
 	this.children.forEach(function (child) {
@@ -110,9 +157,13 @@ WindowLayer.prototype.update = function () {
  * Canvas渲染。
  * Renders with Canvas.
  *
+ * @memberof WindowLayer
  * @method renderCanvas
- * @param {Object} renderer 渲染器 The renderer
  * @private
+ * @description 使用Canvas渲染器渲染窗口图层。
+ * Renders the window layer using Canvas renderer.
+ * @param {Object} renderer - 渲染器 The renderer
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype.renderCanvas = function (renderer) {
 	if (!this.visible || !this.renderable) {
@@ -167,10 +218,14 @@ WindowLayer.prototype.renderCanvas = function (renderer) {
  * Canvas清除窗口矩形。
  * Clears window rectangle on Canvas.
  *
+ * @memberof WindowLayer
  * @method _canvasClearWindowRect
- * @param {Object} renderSession 渲染会话 The render session
- * @param {Window} window 窗口 The window
  * @private
+ * @description 在Canvas上清除窗口矩形区域。
+ * Clears the window rectangle area on Canvas.
+ * @param {Object} renderSession - 渲染会话 The render session
+ * @param {Window} window - 窗口 The window
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype._canvasClearWindowRect = function (renderSession, window) {
 	var rx = this.x + window.x;
@@ -184,9 +239,13 @@ WindowLayer.prototype._canvasClearWindowRect = function (renderSession, window) 
  * WebGL渲染。
  * Renders with WebGL.
  *
+ * @memberof WindowLayer
  * @method renderWebGL
- * @param {Object} renderer 渲染器 The renderer
  * @private
+ * @description 使用WebGL渲染器渲染窗口图层。
+ * Renders the window layer using WebGL renderer.
+ * @param {Object} renderer - 渲染器 The renderer
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype.renderWebGL = function (renderer) {
 	if (!this.visible || !this.renderable) {
@@ -236,10 +295,14 @@ WindowLayer.prototype.renderWebGL = function (renderer) {
  * 窗口遮罩。
  * Masks the window.
  *
+ * @memberof WindowLayer
  * @method _maskWindow
- * @param {Window} window 窗口 The window
- * @param {PIXI.Point} shift 偏移 The shift
  * @private
+ * @description 为窗口设置遮罩区域。
+ * Sets the mask area for the window.
+ * @param {Window} window - 窗口 The window
+ * @param {PIXI.Point} shift - 偏移 The shift
+ * @returns {void} 无返回值 No return value
  */
 WindowLayer.prototype._maskWindow = function (window, shift) {
 	this._windowMask._currentBounds = null;

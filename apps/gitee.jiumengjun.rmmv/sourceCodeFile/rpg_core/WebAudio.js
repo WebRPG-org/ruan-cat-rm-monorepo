@@ -3,11 +3,22 @@
 //=============================================================================
 
 /**
+ * @fileoverview Web Audio API音频处理类，用于加载和播放音频文件。
+ * Web Audio API audio processing class for loading and playing audio files.
+ *
+ * @author RPG Maker MV
+ * @version 1.6.2
+ * @since 2015
+ */
+
+/**
  * Web Audio API的音频对象。
  * The audio object of Web Audio API.
  *
  * @class WebAudio
- * @param {String} url 音频文件的URL The url of the audio file
+ * @description Web Audio API音频处理类，提供音频加载、播放和控制功能。
+ * Web Audio API audio processing class providing audio loading, playback and control functionality.
+ * @param {String} url - 音频文件的URL The url of the audio file
  */
 function WebAudio() {
 	this.initialize.apply(this, arguments);
@@ -35,6 +46,18 @@ WebAudio.prototype.initialize = function (url) {
 	this._load(url);
 	this._url = url;
 };
+
+/**
+ * 初始化WebAudio对象。
+ * Initializes the WebAudio object.
+ *
+ * @memberof WebAudio
+ * @method initialize
+ * @description 初始化WebAudio对象，设置音频系统并加载音频文件。
+ * Initializes the WebAudio object, sets up the audio system and loads the audio file.
+ * @param {String} url - 音频文件的URL The url of the audio file
+ * @returns {void} 无返回值 No return value
+ */
 
 WebAudio._masterVolume = 1;
 WebAudio._context = null;
@@ -302,7 +325,11 @@ WebAudio._fadeOut = function (duration) {
  * 清除音频数据。
  * Clears the audio data.
  *
+ * @memberof WebAudio
  * @method clear
+ * @description 清除音频数据，停止播放并重置所有音频相关属性。
+ * Clears the audio data, stops playback and resets all audio-related properties.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype.clear = function () {
 	this.stop();
@@ -329,7 +356,10 @@ WebAudio.prototype.clear = function () {
  * [只读] 音频文件的URL。
  * [read-only] The url of the audio file.
  *
- * @type {String}
+ * @memberof WebAudio
+ * @property {String} url - 音频文件的URL The url of the audio file
+ * @description 音频文件的只读URL属性。
+ * Read-only URL property of the audio file.
  */
 Object.defineProperty(WebAudio.prototype, "url", {
 	get: function () {
@@ -342,7 +372,10 @@ Object.defineProperty(WebAudio.prototype, "url", {
  * 音频的音量。
  * The volume of the audio.
  *
- * @type {Number}
+ * @memberof WebAudio
+ * @property {Number} volume - 音频的音量 The volume of the audio
+ * @description 音频的音量属性，用于控制音频播放的音量大小。
+ * Volume property of the audio for controlling the playback volume.
  */
 Object.defineProperty(WebAudio.prototype, "volume", {
 	get: function () {
@@ -361,7 +394,10 @@ Object.defineProperty(WebAudio.prototype, "volume", {
  * 音频的音调。
  * The pitch of the audio.
  *
- * @type {Number}
+ * @memberof WebAudio
+ * @property {Number} pitch - 音频的音调 The pitch of the audio
+ * @description 音频的音调属性，用于控制音频播放的音调高低。
+ * Pitch property of the audio for controlling the playback pitch.
  */
 Object.defineProperty(WebAudio.prototype, "pitch", {
 	get: function () {
@@ -382,7 +418,10 @@ Object.defineProperty(WebAudio.prototype, "pitch", {
  * 音频的声像。
  * The pan of the audio.
  *
- * @type {Number}
+ * @memberof WebAudio
+ * @property {Number} pan - 音频的声像 The pan of the audio
+ * @description 音频的声像属性，用于控制音频在立体声场中的位置。
+ * Pan property of the audio for controlling the position in stereo field.
  */
 Object.defineProperty(WebAudio.prototype, "pan", {
 	get: function () {
@@ -515,7 +554,11 @@ WebAudio.prototype.fadeOut = function (duration) {
  * 获取音频的搜索位置。
  * Gets the seek position of the audio.
  *
+ * @memberof WebAudio
  * @method seek
+ * @description 获取当前音频播放的位置。
+ * Gets the current playback position of the audio.
+ * @returns {Number} 当前播放位置（秒） Current playback position in seconds
  */
 WebAudio.prototype.seek = function () {
 	if (WebAudio._context) {
@@ -535,8 +578,12 @@ WebAudio.prototype.seek = function () {
  * 添加音频数据加载时调用的回调函数。
  * Add a callback function that will be called when the audio data is loaded.
  *
+ * @memberof WebAudio
  * @method addLoadListener
- * @param {Function} listner 回调函数 The callback function
+ * @description 添加音频数据加载完成时的回调函数监听器。
+ * Adds a callback function listener for when audio data loading is complete.
+ * @param {Function} listner - 回调函数 The callback function
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype.addLoadListener = function (listner) {
 	this._loadListeners.push(listner);
@@ -546,8 +593,12 @@ WebAudio.prototype.addLoadListener = function (listner) {
  * 添加播放停止时调用的回调函数。
  * Add a callback function that will be called when the playback is stopped.
  *
+ * @memberof WebAudio
  * @method addStopListener
- * @param {Function} listner 回调函数 The callback function
+ * @description 添加音频播放停止时的回调函数监听器。
+ * Adds a callback function listener for when audio playback is stopped.
+ * @param {Function} listner - 回调函数 The callback function
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype.addStopListener = function (listner) {
 	this._stopListeners.push(listner);
@@ -557,9 +608,13 @@ WebAudio.prototype.addStopListener = function (listner) {
  * 加载音频文件。
  * Loads the audio file.
  *
+ * @memberof WebAudio
  * @method _load
- * @param {String} url 音频文件URL The audio file URL
  * @private
+ * @description 通过XMLHttpRequest加载音频文件数据。
+ * Loads audio file data via XMLHttpRequest.
+ * @param {String} url - 音频文件URL The audio file URL
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._load = function (url) {
 	if (WebAudio._context) {
@@ -585,9 +640,13 @@ WebAudio.prototype._load = function (url) {
  * XHR加载完成事件处理。
  * Handles XHR load completion event.
  *
+ * @memberof WebAudio
  * @method _onXhrLoad
- * @param {XMLHttpRequest} xhr XMLHttpRequest对象 The XMLHttpRequest object
  * @private
+ * @description 处理XMLHttpRequest加载完成事件，解密并解码音频数据。
+ * Handles XMLHttpRequest load completion event, decrypts and decodes audio data.
+ * @param {XMLHttpRequest} xhr - XMLHttpRequest对象 The XMLHttpRequest object
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._onXhrLoad = function (xhr) {
 	var array = xhr.response;
@@ -614,10 +673,14 @@ WebAudio.prototype._onXhrLoad = function (xhr) {
  * 开始播放音频。
  * Starts playing the audio.
  *
+ * @memberof WebAudio
  * @method _startPlaying
- * @param {Boolean} loop 是否循环 Whether to loop
- * @param {Number} offset 偏移量 The offset
  * @private
+ * @description 开始播放音频，设置循环和偏移量。
+ * Starts playing the audio, sets up loop and offset.
+ * @param {Boolean} loop - 是否循环 Whether to loop
+ * @param {Number} offset - 偏移量 The offset
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._startPlaying = function (loop, offset) {
 	if (this._loopLength > 0) {
@@ -639,8 +702,12 @@ WebAudio.prototype._startPlaying = function (loop, offset) {
  * 创建音频节点。
  * Creates audio nodes.
  *
+ * @memberof WebAudio
  * @method _createNodes
  * @private
+ * @description 创建Web Audio API所需的音频节点。
+ * Creates the audio nodes required for Web Audio API.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._createNodes = function () {
 	var context = WebAudio._context;
@@ -660,8 +727,12 @@ WebAudio.prototype._createNodes = function () {
  * 连接音频节点。
  * Connects audio nodes.
  *
+ * @memberof WebAudio
  * @method _connectNodes
  * @private
+ * @description 连接音频节点以建立音频处理链。
+ * Connects audio nodes to establish the audio processing chain.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._connectNodes = function () {
 	this._sourceNode.connect(this._gainNode);
@@ -673,8 +744,12 @@ WebAudio.prototype._connectNodes = function () {
  * 移除音频节点。
  * Removes audio nodes.
  *
+ * @memberof WebAudio
  * @method _removeNodes
  * @private
+ * @description 移除并清理音频节点。
+ * Removes and cleans up audio nodes.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._removeNodes = function () {
 	if (this._sourceNode) {
@@ -689,8 +764,12 @@ WebAudio.prototype._removeNodes = function () {
  * 创建结束定时器。
  * Creates end timer.
  *
+ * @memberof WebAudio
  * @method _createEndTimer
  * @private
+ * @description 为非循环音频创建结束定时器。
+ * Creates end timer for non-looping audio.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._createEndTimer = function () {
 	if (this._sourceNode && !this._sourceNode.loop) {
@@ -709,8 +788,12 @@ WebAudio.prototype._createEndTimer = function () {
  * 移除结束定时器。
  * Removes end timer.
  *
+ * @memberof WebAudio
  * @method _removeEndTimer
  * @private
+ * @description 移除音频结束定时器。
+ * Removes the audio end timer.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._removeEndTimer = function () {
 	if (this._endTimer) {
@@ -723,8 +806,12 @@ WebAudio.prototype._removeEndTimer = function () {
  * 更新声像器。
  * Updates the panner.
  *
+ * @memberof WebAudio
  * @method _updatePanner
  * @private
+ * @description 根据声像值更新声像器的位置。
+ * Updates the panner position based on the pan value.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._updatePanner = function () {
 	if (this._pannerNode) {
@@ -738,8 +825,12 @@ WebAudio.prototype._updatePanner = function () {
  * 加载完成事件处理。
  * Handles load completion event.
  *
+ * @memberof WebAudio
  * @method _onLoad
  * @private
+ * @description 处理音频加载完成事件，调用所有加载监听器。
+ * Handles audio load completion event, calls all load listeners.
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._onLoad = function () {
 	while (this._loadListeners.length > 0) {
@@ -752,9 +843,13 @@ WebAudio.prototype._onLoad = function () {
  * 读取循环注释。
  * Reads loop comments.
  *
+ * @memberof WebAudio
  * @method _readLoopComments
- * @param {Uint8Array} array 字节数组 The byte array
  * @private
+ * @description 从音频文件中读取循环注释信息。
+ * Reads loop comment information from the audio file.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._readLoopComments = function (array) {
 	this._readOgg(array);
@@ -765,9 +860,13 @@ WebAudio.prototype._readLoopComments = function (array) {
  * 读取Ogg文件。
  * Reads Ogg file.
  *
+ * @memberof WebAudio
  * @method _readOgg
- * @param {Uint8Array} array 字节数组 The byte array
  * @private
+ * @description 解析Ogg格式的音频文件以提取循环信息。
+ * Parses Ogg format audio file to extract loop information.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._readOgg = function (array) {
 	var index = 0;
@@ -805,9 +904,13 @@ WebAudio.prototype._readOgg = function (array) {
  * 读取MP4文件。
  * Reads MP4 file.
  *
+ * @memberof WebAudio
  * @method _readMp4
- * @param {Uint8Array} array 字节数组 The byte array
  * @private
+ * @description 解析MP4格式的音频文件以提取循环信息。
+ * Parses MP4 format audio file to extract loop information.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._readMp4 = function (array) {
 	if (this._readFourCharacters(array, 4) === "ftyp") {
@@ -837,11 +940,15 @@ WebAudio.prototype._readMp4 = function (array) {
  * 读取元数据。
  * Reads metadata.
  *
+ * @memberof WebAudio
  * @method _readMetaData
- * @param {Uint8Array} array 字节数组 The byte array
- * @param {Number} index 索引 The index
- * @param {Number} size 大小 The size
  * @private
+ * @description 从音频文件中读取元数据，提取循环开始和长度信息。
+ * Reads metadata from audio file, extracts loop start and length information.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @param {Number} index - 索引 The index
+ * @param {Number} size - 大小 The size
+ * @returns {void} 无返回值 No return value
  */
 WebAudio.prototype._readMetaData = function (array, index, size) {
 	for (var i = index; i < index + size - 10; i++) {
@@ -876,10 +983,14 @@ WebAudio.prototype._readMetaData = function (array, index, size) {
  * 读取小端字节序。
  * Reads little endian.
  *
+ * @memberof WebAudio
  * @method _readLittleEndian
- * @param {Uint8Array} array 字节数组 The byte array
- * @param {Number} index 索引 The index
  * @private
+ * @description 从字节数组中读取小端字节序的32位整数。
+ * Reads 32-bit integer in little endian format from byte array.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @param {Number} index - 索引 The index
+ * @returns {Number} 32位整数值 32-bit integer value
  */
 WebAudio.prototype._readLittleEndian = function (array, index) {
 	return array[index + 3] * 0x1000000 + array[index + 2] * 0x10000 + array[index + 1] * 0x100 + array[index + 0];
@@ -889,10 +1000,14 @@ WebAudio.prototype._readLittleEndian = function (array, index) {
  * 读取大端字节序。
  * Reads big endian.
  *
+ * @memberof WebAudio
  * @method _readBigEndian
- * @param {Uint8Array} array 字节数组 The byte array
- * @param {Number} index 索引 The index
  * @private
+ * @description 从字节数组中读取大端字节序的32位整数。
+ * Reads 32-bit integer in big endian format from byte array.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @param {Number} index - 索引 The index
+ * @returns {Number} 32位整数值 32-bit integer value
  */
 WebAudio.prototype._readBigEndian = function (array, index) {
 	return array[index + 0] * 0x1000000 + array[index + 1] * 0x10000 + array[index + 2] * 0x100 + array[index + 3];
@@ -902,10 +1017,14 @@ WebAudio.prototype._readBigEndian = function (array, index) {
  * 读取四个字符。
  * Reads four characters.
  *
+ * @memberof WebAudio
  * @method _readFourCharacters
- * @param {Uint8Array} array 字节数组 The byte array
- * @param {Number} index 索引 The index
  * @private
+ * @description 从字节数组中读取四个字符并转换为字符串。
+ * Reads four characters from byte array and converts to string.
+ * @param {Uint8Array} array - 字节数组 The byte array
+ * @param {Number} index - 索引 The index
+ * @returns {String} 四个字符的字符串 String of four characters
  */
 WebAudio.prototype._readFourCharacters = function (array, index) {
 	var string = "";
