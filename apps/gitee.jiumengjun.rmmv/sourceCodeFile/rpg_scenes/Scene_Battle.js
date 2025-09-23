@@ -1,9 +1,10 @@
 /**
- * @fileoverview Scene_Battle - 战斗场景类
- * @description 战斗画面的场景类，处理战斗中的所有界面和交互
- * The scene class of the battle screen, handles all UI and interactions during battle
+ * @fileoverview 战斗场景类，战斗画面的场景类，处理战斗中的所有界面和交互。
+ * Battle scene class, the scene class of the battle screen, handles all UI and interactions during battle.
+ *
  * @author RPG Maker MV
- * @version 1.0.0
+ * @version 1.6.2
+ * @since 2015
  */
 
 //-----------------------------------------------------------------------------
@@ -32,6 +33,9 @@ Scene_Battle.prototype.constructor = Scene_Battle;
  *
  * @memberof Scene_Battle
  * @method initialize
+ * @description 初始化战斗场景对象。
+ * Initializes the battle scene object.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.initialize = function () {
 	Scene_Base.prototype.initialize.call(this);
@@ -43,6 +47,9 @@ Scene_Battle.prototype.initialize = function () {
  *
  * @memberof Scene_Battle
  * @method create
+ * @description 创建战斗场景的显示对象。
+ * Creates the display objects for the battle scene.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.create = function () {
 	Scene_Base.prototype.create.call(this);
@@ -55,6 +62,9 @@ Scene_Battle.prototype.create = function () {
  *
  * @memberof Scene_Battle
  * @method start
+ * @description 开始战斗场景，播放战斗BGM并开始战斗。
+ * Starts the battle scene, plays battle BGM and starts the battle.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.start = function () {
 	Scene_Base.prototype.start.call(this);
@@ -69,6 +79,9 @@ Scene_Battle.prototype.start = function () {
  *
  * @memberof Scene_Battle
  * @method update
+ * @description 每帧更新战斗场景状态。
+ * Updates the battle scene state each frame.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.update = function () {
 	var active = this.isActive();
@@ -88,6 +101,9 @@ Scene_Battle.prototype.update = function () {
  *
  * @memberof Scene_Battle
  * @method updateBattleProcess
+ * @description 更新战斗管理器的状态。
+ * Updates the battle manager state.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.updateBattleProcess = function () {
 	if (!this.isAnyInputWindowActive() || BattleManager.isAborting() || BattleManager.isBattleEnd()) {
@@ -121,6 +137,9 @@ Scene_Battle.prototype.isAnyInputWindowActive = function () {
  *
  * @memberof Scene_Battle
  * @method changeInputWindow
+ * @description 根据战斗状态改变当前活动的输入窗口。
+ * Changes the current active input window based on battle state.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.changeInputWindow = function () {
 	if (BattleManager.isInputting()) {
@@ -140,6 +159,9 @@ Scene_Battle.prototype.changeInputWindow = function () {
  *
  * @memberof Scene_Battle
  * @method stop
+ * @description 停止战斗场景，关闭窗口并开始淡出。
+ * Stops the battle scene, closes windows and starts fade out.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.stop = function () {
 	Scene_Base.prototype.stop.call(this);
@@ -159,6 +181,9 @@ Scene_Battle.prototype.stop = function () {
  *
  * @memberof Scene_Battle
  * @method terminate
+ * @description 终止战斗场景，处理战斗结束逻辑。
+ * Terminates the battle scene, handles battle end logic.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.terminate = function () {
 	Scene_Base.prototype.terminate.call(this);
@@ -187,6 +212,9 @@ Scene_Battle.prototype.needsSlowFadeOut = function () {
  *
  * @memberof Scene_Battle
  * @method updateStatusWindow
+ * @description 根据消息状态更新状态窗口的显示。
+ * Updates the status window display based on message state.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Battle.prototype.updateStatusWindow = function () {
 	if ($gameMessage.isBusy()) {
@@ -204,6 +232,9 @@ Scene_Battle.prototype.updateStatusWindow = function () {
  *
  * @memberof Scene_Battle
  * @method updateWindowPositions
+ * @description 根据战斗输入状态动态调整状态窗口的水平位置，实现平滑过渡效果。
+ * Dynamically adjusts the horizontal position of the status window based on battle input state, implementing smooth transition effects.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.updateWindowPositions = function () {
 	var statusX = 0;
@@ -232,6 +263,9 @@ Scene_Battle.prototype.updateWindowPositions = function () {
  *
  * @memberof Scene_Battle
  * @method createDisplayObjects
+ * @description 创建战斗场景所需的所有显示对象，包括精灵组、窗口层和各种窗口，并设置战斗管理器的相关引用。
+ * Creates all display objects needed for the battle scene, including spriteset, window layer and various windows, and sets up battle manager references.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createDisplayObjects = function () {
 	this.createSpriteset();
@@ -249,6 +283,9 @@ Scene_Battle.prototype.createDisplayObjects = function () {
  *
  * @memberof Scene_Battle
  * @method createSpriteset
+ * @description 创建战斗精灵组并添加到场景中，精灵组负责显示战斗背景、敌人和角色。
+ * Creates the battle spriteset and adds it to the scene, the spriteset is responsible for displaying battle background, enemies and actors.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createSpriteset = function () {
 	this._spriteset = new Spriteset_Battle();
@@ -261,6 +298,9 @@ Scene_Battle.prototype.createSpriteset = function () {
  *
  * @memberof Scene_Battle
  * @method createAllWindows
+ * @description 创建战斗场景中所需的所有用户界面窗口，包括日志、状态、指令和选择窗口等。
+ * Creates all user interface windows needed in the battle scene, including log, status, command and selection windows.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createAllWindows = function () {
 	this.createLogWindow();
@@ -282,6 +322,9 @@ Scene_Battle.prototype.createAllWindows = function () {
  *
  * @memberof Scene_Battle
  * @method createLogWindow
+ * @description 创建战斗日志窗口实例并添加到场景中，用于显示战斗过程中的文本信息。
+ * Creates the battle log window instance and adds it to the scene, used for displaying text information during battle.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createLogWindow = function () {
 	this._logWindow = new Window_BattleLog();
@@ -294,6 +337,9 @@ Scene_Battle.prototype.createLogWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createStatusWindow
+ * @description 创建战斗状态窗口实例并添加到场景中，用于显示队伍成员的HP、MP等状态信息。
+ * Creates the battle status window instance and adds it to the scene, used for displaying HP, MP and other status information of party members.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createStatusWindow = function () {
 	this._statusWindow = new Window_BattleStatus();
@@ -306,6 +352,9 @@ Scene_Battle.prototype.createStatusWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createPartyCommandWindow
+ * @description 创建队伍指令窗口实例并设置战斗和逃跑指令的事件处理器，用于选择队伍整体行动。
+ * Creates the party command window instance and sets up event handlers for fight and escape commands, used for selecting overall party actions.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createPartyCommandWindow = function () {
 	this._partyCommandWindow = new Window_PartyCommand();
@@ -321,6 +370,9 @@ Scene_Battle.prototype.createPartyCommandWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createActorCommandWindow
+ * @description 创建角色指令窗口实例并设置攻击、技能、防御、物品等指令的事件处理器，用于选择单个角色的行动。
+ * Creates the actor command window instance and sets up event handlers for attack, skill, guard, item and other commands, used for selecting individual actor actions.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createActorCommandWindow = function () {
 	this._actorCommandWindow = new Window_ActorCommand();
@@ -338,6 +390,9 @@ Scene_Battle.prototype.createActorCommandWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createHelpWindow
+ * @description 创建帮助窗口实例并设置为默认隐藏状态，用于显示技能、物品等的详细说明信息。
+ * Creates the help window instance and sets it to hidden state by default, used for displaying detailed description information of skills, items, etc.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createHelpWindow = function () {
 	this._helpWindow = new Window_Help();
@@ -351,6 +406,9 @@ Scene_Battle.prototype.createHelpWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createSkillWindow
+ * @description 创建技能选择窗口实例并设置相关的事件处理器，用于在战斗中选择和使用技能。
+ * Creates the skill selection window instance and sets up related event handlers, used for selecting and using skills in battle.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createSkillWindow = function () {
 	var wy = this._helpWindow.y + this._helpWindow.height;
@@ -368,6 +426,9 @@ Scene_Battle.prototype.createSkillWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createItemWindow
+ * @description 创建物品选择窗口实例并设置相关的事件处理器，用于在战斗中选择和使用物品。
+ * Creates the item selection window instance and sets up related event handlers, used for selecting and using items in battle.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createItemWindow = function () {
 	var wy = this._helpWindow.y + this._helpWindow.height;
@@ -385,6 +446,9 @@ Scene_Battle.prototype.createItemWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createActorWindow
+ * @description 创建角色选择窗口实例并设置事件处理器，用于选择技能或物品的使用目标角色。
+ * Creates the actor selection window instance and sets up event handlers, used for selecting target actors for skill or item usage.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createActorWindow = function () {
 	this._actorWindow = new Window_BattleActor(0, this._statusWindow.y);
@@ -399,6 +463,9 @@ Scene_Battle.prototype.createActorWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createEnemyWindow
+ * @description 创建敌人选择窗口实例并设置事件处理器，用于选择攻击或技能的目标敌人。
+ * Creates the enemy selection window instance and sets up event handlers, used for selecting target enemies for attacks or skills.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createEnemyWindow = function () {
 	this._enemyWindow = new Window_BattleEnemy(0, this._statusWindow.y);
@@ -414,6 +481,9 @@ Scene_Battle.prototype.createEnemyWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createMessageWindow
+ * @description 创建消息窗口实例并添加其子窗口到场景中，用于显示战斗中的对话和系统消息。
+ * Creates the message window instance and adds its sub-windows to the scene, used for displaying dialogue and system messages during battle.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createMessageWindow = function () {
 	this._messageWindow = new Window_Message();
@@ -429,6 +499,9 @@ Scene_Battle.prototype.createMessageWindow = function () {
  *
  * @memberof Scene_Battle
  * @method createScrollTextWindow
+ * @description 创建滚动文本窗口实例并添加到场景中，用于显示战斗开始或结束时的滚动文本效果。
+ * Creates the scrolling text window instance and adds it to the scene, used for displaying scrolling text effects at battle start or end.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.createScrollTextWindow = function () {
 	this._scrollTextWindow = new Window_ScrollText();
@@ -441,6 +514,9 @@ Scene_Battle.prototype.createScrollTextWindow = function () {
  *
  * @memberof Scene_Battle
  * @method refreshStatus
+ * @description 刷新状态窗口的显示内容，更新队伍成员的状态信息。
+ * Refreshes the display content of the status window, updating the status information of party members.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.refreshStatus = function () {
 	this._statusWindow.refresh();
@@ -452,6 +528,9 @@ Scene_Battle.prototype.refreshStatus = function () {
  *
  * @memberof Scene_Battle
  * @method startPartyCommandSelection
+ * @description 开始队伍指令选择模式，刷新状态并打开队伍指令窗口，让玩家选择战斗或逃跑。
+ * Starts party command selection mode, refreshes status and opens the party command window, allowing player to choose fight or escape.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.startPartyCommandSelection = function () {
 	this.refreshStatus();
@@ -467,6 +546,9 @@ Scene_Battle.prototype.startPartyCommandSelection = function () {
  *
  * @memberof Scene_Battle
  * @method commandFight
+ * @description 处理玩家选择战斗指令，进入下一个角色的指令选择状态。
+ * Handles player selecting the fight command, proceeding to the next character's command selection state.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandFight = function () {
 	this.selectNextCommand();
@@ -478,6 +560,9 @@ Scene_Battle.prototype.commandFight = function () {
  *
  * @memberof Scene_Battle
  * @method commandEscape
+ * @description 处理玩家选择逃跑指令，触发战斗管理器的逃跑处理流程。
+ * Handles player selecting the escape command, triggering the battle manager's escape handling process.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandEscape = function () {
 	BattleManager.processEscape();
@@ -490,6 +575,9 @@ Scene_Battle.prototype.commandEscape = function () {
  *
  * @memberof Scene_Battle
  * @method startActorCommandSelection
+ * @description 开始角色指令选择模式，选择当前行动角色并打开角色指令窗口。
+ * Starts actor command selection mode, selects the current acting character and opens the actor command window.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.startActorCommandSelection = function () {
 	this._statusWindow.select(BattleManager.actor().index());
@@ -503,6 +591,9 @@ Scene_Battle.prototype.startActorCommandSelection = function () {
  *
  * @memberof Scene_Battle
  * @method commandAttack
+ * @description 处理玩家选择攻击指令，设置当前行动为普通攻击并进入敌人选择状态。
+ * Handles player selecting the attack command, sets the current action to normal attack and enters enemy selection state.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandAttack = function () {
 	BattleManager.inputtingAction().setAttack();
@@ -515,6 +606,9 @@ Scene_Battle.prototype.commandAttack = function () {
  *
  * @memberof Scene_Battle
  * @method commandSkill
+ * @description 处理玩家选择技能指令，打开技能选择窗口并显示当前角色的可用技能。
+ * Handles player selecting the skill command, opens the skill selection window and displays the current character's available skills.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandSkill = function () {
 	this._skillWindow.setActor(BattleManager.actor());
@@ -530,6 +624,9 @@ Scene_Battle.prototype.commandSkill = function () {
  *
  * @memberof Scene_Battle
  * @method commandGuard
+ * @description 处理玩家选择防御指令，设置当前行动为防御并进入下一个角色的指令选择。
+ * Handles player selecting the guard command, sets the current action to guard and proceeds to the next character's command selection.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandGuard = function () {
 	BattleManager.inputtingAction().setGuard();
@@ -542,6 +639,9 @@ Scene_Battle.prototype.commandGuard = function () {
  *
  * @memberof Scene_Battle
  * @method commandItem
+ * @description 处理玩家选择物品指令，打开物品选择窗口并显示背包中的可用物品。
+ * Handles player selecting the item command, opens the item selection window and displays available items in the inventory.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.commandItem = function () {
 	this._itemWindow.refresh();
@@ -555,6 +655,9 @@ Scene_Battle.prototype.commandItem = function () {
  *
  * @memberof Scene_Battle
  * @method selectNextCommand
+ * @description 切换到下一个角色的指令输入状态，更新战斗管理器并改变当前输入窗口。
+ * Switches to the next character's command input state, updates the battle manager and changes the current input window.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.selectNextCommand = function () {
 	BattleManager.selectNextCommand();
@@ -567,6 +670,9 @@ Scene_Battle.prototype.selectNextCommand = function () {
  *
  * @memberof Scene_Battle
  * @method selectPreviousCommand
+ * @description 切换到上一个角色的指令输入状态，更新战斗管理器并改变当前输入窗口。
+ * Switches to the previous character's command input state, updates the battle manager and changes the current input window.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.selectPreviousCommand = function () {
 	BattleManager.selectPreviousCommand();
@@ -579,6 +685,9 @@ Scene_Battle.prototype.selectPreviousCommand = function () {
  *
  * @memberof Scene_Battle
  * @method selectActorSelection
+ * @description 进入角色选择状态，显示角色窗口供玩家选择技能或物品的目标角色。
+ * Enters actor selection state, displays the actor window for player to select target characters for skills or items.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.selectActorSelection = function () {
 	this._actorWindow.refresh();
@@ -592,6 +701,9 @@ Scene_Battle.prototype.selectActorSelection = function () {
  *
  * @memberof Scene_Battle
  * @method onActorOk
+ * @description 处理角色选择窗口的确定事件，设置当前行动的目标角色并隐藏相关选择窗口。
+ * Handles the ok event of the actor selection window, sets the target character for the current action and hides related selection windows.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onActorOk = function () {
 	var action = BattleManager.inputtingAction();
@@ -608,6 +720,9 @@ Scene_Battle.prototype.onActorOk = function () {
  *
  * @memberof Scene_Battle
  * @method onActorCancel
+ * @description 处理角色选择窗口的取消事件，根据当前指令类型返回到相应的选择窗口。
+ * Handles the cancel event of the actor selection window, returns to the corresponding selection window based on the current command type.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onActorCancel = function () {
 	this._actorWindow.hide();
@@ -629,6 +744,9 @@ Scene_Battle.prototype.onActorCancel = function () {
  *
  * @memberof Scene_Battle
  * @method selectEnemySelection
+ * @description 进入敌人选择状态，显示敌人窗口供玩家选择攻击或技能的目标敌人。
+ * Enters enemy selection state, displays the enemy window for player to select target enemies for attacks or skills.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.selectEnemySelection = function () {
 	this._enemyWindow.refresh();
@@ -643,6 +761,9 @@ Scene_Battle.prototype.selectEnemySelection = function () {
  *
  * @memberof Scene_Battle
  * @method onEnemyOk
+ * @description 处理敌人选择窗口的确定事件，设置当前行动的目标敌人并隐藏相关选择窗口。
+ * Handles the ok event of the enemy selection window, sets the target enemy for the current action and hides related selection windows.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onEnemyOk = function () {
 	var action = BattleManager.inputtingAction();
@@ -659,6 +780,9 @@ Scene_Battle.prototype.onEnemyOk = function () {
  *
  * @memberof Scene_Battle
  * @method onEnemyCancel
+ * @description 处理敌人选择窗口的取消事件，根据当前指令类型返回到相应的选择窗口。
+ * Handles the cancel event of the enemy selection window, returns to the corresponding selection window based on the current command type.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onEnemyCancel = function () {
 	this._enemyWindow.hide();
@@ -683,6 +807,9 @@ Scene_Battle.prototype.onEnemyCancel = function () {
  *
  * @memberof Scene_Battle
  * @method onSkillOk
+ * @description 处理技能选择窗口的确定事件，设置当前行动为选定的技能并记录最后使用的技能。
+ * Handles the ok event of the skill selection window, sets the current action to the selected skill and records the last used skill.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onSkillOk = function () {
 	var skill = this._skillWindow.item();
@@ -698,6 +825,9 @@ Scene_Battle.prototype.onSkillOk = function () {
  *
  * @memberof Scene_Battle
  * @method onSkillCancel
+ * @description 处理技能选择窗口的取消事件，隐藏技能窗口并返回到角色指令窗口。
+ * Handles the cancel event of the skill selection window, hides the skill window and returns to the actor command window.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onSkillCancel = function () {
 	this._skillWindow.hide();
@@ -710,6 +840,9 @@ Scene_Battle.prototype.onSkillCancel = function () {
  *
  * @memberof Scene_Battle
  * @method onItemOk
+ * @description 处理物品选择窗口的确定事件，设置当前行动为选定的物品并记录最后使用的物品。
+ * Handles the ok event of the item selection window, sets the current action to the selected item and records the last used item.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onItemOk = function () {
 	var item = this._itemWindow.item();
@@ -725,6 +858,9 @@ Scene_Battle.prototype.onItemOk = function () {
  *
  * @memberof Scene_Battle
  * @method onItemCancel
+ * @description 处理物品选择窗口的取消事件，隐藏物品窗口并返回到角色指令窗口。
+ * Handles the cancel event of the item selection window, hides the item window and returns to the actor command window.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onItemCancel = function () {
 	this._itemWindow.hide();
@@ -737,6 +873,9 @@ Scene_Battle.prototype.onItemCancel = function () {
  *
  * @memberof Scene_Battle
  * @method onSelectAction
+ * @description 处理技能或物品选择完成后的行动处理，根据行动类型决定是否需要目标选择。
+ * Handles action processing after skill or item selection is completed, determines whether target selection is needed based on action type.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.onSelectAction = function () {
 	var action = BattleManager.inputtingAction();
@@ -757,6 +896,9 @@ Scene_Battle.prototype.onSelectAction = function () {
  *
  * @memberof Scene_Battle
  * @method endCommandSelection
+ * @description 结束当前回合的指令选择模式，关闭所有指令窗口并取消状态窗口的选择状态。
+ * Ends the current turn's command selection mode, closes all command windows and cancels the status window's selection state.
+ * @returns {void} 无返回值 - No return value
  */
 Scene_Battle.prototype.endCommandSelection = function () {
 	this._partyCommandWindow.close();

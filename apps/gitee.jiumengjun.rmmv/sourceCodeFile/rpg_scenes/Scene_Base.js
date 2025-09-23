@@ -1,11 +1,10 @@
 /**
- * @fileoverview Scene_Base - 场景基类
+ * @fileoverview 场景基类，游戏中所有场景的父类。
+ * Scene base class, the superclass of all scenes within the game.
  *
- * 游戏中所有场景的父类。
- * The superclass of all scenes within the game.
- *
- * @author 作者名
- * @since 1.0.0
+ * @author RPG Maker MV
+ * @version 1.6.2
+ * @since 2015
  */
 
 /**
@@ -13,7 +12,8 @@
  * Scene base class
  *
  * @class Scene_Base
- * @constructor
+ * @description 游戏中所有场景的父类，提供基本的场景管理功能。
+ * The superclass of all scenes within the game, providing basic scene management functionality.
  * @extends Stage
  */
 function Scene_Base() {
@@ -29,6 +29,9 @@ Scene_Base.prototype.constructor = Scene_Base;
  *
  * @memberof Scene_Base
  * @method initialize
+ * @description 初始化场景基类，设置默认属性和图像预留ID。
+ * Initializes the scene base, sets default properties and image reservation ID.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.initialize = function () {
 	Stage.prototype.initialize.call(this);
@@ -45,6 +48,9 @@ Scene_Base.prototype.initialize = function () {
  *
  * @memberof Scene_Base
  * @method attachReservation
+ * @description 将图像预留ID附加到默认预留队列。
+ * Attaches the image reservation ID to the default reservation queue.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.attachReservation = function () {
 	ImageManager.setDefaultReservationId(this._imageReservationId);
@@ -56,6 +62,9 @@ Scene_Base.prototype.attachReservation = function () {
  *
  * @memberof Scene_Base
  * @method detachReservation
+ * @description 从预留队列中移除图像预留ID。
+ * Removes the image reservation ID from the reservation queue.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.detachReservation = function () {
 	ImageManager.releaseReservation(this._imageReservationId);
@@ -67,6 +76,9 @@ Scene_Base.prototype.detachReservation = function () {
  *
  * @memberof Scene_Base
  * @method create
+ * @description 创建场景的组件并添加到渲染流程中，由子类重写实现。
+ * Creates scene components and adds them to the rendering process, overridden by subclasses.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.create = function () {};
 
@@ -100,6 +112,9 @@ Scene_Base.prototype.isReady = function () {
  *
  * @memberof Scene_Base
  * @method start
+ * @description 开始场景处理，将场景设置为激活状态。
+ * Starts scene processing, sets the scene to active state.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.start = function () {
 	this._active = true;
@@ -111,6 +126,9 @@ Scene_Base.prototype.start = function () {
  *
  * @memberof Scene_Base
  * @method update
+ * @description 每帧更新场景处理，包括淡化效果和子元素更新。
+ * Updates scene processing each frame, including fade effects and children updates.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.update = function () {
 	this.updateFade();
@@ -123,6 +141,9 @@ Scene_Base.prototype.update = function () {
  *
  * @memberof Scene_Base
  * @method stop
+ * @description 停止场景处理，将场景设置为非激活状态。
+ * Stops scene processing, sets the scene to inactive state.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.stop = function () {
 	this._active = false;
@@ -146,6 +167,9 @@ Scene_Base.prototype.isBusy = function () {
  *
  * @memberof Scene_Base
  * @method terminate
+ * @description 终止场景处理，由子类重写实现。
+ * Terminates scene processing, overridden by subclasses.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.terminate = function () {};
 
@@ -155,6 +179,9 @@ Scene_Base.prototype.terminate = function () {};
  *
  * @memberof Scene_Base
  * @method createWindowLayer
+ * @description 创建窗口图层并添加到场景中。
+ * Creates the window layer and adds it to the scene.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.createWindowLayer = function () {
 	var width = Graphics.boxWidth;
@@ -236,6 +263,9 @@ Scene_Base.prototype.createFadeSprite = function (white) {
  *
  * @memberof Scene_Base
  * @method updateFade
+ * @description 更新淡化效果的透明度。
+ * Updates the opacity of the fade effect.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.updateFade = function () {
 	if (this._fadeDuration > 0) {
@@ -255,6 +285,9 @@ Scene_Base.prototype.updateFade = function () {
  *
  * @memberof Scene_Base
  * @method updateChildren
+ * @description 更新所有子元素的每一帧处理。
+ * Updates the frame processing of all child elements.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.updateChildren = function () {
 	this.children.forEach(function (child) {
@@ -270,6 +303,9 @@ Scene_Base.prototype.updateChildren = function () {
  *
  * @memberof Scene_Base
  * @method popScene
+ * @description 弹出当前场景，返回到上一个场景。
+ * Pops the current scene and returns to the previous scene.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.popScene = function () {
 	SceneManager.pop();
@@ -281,6 +317,9 @@ Scene_Base.prototype.popScene = function () {
  *
  * @memberof Scene_Base
  * @method checkGameover
+ * @description 检查游戏是否结束，如果所有角色死亡则跳转到游戏结束场景。
+ * Checks whether the game is over, if all characters are dead, jumps to game over scene.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.checkGameover = function () {
 	if ($gameParty.isAllDead()) {
@@ -294,6 +333,9 @@ Scene_Base.prototype.checkGameover = function () {
  *
  * @memberof Scene_Base
  * @method fadeOutAll
+ * @description 淡出所有音频和视频内容。
+ * Fades out all audio and visual content.
+ * @returns {void} 无返回值 No return value
  */
 Scene_Base.prototype.fadeOutAll = function () {
 	var time = this.slowFadeSpeed() / 60;
