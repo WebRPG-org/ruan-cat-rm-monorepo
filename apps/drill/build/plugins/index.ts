@@ -35,6 +35,10 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 	const VITE_project_flag_name = env.VITE_project_flag_name;
 	const VITE_project_path = env.VITE_project_path;
 
+	// 检查是否在开发环境中
+	const isDev = env.NODE_ENV !== 'production';
+	const isDevMode = env.MODE?.includes('dev');
+
 	return [
 		vitePluginTsupRpgmv({
 			verbose: true, // 启用详细日志
@@ -48,10 +52,13 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 		 * @description
 		 * vueDevTools 必须在 createHtmlPlugin 的前面导入
 		 *
+		 * 条件性启用，避免 vite-plugin-inspect 的问题
+		 * 如果遇到问题，可以设置环境变量 DISABLE_VUE_DEVTOOLS=true
+		 *
 		 * @see https://devtools.vuejs.org/help/troubleshooting#devtools-vite-plugin-doesn-t-render-as-expected
 		 * @see https://github.com/vuejs/devtools/issues/278#issuecomment-2167415057
 		 */
-		vueDevTools(),
+		...(isDev && !process.env.DISABLE_VUE_DEVTOOLS ? [vueDevTools()] : []),
 
 		// 重设index.html的入口 和 全局ts文件的注入
 		createHtmlPlugin({
