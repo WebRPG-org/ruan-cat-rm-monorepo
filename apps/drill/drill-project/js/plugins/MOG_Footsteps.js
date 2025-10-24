@@ -530,7 +530,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_Footsteps = true;
 　　var Moghunter = Moghunter || {}; 
   　Moghunter.parameters = PluginManager.parameters('MOG_Footsteps');  
@@ -595,7 +595,7 @@ Game_System.prototype.initialize = function() {
 // * PluginCommand
 //==============================
 var _mog_footStep_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_mog_footStep_pluginCommand.call(this,command, args);
 	if (command === "disable_footsteps")  {$gameSystem._footStepVisible = false};
 	if (command === "enable_footsteps")  {$gameSystem._footStepVisible = true};

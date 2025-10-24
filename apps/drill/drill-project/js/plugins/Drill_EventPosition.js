@@ -3,7 +3,7 @@
 //=============================================================================
 
 /*:
- * @plugindesc [v1.5]        物体 - 位置与位移
+ * @plugindesc [v1.6]        物体 - 位置与位移
  * @author Drill_up
  * 
  * 
@@ -179,11 +179,13 @@
  * 添加了全图事件的功能。
  * [v1.5]
  * 添加了玩家位置获取。
+ * [v1.6]
+ * 修复了获取事件位置无效的bug。
  * 
  */
  
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//		插件简称：		EPo (Event_Position)
+//		插件简称		EPo (Event_Position)
 //		临时全局变量	无
 //		临时局部变量	this._drill_EPo_xxx
 //		存储数据变量	无
@@ -204,13 +206,22 @@
 //<<<<<<<<插件记录<<<<<<<<
 //
 //		★功能结构树：
-//			位置与位移：
-//				->迅速归位
-//				->朝向移动
-//				->移动到相对/绝对位置
+//			->☆提示信息
+//			->☆静态数据
+//			->☆插件指令
+//				->立即归位
+//				->移动到
+//					->相对坐标
+//					->相对朝向坐标
 //				->计算距离
-//				->获取事件id
-//		
+//				->获取值
+//					->获取指定位置的事件ID
+//					->获取玩家的位置值
+//					->获取指定事件的位置值
+//			
+//			->☆物体操作
+//			
+//			
 //		★家谱：
 //			无
 //		
@@ -235,7 +246,7 @@
 //
 
 //=============================================================================
-// ** 提示信息
+// ** ☆提示信息
 //=============================================================================
 	//==============================
 	// * 提示信息 - 参数
@@ -252,21 +263,30 @@
 	
 	
 //=============================================================================
-// ** 静态数据
+// ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventPosition = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventPosition');
+	var Imported = Imported || {};
+	Imported.Drill_EventPosition = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventPosition');
 	
 	
 
 //=============================================================================
-// ** 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EPo_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_EPo_pluginCommand.call(this, command, args);
+	this.drill_EPo_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EPo_pluginCommand = function( command, args ){
 	if( command === ">位置与位移" ){
 		
 		/*-----------------立即归位------------------*/
@@ -276,6 +296,8 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 			var e_ids = null;
 			
 			if( e_ids == null && unit == "本事件" ){
+				var e = $gameMap.event( this._eventId );
+				if( e == undefined ){ return; } //『防止并行删除事件出错』
 				e_ids = [ this._eventId ];
 			}
 			if( e_ids == null && unit.indexOf("批量事件变量[") != -1 ){
@@ -405,6 +427,8 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 			var e_pos = null;
 			if( type == "移动到" && unit != "玩家" ){
 				if( unit == "本事件" ){
+					var e = $gameMap.event( this._eventId );
+					if( e == undefined ){ return; } //『防止并行删除事件出错』
 					e_ids = [ this._eventId ];
 				}
 				if( unit.indexOf("批量事件变量[") != -1 ){
@@ -607,17 +631,16 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 			var temp2 = parseInt(args[5]);
 			var temp3 = parseInt(args[7]);
 			if( temp1 == "本事件" ){
-				if(type == "移动到绝对位置" ){
-					var e = $gameMap.event(this._eventId);
+				var e = $gameMap.event( this._eventId );
+				if( e == undefined ){ return; } //『防止并行删除事件出错』
+				if( type == "移动到绝对位置" ){
 					e.locate( temp2, temp3 );
 				}
-				if(type == "移动到相对位置" ){
-					var e = $gameMap.event(this._eventId);
+				if( type == "移动到相对位置" ){
 					e.locate(e.x + temp2, e.y + temp3);
 				}
-				if(type == "移动到朝向的相对位置" ){
-					var e = $gameMap.event(this._eventId);
-					if (e.direction() === 2) {		//下
+				if( type == "移动到朝向的相对位置" ){
+					if (e.direction() === 2) {			//下
 						e.locate(e.x + temp2, e.y + temp3);
 					} else if (e.direction() === 4) {	//左
 						e.locate(e.x - temp3, e.y + temp2);
@@ -629,13 +652,13 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 				}
 			}
 			if( temp1 == "玩家" ){
-				if(type == "移动到绝对位置" ){
+				if( type == "移动到绝对位置" ){
 					$gamePlayer.drill_EPo_locate( temp2, temp3 );
 				}
-				if(type == "移动到相对位置" ){
+				if( type == "移动到相对位置" ){
 					$gamePlayer.drill_EPo_locate( $gamePlayer.x + temp2, $gamePlayer.y + temp3 );
 				}
-				if(type == "移动到朝向的相对位置" ){
+				if( type == "移动到朝向的相对位置" ){
 					if ($gamePlayer.direction() === 2) {		//下
 						$gamePlayer.drill_EPo_locate($gamePlayer.x + temp2, $gamePlayer.y + temp3);
 					} else if ($gamePlayer.direction() === 4) {	//左
@@ -753,9 +776,10 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 					var y1 = $gamePlayer._realY;
 				}
 				if( temp2 == "本事件" ){
-					var e_id = this._eventId;
-					var x1 = $gameMap.event(e_id)._realX;
-					var y1 = $gameMap.event(e_id)._realY;
+					var e = $gameMap.event( this._eventId );
+					if( e == undefined ){ return; } //『防止并行删除事件出错』
+					var x1 = e._realX;
+					var y1 = e._realY;
 				}
 				if( temp2.indexOf("事件[") != -1 ){
 					temp2 = temp2.replace("事件[","");
@@ -798,9 +822,10 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 					var y2 = $gamePlayer._realY;
 				}
 				if( temp3 == "本事件" ){
-					var e_id = this._eventId;
-					var x2 = $gameMap.event(e_id)._realX;
-					var y2 = $gameMap.event(e_id)._realY;
+					var e = $gameMap.event( this._eventId );
+					if( e == undefined ){ return; } //『防止并行删除事件出错』
+					var x2 = e._realX;
+					var y2 = e._realY;
 				}
 				if( temp3.indexOf("事件[") != -1 ){
 					temp3 = temp3.replace("事件[","");
@@ -902,8 +927,10 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 				var pos = temp1.split(/[,，]/);
 				if( pos.length < 2 ){ return; }
 				if( temp2 == "本事件" ){
-					$gameVariables.setValue( Number(pos[0]) , this.x );
-					$gameVariables.setValue( Number(pos[1]) , this.y );
+					var e = $gameMap.event( this._eventId );
+					if( e == undefined ){ return; } //『防止并行删除事件出错』
+					$gameVariables.setValue( Number(pos[0]) , e.x );
+					$gameVariables.setValue( Number(pos[1]) , e.y );
 				}
 				else if( temp2.indexOf("事件[") != -1 ){
 					temp2 = temp2.replace("事件[","");
@@ -954,9 +981,16 @@ Game_Map.prototype.drill_EPo_isEventExist = function( e_id ){
 	return true;
 };
 
+
 //=============================================================================
-// ** 玩家瞬移
+// ** ☆物体操作
+//
+//			说明：	> 此模块专门管理 物体操作 功能。
+//					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
+//==============================
+// * 物体操作 - 玩家瞬移（开放函数）
+//==============================
 Game_Player.prototype.drill_EPo_locate = function( x, y ){
 	Game_Character.prototype.locate.call( this, x, y );
 	if( this.isInVehicle() ){
@@ -964,7 +998,5 @@ Game_Player.prototype.drill_EPo_locate = function( x, y ){
 	}
 	this._followers.synchronize(x, y, this.direction());
 };
-
-
 
 

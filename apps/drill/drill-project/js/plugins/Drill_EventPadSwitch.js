@@ -254,7 +254,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_EPaS_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_EPaS_PluginTip_baseList.length == 0 ){ return ""; }
@@ -276,10 +276,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventPadSwitch = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventPadSwitch');
+	var Imported = Imported || {};
+	Imported.Drill_EventPadSwitch = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventPadSwitch');
 	
 	
 	/*-----------------杂项------------------*/
@@ -296,9 +296,18 @@ if( Imported.Drill_CoreOfInput ){
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EPaS_pluginCommand = Game_Interpreter.prototype.pluginCommand;
 Game_Interpreter.prototype.pluginCommand = function(command, args){ 
 	_drill_EPaS_pluginCommand.call(this, command, args);
+	this.drill_EPaS_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EPaS_pluginCommand = function( command, args ){
 	if( command === ">手柄响应开关" ){
 		
 		if( args.length == 2 ){
@@ -584,34 +593,34 @@ Game_Event.prototype.initMembers = function() {
 	this._drill_EPaS_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定
+// * 事件注释 - 读取绑定
 //==============================
 var _drill_EPaS_event_setupPage = Game_Event.prototype.setupPage;
 Game_Event.prototype.setupPage = function() {
 	_drill_EPaS_event_setupPage.call(this);
-    this.drill_EPaS_setupMutiSwitch();
+    this.drill_EPaS_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定
+// * 事件注释 - 读取 页
 //==============================
-Game_Event.prototype.drill_EPaS_setupMutiSwitch = function() {	
+Game_Event.prototype.drill_EPaS_event_readPage = function() {	
 	
 	// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 	if( !this._erased && this.event() && this.event().pages[0] && this._drill_EPaS_isFirstBirth == true ){ 
-		this._drill_EPaS_isFirstBirth = undefined;		//『节约临时参数存储空间』
-		this.drill_EPaS_readPage( this.event().pages[0].list );
+		this.drill_EPaS_event_readList( this.event().pages[0].list );
+		this._drill_EPaS_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 	}
 	
 	// > 读取当前页注释
 	if( !this._erased && this.page() ){ 
-		this.drill_EPaS_readPage( this.list() );
+		this.drill_EPaS_event_readList( this.list() );
 	}
 }
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_EPaS_readPage = function( page_list ){
-	page_list.forEach( function( l ){
+Game_Event.prototype.drill_EPaS_event_readList = function( pageOfList ){
+	pageOfList.forEach( function( l ){
 		if( l.code === 108 ){
 			var l_str = l.parameters[0];
 			var args = l_str.split(' ');

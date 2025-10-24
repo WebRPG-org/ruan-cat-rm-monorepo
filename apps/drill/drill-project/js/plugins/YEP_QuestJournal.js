@@ -3690,7 +3690,7 @@ Game_System.prototype.isQuestRewardUnclaimed = function(questId, objId) {
 
 Yanfly.Quest.Game_Interpreter_pluginCommand =
   Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
   Yanfly.Quest.Game_Interpreter_pluginCommand.call(this, command, args);
   if (command === 'OpenQuestJournal') {
     SceneManager.push(Scene_Quest);

@@ -333,7 +333,7 @@ ImageManager.load_MapUi = function(filename) {
 // * PluginCommand
 //==============================
 var _alias_mog_mapNamehud_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_mapNamehud_pluginCommand.call(this,command, args)
 	if (command === ">地图浮动框")  {
 		if(args.length === 2){

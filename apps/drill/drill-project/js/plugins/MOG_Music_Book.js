@@ -1141,7 +1141,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_Music_Book = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -1150,7 +1150,7 @@
     Moghunter.musicbook_command_name = String(Moghunter.parameters['用语-菜单名称'] || "音乐书");
     Moghunter.musicbook_title_command_menu = String(Moghunter.parameters['是否在标题窗口中显示'] || "false");
     Moghunter.musicbook_title_command_name = String(Moghunter.parameters['用语-标题窗口名称'] || "音乐书");
-    Moghunter.musicbook_title_data_global = String(Moghunter.parameters['数据是否全局存储'] || "false") === "true";
+    Moghunter.musicbook_title_data_global = String(Moghunter.parameters["数据是否全局存储"] || "false") === "true";
 	Moghunter.musicbook_fade_time = Number(Moghunter.parameters['收起延迟'] || 120);
 	Moghunter.musicbook_completion_word = String(Moghunter.parameters['用语-完成度'] || "Completion");
 	Moghunter.musicbook_meter_x = Number(Moghunter.parameters['平移-进度条 X'] || 90);
@@ -1286,7 +1286,7 @@ ImageManager.loadmusicbook = function(filename) {
 // * PluginCommand
 //==============================
 var _alias_mog_music_book_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_music_book_pluginCommand.call(this,command, args)
 	if (command === "open_music_book")  {$gameSystem.music_book();};
 	if (command === "enable_music" 

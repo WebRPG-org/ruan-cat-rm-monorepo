@@ -46,7 +46,7 @@
 // ** PLUGIN PARAMETERS
 //=============================================================================
 
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_FlashDamage = true;
 　　var Moghunter = Moghunter || {}; 	
 	Moghunter.parameters = PluginManager.parameters('MOG_FlashDamage');

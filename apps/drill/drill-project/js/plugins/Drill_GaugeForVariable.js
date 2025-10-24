@@ -1111,7 +1111,7 @@
  */
  
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//		插件简称：		GFV (Gauge_For_Variable)
+//		插件简称		GFV (Gauge_For_Variable)
 //		临时全局变量	DrillUp.g_GFV_xxx
 //		临时局部变量	this._drill_GFV_xxx
 //		存储数据变量	$gameSystem._drill_GFV_xxx
@@ -1199,7 +1199,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_GFV_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_GFV_PluginTip_baseList.length == 0 ){ return ""; }
@@ -1215,9 +1215,9 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_GaugeForVariable = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_GaugeForVariable = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_GaugeForVariable');
 	
 	
@@ -1225,7 +1225,7 @@
 	// * 静态数据 - 变量固定框样式
 	//				（~struct~GFVStyle）
 	//==============================
-	DrillUp.drill_GFV_initStyle = function( dataFrom ) {
+	DrillUp.drill_GFV_initStyle = function( dataFrom ){
 		var data = {};
 		// > 槽样式
 		//			~struct~GFVStyleSlot:			槽样式列表
@@ -1275,7 +1275,7 @@
 	// * 静态数据 - 变量设置
 	//				（~struct~GFVBind）
 	//==============================
-	DrillUp.drill_GFV_initBind = function( dataFrom ) {
+	DrillUp.drill_GFV_initBind = function( dataFrom ){
 		var data = {};
 		// > 绑定
 		data['style_id'] = Number( dataFrom["绑定的样式"] || 0 );
@@ -1335,7 +1335,8 @@
 	DrillUp.g_GFV_styleList_length = 20;
 	DrillUp.g_GFV_styleList = [];
 	for (var i = 0; i < DrillUp.g_GFV_styleList_length; i++) {
-		if( DrillUp.parameters["固定框样式-" + String(i+1) ] != "" ){
+		if( DrillUp.parameters["固定框样式-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["固定框样式-" + String(i+1) ] != "" ){
 			var data = JSON.parse(DrillUp.parameters["固定框样式-" + String(i+1) ]);
 			DrillUp.g_GFV_styleList[i] = DrillUp.drill_GFV_initStyle( data );
 			DrillUp.g_GFV_styleList[i]['inited'] = true;
@@ -1349,7 +1350,8 @@
 	DrillUp.g_GFV_bind_length = 60;
 	DrillUp.g_GFV_bind = [];
 	for (var i = 0; i < DrillUp.g_GFV_bind_length; i++) {
-		if( DrillUp.parameters["变量框设置-" + String(i+1) ] != "" ){
+		if( DrillUp.parameters["变量框设置-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["变量框设置-" + String(i+1) ] != "" ){
 			var data = JSON.parse(DrillUp.parameters["变量框设置-" + String(i+1) ]);
 			DrillUp.g_GFV_bind[i] = DrillUp.drill_GFV_initBind( data );
 		}else{
@@ -1374,12 +1376,22 @@ ImageManager.load_SpecialVariable = function(filename) {
     return this.loadBitmap('img/Special__variable/', filename, 0, true);
 };
 
+
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_GFV_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_GFV_pluginCommand.call(this, command, args);
+	this.drill_GFV_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_GFV_pluginCommand = function( command, args ){
 	if( command === ">高级变量框" ){
 		var bind_ids = [];
 		if( args.length >= 2 ){
@@ -1609,6 +1621,7 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 		}
 	}
 };
+
 
 //=============================================================================
 // * 临时数据

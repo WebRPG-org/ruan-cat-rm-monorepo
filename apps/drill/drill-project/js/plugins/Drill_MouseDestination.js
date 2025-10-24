@@ -407,17 +407,17 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_MouseDestination = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_MouseDestination');
+	var Imported = Imported || {};
+	Imported.Drill_MouseDestination = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_MouseDestination');
 	
 	
 	//==============================
 	// * 静态数据 - 鼠标指向标
 	//				（~struct~DrillMDeSprite）
 	//==============================
-	DrillUp.drill_MDe_initDestData = function( dataFrom ) {
+	DrillUp.drill_MDe_initDestData = function( dataFrom ){
 		var data = {};
 		
 		// > 贴图
@@ -459,15 +459,16 @@
 	}
 	
 	/*-----------------杂项------------------*/
-	DrillUp.g_MDe_visible = String(DrillUp.parameters['是否初始显示'] || 'true') === 'true';
-	DrillUp.g_MDe_curStyle = Number(DrillUp.parameters['当前指向标'] || 0);
+	DrillUp.g_MDe_visible = String(DrillUp.parameters["是否初始显示"] || "true") === "true";
+	DrillUp.g_MDe_curStyle = Number(DrillUp.parameters["当前指向标"] || 0);
 	
 	/*-----------------鼠标指向标------------------*/
 	DrillUp.g_MDe_list_length = 10;
 	DrillUp.g_MDe_list = [];
-	for (var i = 0; i < DrillUp.g_MDe_list_length; i++) {
-		if( DrillUp.parameters['指向标-' + String(i+1) ] != "" ){
-			var temp = JSON.parse(DrillUp.parameters['指向标-' + String(i+1) ]);
+	for( var i = 0; i < DrillUp.g_MDe_list_length; i++ ){
+		if( DrillUp.parameters["指向标-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["指向标-" + String(i+1) ] != "" ){
+			var temp = JSON.parse(DrillUp.parameters["指向标-" + String(i+1) ]);
 			DrillUp.g_MDe_list[i] = DrillUp.drill_MDe_initDestData( temp );
 		}else{
 			DrillUp.g_MDe_list[i] = null;
@@ -478,9 +479,18 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_MDe_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_MDe_pluginCommand.call(this, command, args);
+	this.drill_MDe_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_MDe_pluginCommand = function( command, args ){
 	if( command === ">目的地指向标" ){
 		
 		if( args.length == 2 ){
@@ -648,8 +658,9 @@ Spriteset_Map.prototype.update = function() {
 // ** 目的地贴图【Drill_MDe_DestSprite】
 // **		
 // **		作用域：	地图界面、战斗界面
-// **		主功能：	> 定义一个 鼠标目的地 的贴图。
-// **		子功能：	->贴图
+// **		主功能：	定义一个 鼠标目的地 的贴图。
+// **		子功能：	
+// **					->贴图
 // **					->A主体
 // **						->层级
 // **					->B播放GIF
@@ -743,8 +754,6 @@ Drill_MDe_DestSprite.prototype.drill_sprite_destroy = function(){
 //			
 //			说明：	> data 动态参数对象（来自类初始化）
 //					  该对象包含 类所需的所有默认值。
-//					> 其中 DrillUp.drill_MDe_initStyle 提供了部分数据库设置的样式数据，
-//					  样式数据中注释的部分，仍然需要子插件根据自身情况来进行赋值。
 //##############################
 Drill_MDe_DestSprite.prototype.drill_sprite_initData = function() {
 	var data = this._drill_data;

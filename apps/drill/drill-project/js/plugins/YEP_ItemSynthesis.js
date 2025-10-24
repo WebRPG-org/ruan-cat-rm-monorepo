@@ -689,7 +689,7 @@ Game_System.prototype.maxSynthesize = function(item) {
 
 Yanfly.IS.Game_Interpreter_pluginCommand =
     Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
     Yanfly.IS.Game_Interpreter_pluginCommand.call(this, command, args)
     if (command === 'OpenSynthesis') this.gotoSceneSynthesis(args);
     if (command === 'ShowSynthesis') $gameSystem._showSynthesis = true;

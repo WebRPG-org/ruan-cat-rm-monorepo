@@ -145,7 +145,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_OKCB_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_OKCB_PluginTip_baseList.length == 0 ){ return ""; }
@@ -161,10 +161,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_OperateKeyboradConditionBranch = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_OperateKeyboradConditionBranch');
+	var Imported = Imported || {};
+	Imported.Drill_OperateKeyboradConditionBranch = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_OperateKeyboradConditionBranch');
 	
 	
 //=============================================================================
@@ -187,7 +187,8 @@ Game_Interpreter.prototype.drill_COCB_conditionCommand = function(command, args)
 			var temp2 = String(args[1]);
 			if( temp1.indexOf("物理按键") != -1 ){
 				temp1 = temp1.replace("物理按键","");
-				temp1 = temp1.replace(/\"/g,"");
+				temp1 = temp1.replace("\"","");
+				temp1 = temp1.replace("\"","");
 				if( temp2 == "按下时" ){
 					var passed = Input.drill_isKeyPressed( temp1 ) == true;
 					this.drill_COCB_conditionSubmit( passed );

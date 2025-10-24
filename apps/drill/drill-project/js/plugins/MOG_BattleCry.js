@@ -38,7 +38,7 @@
 
     // Não modifique essa parte.
     // ☢CAUTION!!☢ Don't Touch.^_^ ----------------------------------------
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_BattleCry = true;
 　　var Moghunter = Moghunter || {}; 	
 	Moghunter.parameters = PluginManager.parameters('MOG_BattleCry');

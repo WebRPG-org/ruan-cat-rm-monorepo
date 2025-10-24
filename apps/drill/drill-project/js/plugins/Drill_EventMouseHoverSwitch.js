@@ -333,7 +333,7 @@
 //			->☆静态数据
 //			->☆插件指令
 //			->☆存储数据
-//			->☆事件注释
+//			->☆事件注释（Sprite_Character）
 //			
 //			->☆开关的属性
 //			->☆鼠标悬停响应开关容器
@@ -378,7 +378,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_EMoHS_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_EMoHS_PluginTip_baseList.length == 0 ){ return ""; }
@@ -406,10 +406,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventMouseHoverSwitch = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventMouseHoverSwitch');
+	var Imported = Imported || {};
+	Imported.Drill_EventMouseHoverSwitch = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventMouseHoverSwitch');
 	
 	
 	/*-----------------杂项------------------*/
@@ -427,9 +427,18 @@ if( Imported.Drill_CoreOfInput &&
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EMoHS_pluginCommand = Game_Interpreter.prototype.pluginCommand;
 Game_Interpreter.prototype.pluginCommand = function(command, args){ 
 	_drill_EMoHS_pluginCommand.call(this, command, args);
+	this.drill_EMoHS_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EMoHS_pluginCommand = function( command, args ){
 	if( command === ">鼠标悬停响应开关" ){
 		
 		if( args.length == 2 ){
@@ -755,48 +764,48 @@ Game_System.prototype.drill_EMoHS_checkSysData_Private = function() {
 
 
 //=============================================================================
-// ** ☆事件注释
+// ** ☆事件注释（Sprite_Character）
 //=============================================================================
 //==============================
 // * 事件注释 - 第一页标记
 //==============================
-var _drill_EMoHS_initMembers = Game_Event.prototype.initMembers;
+var _drill_EMoHS_event_initMembers = Game_Event.prototype.initMembers;
 Game_Event.prototype.initMembers = function(){ 
-	_drill_EMoHS_initMembers.call(this);
+	_drill_EMoHS_event_initMembers.call(this);
 	this._drill_EMoHS_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定（Sprite_Character）
+// * 事件注释 - 读取绑定（Sprite_Character）
 //==============================
-var _drill_EMoHS_setCharacter = Sprite_Character.prototype.setCharacter;
+var _drill_EMoHS_event_setCharacter = Sprite_Character.prototype.setCharacter;
 Sprite_Character.prototype.setCharacter = function(character){ 		//图像改变，范围就改变
-	_drill_EMoHS_setCharacter.call(this,character);
-    this.drill_EMoHS_setupTrigger();
+	_drill_EMoHS_event_setCharacter.call(this,character);
+    this.drill_EMoHS_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定（Sprite_Character）
+// * 事件注释 - 读取 页（Sprite_Character）
 //==============================
-Sprite_Character.prototype.drill_EMoHS_setupTrigger = function(){ 
+Sprite_Character.prototype.drill_EMoHS_event_readPage = function(){ 
 	if( this._character && this._character instanceof Game_Event ){
 		var ch = this._character;
 		
 		// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 		if( !ch._erased && ch.event() && ch.event().pages[0] && ch._drill_EMoHS_isFirstBirth == true ){ 
-			ch._drill_EMoHS_isFirstBirth = undefined;		//『节约临时参数存储空间』
-			ch.drill_EMoHS_readPage( ch.event().pages[0].list );
+			ch.drill_EMoHS_event_readList( ch.event().pages[0].list );
+			ch._drill_EMoHS_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 		}
 		
 		// > 读取当前页注释
 		if( !ch._erased && ch.page() ){ 
-			ch.drill_EMoHS_readPage( ch.list() );
+			ch.drill_EMoHS_event_readList( ch.list() );
 		}
 	}
 };
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_EMoHS_readPage = function( page_list ){
-	page_list.forEach( function(l){
+Game_Event.prototype.drill_EMoHS_event_readList = function( pageOfList ){
+	pageOfList.forEach( function(l){
 		if( l.code === 108 ){
 			var l_str = l.parameters[0];
 			var args = l_str.split(' ');

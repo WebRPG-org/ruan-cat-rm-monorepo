@@ -76,7 +76,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_DmgPopupEffects = true;
 　　var Moghunter = Moghunter || {}; 
 

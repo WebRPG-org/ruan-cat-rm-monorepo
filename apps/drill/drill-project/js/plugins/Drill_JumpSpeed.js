@@ -204,35 +204,35 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_JumpSpeed = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_JumpSpeed');
+	var Imported = Imported || {};
+	Imported.Drill_JumpSpeed = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_JumpSpeed');
 	
 	
 	/*-----------------杂项------------------*/
-	if( DrillUp.parameters['资源-多次弹跳音效'] != "" &&
-		DrillUp.parameters['资源-多次弹跳音效'] != undefined  ){
-		DrillUp.g_JSp_se = JSON.parse(DrillUp.parameters['资源-多次弹跳音效']);
+	if( DrillUp.parameters["资源-多次弹跳音效"] != undefined &&
+		DrillUp.parameters["资源-多次弹跳音效"] != ""  ){
+		DrillUp.g_JSp_se = JSON.parse(DrillUp.parameters["资源-多次弹跳音效"]);
 	}else{
 		DrillUp.g_JSp_se = [];
 	}
 
 
 //=============================================================================
-// ** 插件指令
+// ** ☆插件指令
 //=============================================================================
 //==============================
-// * 插件指令 - 指令
+// * 插件指令 - 指令绑定
 //==============================
 var _drill_JSp_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_JSp_pluginCommand.call(this,command, args);
     this.drill_JSp_command(command, args);
     this.drill_JSp_oldCommand(command, args);
 };
 //==============================
-// * 插件指令 - 新指令
+// * 插件指令 - 指令执行
 //==============================
 Game_Interpreter.prototype.drill_JSp_command = function( command, args ){
 	if( command === ">跳跃设置" ){

@@ -286,10 +286,20 @@
 //			无
 //		
 //		★必要注意事项：
-//			1.【该插件使用了事件容器】，必须考虑三种情况：初始化、切换地图时、切换贴图时，不然会出现指针错误！
-//				只要是装事件的容器，都需要考虑指针问题，不管是放在$gameMap还是$gameTemp中。
-//				另外，帧刷新判断时，最好每次变化直接【刷新统计】。
-//			
+//			1.一只老鼠提醒你，我可没有那么重能踩下重力开关哦。
+//				   .--,       .--,
+//				  ( (  \.---./  ) )
+//				   '.__/o   o\__.'
+//				      {=  ^  =}
+//				       >  -  <
+//				      /       \
+//				     //       \\
+//				    //|   .   |\\
+//				    "'\       /'"_.-~
+//				       \  _  /--'
+//				     ___)( )(___
+//				    (((__) (__)))
+//		
 //		★其它说明细节：
 //			1.每次检查坐标情况，来确定开关是否被压住。
 //			2.优化：地图中所有容器都为空时，不工作。
@@ -321,19 +331,28 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventPressureSwitch = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventPressureSwitch');
+	var Imported = Imported || {};
+	Imported.Drill_EventPressureSwitch = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventPressureSwitch');
 
 
 
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EPS_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_EPS_pluginCommand.call(this, command, args);
+	this.drill_EPS_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EPS_pluginCommand = function( command, args ){
 	if( command === ">重力开关" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -477,34 +496,34 @@ Game_Event.prototype.initMembers = function(){
 	this._drill_EPS_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定
+// * 事件注释 - 读取绑定
 //==============================
 var _drill_EPS_event_setupPage = Game_Event.prototype.setupPage;
 Game_Event.prototype.setupPage = function(){
 	_drill_EPS_event_setupPage.call(this);
-    this.drill_EPS_setupPressSwitch();
+    this.drill_EPS_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定
+// * 事件注释 - 读取 页
 //==============================
-Game_Event.prototype.drill_EPS_setupPressSwitch = function(){
+Game_Event.prototype.drill_EPS_event_readPage = function(){
 	
 	// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 	if( !this._erased && this.event() && this.event().pages[0] && this._drill_EPS_isFirstBirth == true ){ 
-		this._drill_EPS_isFirstBirth = undefined;		//『节约临时参数存储空间』
-		this.drill_EPS_readPage( this.event().pages[0].list );
+		this.drill_EPS_event_readList( this.event().pages[0].list );
+		this._drill_EPS_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 	}
 	
 	// > 读取当前页注释
 	if( !this._erased && this.page() ){ 
-		this.drill_EPS_readPage( this.list() );
+		this.drill_EPS_event_readList( this.list() );
 	}
 }
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_EPS_readPage = function( page_list ){		
-	page_list.forEach( function( l ){
+Game_Event.prototype.drill_EPS_event_readList = function( pageOfList ){		
+	pageOfList.forEach( function( l ){
 		if( l.code === 108 ){
 			var l_str = l.parameters[0];
 			var args = l_str.split(' ');

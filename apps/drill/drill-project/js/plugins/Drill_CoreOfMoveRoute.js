@@ -137,7 +137,7 @@
  */
  
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//		插件简称：		COMR (Core_Of_Move_Route)
+//		插件简称		COMR (Core_Of_Move_Route)
 //		临时全局变量	DrillUp.g_COMR_xxx
 //		临时局部变量	无
 //		存储数据变量	无
@@ -248,10 +248,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_CoreOfMoveRoute = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_CoreOfMoveRoute');
+	var Imported = Imported || {};
+	Imported.Drill_CoreOfMoveRoute = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_CoreOfMoveRoute');
 	
 	
 	/*-----------------杂项------------------*/
@@ -261,9 +261,18 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_COMR_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_COMR_pluginCommand.call(this, command, args);
+	this.drill_COMR_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_COMR_pluginCommand = function( command, args ){
 	if( command === ">移动路线核心" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -350,40 +359,40 @@ Game_Map.prototype.drill_COMR_isEventExist = function( e_id ){
 //==============================
 // * 事件注释 - 第一页标记
 //==============================
-var _drill_COMR_initMembers = Game_Event.prototype.initMembers;
+var _drill_COMR_event_initMembers = Game_Event.prototype.initMembers;
 Game_Event.prototype.initMembers = function() {
-	_drill_COMR_initMembers.call(this);
+	_drill_COMR_event_initMembers.call(this);
 	this._drill_COMR_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定
+// * 事件注释 - 读取绑定
 //==============================
-var _drill_COMR_setupPage = Game_Event.prototype.setupPage;
+var _drill_COMR_event_setupPage = Game_Event.prototype.setupPage;
 Game_Event.prototype.setupPage = function() {
-	_drill_COMR_setupPage.call(this);
-    this.drill_COMR_setupPage();
+	_drill_COMR_event_setupPage.call(this);
+    this.drill_COMR_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定
+// * 事件注释 - 读取 页
 //==============================
-Game_Event.prototype.drill_COMR_setupPage = function() {
+Game_Event.prototype.drill_COMR_event_readPage = function() {
 	
 	// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 	if( !this._erased && this.event() && this.event().pages[0] && this._drill_COMR_isFirstBirth == true ){ 
-		this._drill_COMR_isFirstBirth = undefined;		//『节约临时参数存储空间』
-		this.drill_COMR_readPage( this.event().pages[0].list );
+		this.drill_COMR_event_readList( this.event().pages[0].list );
+		this._drill_COMR_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 	}
 	
 	// > 读取当前页注释
 	if( !this._erased && this.page() ){ 
-		this.drill_COMR_readPage( this.list() );
+		this.drill_COMR_event_readList( this.list() );
 	}
 }
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_COMR_readPage = function( page_list ) {		
-	page_list.forEach( function(l){
+Game_Event.prototype.drill_COMR_event_readList = function( pageOfList ){
+	pageOfList.forEach( function(l){
 		if( l.code === 108 ){
 			var args = l.parameters[0].split(' ');
 			var command = args.shift();
@@ -722,7 +731,11 @@ Game_Character.prototype.processMoveCommand = function( command ){
 		}
 		
 		// > 阻止 "没有括号的函数"
-		if( temp_script.indexOf("=") == -1 && ( temp_script.indexOf("(") == -1 || temp_script.indexOf(")") == -1 ) ){
+		if( temp_script.indexOf("=") == -1 && 
+		    temp_script.indexOf(">") == -1 && 
+		    temp_script.indexOf("<") == -1 && 
+		    temp_script.indexOf(".") == -1 && 
+		   (temp_script.indexOf("(") == -1 || temp_script.indexOf(")") == -1) ){
 			DrillUp.drill_COMR_addScript( temp_script );
 			return; 
 		}

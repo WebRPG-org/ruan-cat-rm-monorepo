@@ -561,7 +561,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_TimeSystem = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -671,7 +671,7 @@
 // * PluginCommand
 //==============================
 var _alias_mog_timeSystem_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_timeSystem_pluginCommand.call(this,command, args)
 	if (command === "show_clock")  {$gameSystem._time_window_visible = true;};
 	if (command === "hide_clock")  {$gameSystem._time_window_visible = false;};

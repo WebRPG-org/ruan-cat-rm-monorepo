@@ -131,6 +131,7 @@
  *   事件插件指令设置后，只在本地图有效，离开地图失效。
  * 3.注意，只有"动画帧间隔"能设置公式。
  *   事件虽然可以设置"动画帧间隔(奔跑时)"，但事件并不能奔跑，所以没有效果。
+ * 4."玩家队员[1]"中，-2表示领队，1表示第一个跟随者。
  * 
  * -----------------------------------------------------------------------------
  * ----可选设定 - 固定帧
@@ -394,7 +395,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_EFN_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_EFN_PluginTip_baseList.length == 0 ){ return ""; }
@@ -428,10 +429,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventFrameNumber = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventFrameNumber');
+	var Imported = Imported || {};
+	Imported.Drill_EventFrameNumber = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventFrameNumber');
 	
 	
 	/*-----------------杂项------------------*/
@@ -450,9 +451,18 @@ if( Imported.Drill_CoreOfEventFrame ){
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EFN_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_EFN_pluginCommand.call(this, command, args);
+	this.drill_EFN_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EFN_pluginCommand = function( command, args ){
 	if( command === ">多帧行走图" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -516,18 +526,28 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 			if( p_chars == null && unit.indexOf("玩家队员变量[") != -1 ){
 				unit = unit.replace("玩家队员变量[","");
 				unit = unit.replace("]","");
-				var group = $gamePlayer.followers().visibleFollowers();
-				group.unshift($gamePlayer);
-				p_chars = [];
-				p_chars.push(group[ $gameVariables.value(Number(unit)) ]);
+				var p_id = $gameVariables.value(Number(unit));
+				if( p_id == -2 ){  //『玩家id』
+					p_chars = [ $gamePlayer ];
+				}
+				if( p_id > 0 ){  //『玩家队员id』
+					var group = $gamePlayer.followers().visibleFollowers();
+					p_chars = [];
+					p_chars.push(group[ p_id-1 ]);
+				}
 			}
 			if( p_chars == null && unit.indexOf("玩家队员[") != -1 ){
 				unit = unit.replace("玩家队员[","");
 				unit = unit.replace("]","");
-				var group = $gamePlayer.followers().visibleFollowers();
-				group.unshift($gamePlayer);
-				p_chars = [];
-				p_chars.push(group[ Number(unit) ]);
+				var p_id = Number(unit);
+				if( p_id == -2 ){  //『玩家id』
+					p_chars = [ $gamePlayer ];
+				}
+				if( p_id > 0 ){  //『玩家队员id』
+					var group = $gamePlayer.followers().visibleFollowers();
+					p_chars = [];
+					p_chars.push(group[ p_id-1 ]);
+				}
 			}
 		}
 		// > 未获取到对象，直接跳过
@@ -903,11 +923,13 @@ Game_CharacterBase.prototype.drill_EFN_setupNote = function( note ){
 // ** 多帧行走图 控制器【Drill_EFN_Controller】
 // **		
 // **		作用域：	地图界面
-// **		主功能：	> 定义一个专门控制行走图动画帧的数据类。
-// **		子功能：	->动画帧
+// **		主功能：	定义一个专门控制行走图动画帧的数据类。
+// **		子功能：	
+// **					->控制器
 // **						->启用/关闭
 // **						->暂停/继续
 // **						->重设数据
+// **					
 // **					->A主体
 // **						> 初始帧
 // **						> 帧数
@@ -925,7 +947,7 @@ Game_CharacterBase.prototype.drill_EFN_setupNote = function( note ){
 // **						->循环播放
 // **						->排除初始帧
 // **						->获取序列
-// **		
+// **					
 // **		说明：	> 该类可与 Game_CharacterBase 一并存储在 $gameMap 中。
 //=============================================================================
 //==============================
@@ -939,7 +961,7 @@ function Drill_EFN_Controller(){
 //==============================
 Drill_EFN_Controller.prototype.initialize = function( data ){
 	this._drill_data = {};
-	this._drill_controllerSerial = new Date().getTime() + Math.random();	//（生成一个不重复的序列号）
+	this._drill_controllerSerial = new Date().getTime() + Math.random();	//『生成一个不重复的序列号』
     this.drill_controller_initData();										//初始化数据
     this.drill_controller_initChild();										//私有数据初始化
 	if( data == undefined ){ data = {}; }
@@ -1240,7 +1262,7 @@ Drill_EFN_Controller.prototype.drill_controller_resetData_Private = function( da
 	
 	// > 执行重置
 	this._drill_data = JSON.parse(JSON.stringify( data ));					//深拷贝
-	this._drill_controllerSerial = new Date().getTime() + Math.random();	//（生成一个不重复的序列号）
+	this._drill_controllerSerial = new Date().getTime() + Math.random();	//『生成一个不重复的序列号』
     this.drill_controller_initData();										//初始化数据
     this.drill_controller_initChild();										//私有数据初始化
 }

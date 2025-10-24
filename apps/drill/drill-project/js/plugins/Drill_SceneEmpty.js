@@ -70,19 +70,19 @@
  * 完成插件ヽ(*。>Д<)o゜
  * 
  *
- * @param ----杂项----
+ * @param ----面板跳转----
  * @default 
  *
- * @param 是否添加到主菜单
+ * @param 是否在主菜单窗口中显示
  * @parent ----杂项----
  * @type boolean
- * @on 添加
- * @off 不添加
- * @desc true - 添加，false - 不添加
+ * @on 显示
+ * @off 不显示
+ * @desc true-显示,false-不显示。
  * @default false
  *
- * @param 主菜单显示名
- * @parent 是否添加到主菜单
+ * @param 主菜单窗口显示名
+ * @parent 是否在主菜单窗口中显示
  * @desc 主菜单显示的选项名。
  * @default 空面板
  *
@@ -129,8 +129,8 @@
 //			->☆静态数据
 //			->☆插件指令
 //			
-//			->☆主菜单选项
-//			->☆标题选项
+//			->☆面板跳转之主菜单
+//			->☆面板跳转之标题
 //			
 //			->空面板【Scene_Drill_SEm】
 //				->☆原型链规范（Scene_Drill_SEm）
@@ -169,15 +169,15 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_SceneEmpty = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_SceneEmpty');
+	var Imported = Imported || {};
+	Imported.Drill_SceneEmpty = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_SceneEmpty');
 	
 	
-	/*-----------------杂项------------------*/
-	DrillUp.g_SEm_add_to_menu = String(DrillUp.parameters['是否添加到主菜单'] || "true") === "true";	
-    DrillUp.g_SEm_menu_name = String(DrillUp.parameters['主菜单显示名'] || "");
+	/*-----------------面板跳转------------------*/
+	DrillUp.g_SEm_add_to_menu = String(DrillUp.parameters['是否在主菜单窗口中显示'] || "true") === "true";	
+    DrillUp.g_SEm_menu_name = String(DrillUp.parameters['主菜单窗口显示名'] || "");
 	DrillUp.g_SEm_add_to_title = String(DrillUp.parameters['是否在标题窗口中显示'] || "false") === "true";	
     DrillUp.g_SEm_title_name = String(DrillUp.parameters['标题窗口显示名'] || "");
 
@@ -185,14 +185,23 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_SEm_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_SEm_pluginCommand.call(this, command, args);
+	this.drill_SEm_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_SEm_pluginCommand = function( command, args ){
 	if( command === ">空面板" ){
 		
 		if(args.length == 2){
 			var type = String(args[1]);
-			if( type == "打开面板" ){			//打开菜单
+			if( type == "打开面板" ){
 				SceneManager.push(Scene_Drill_SEm);
 			}
 		}
@@ -201,7 +210,7 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 
 
 //=============================================================================
-// ** ☆主菜单选项
+// ** ☆面板跳转之主菜单
 //
 //			说明：	> 此模块专门关联主菜单选项，选项进入后跳转到 空面板 界面。
 //					（插件完整的功能目录去看看：功能结构树）
@@ -224,7 +233,7 @@ Window_MenuCommand.prototype.addOriginalCommands = function() {
 
 
 //=============================================================================
-// ** ☆标题选项
+// ** ☆面板跳转之标题
 //
 //			说明：	> 此模块专门关联标题选项，选项进入后跳转到 空面板 界面。
 //					（插件完整的功能目录去看看：功能结构树）
@@ -249,7 +258,28 @@ Window_TitleCommand.prototype.makeCommandList = function() {
 
 //=============================================================================
 // ** 空面板【Scene_Drill_SEm】
-//
+// **
+// **		作用域：	菜单界面
+// **		主功能：	提供一个空白的面板。
+// **		子功能：
+// **					->界面重要函数
+// **						> 初始化（initialize）
+// **						> 创建（create）
+// **						> 帧刷新（update）
+// **						x> 开始运行（start）
+// **						x> 结束运行（stop）
+// **						x> 忙碌状态（isBusy）
+// **						x> 析构函数（terminate）
+// **						x> 判断加载完成（isReady）
+// **						x> 判断是否激活/启动（isActive）
+// **						x> 当前角色切换时（onActorChange）
+// **						x> 创建 - 菜单背景（createBackground）
+// **						x> 创建 - 帮助窗口（createHelpWindow）
+// **					
+// **		界面成员：
+// **					无
+// **				
+// **		说明：	> 暂无。
 //=============================================================================
 //==============================
 // * 空面板 - 定义
@@ -260,24 +290,24 @@ function Scene_Drill_SEm() {
 Scene_Drill_SEm.prototype = Object.create(Scene_MenuBase.prototype);
 Scene_Drill_SEm.prototype.constructor = Scene_Drill_SEm;
 //==============================
-// * 空面板 - 初始化
+// * 空面板 - 初始化（继承）
 //==============================
 Scene_Drill_SEm.prototype.initialize = function() {
     Scene_MenuBase.prototype.initialize.call(this);
 };
 //==============================
-// * 空面板 - 创建
+// * 空面板 - 创建（继承）
 //==============================
 Scene_Drill_SEm.prototype.create = function() {
     Scene_MenuBase.prototype.create.call(this);
 };
 //==============================
-// * 空面板 - 帧刷新
+// * 空面板 - 帧刷新（继承）
 //==============================
 Scene_Drill_SEm.prototype.update = function() { 
 	Scene_MenuBase.prototype.update.call(this);	
 	
-	this.drill_updateQuit();			//退出监听
+	this.drill_updateQuit();			//退出
 };
 //==============================
 // * 空面板 - 退出
@@ -330,10 +360,10 @@ Scene_Drill_SEm.prototype.stop = function() {
     Scene_MenuBase.prototype.stop.call(this);
 };
 //==============================
-// * 空面板（场景基类） - 判断是否激活/启动
+// * 空面板（场景基类） - 忙碌状态
 //==============================
-Scene_Drill_SEm.prototype.isActive = function() {
-	return Scene_MenuBase.prototype.isActive.call(this);
+Scene_Drill_SEm.prototype.isBusy = function() {
+	return Scene_MenuBase.prototype.isBusy.call(this);
 };
 //==============================
 // * 空面板（场景基类） - 析构函数
@@ -341,7 +371,6 @@ Scene_Drill_SEm.prototype.isActive = function() {
 Scene_Drill_SEm.prototype.terminate = function() {
     Scene_MenuBase.prototype.terminate.call(this);
 };
-
 //==============================
 // * 空面板（场景基类） - 判断加载完成
 //==============================
@@ -349,12 +378,18 @@ Scene_Drill_SEm.prototype.isReady = function() {
 	return Scene_MenuBase.prototype.isReady.call(this);
 };
 //==============================
-// * 空面板（场景基类） - 忙碌状态
+// * 空面板（场景基类） - 判断是否激活/启动
 //==============================
-Scene_Drill_SEm.prototype.isBusy = function() {
-	return Scene_MenuBase.prototype.isBusy.call(this);
+Scene_Drill_SEm.prototype.isActive = function() {
+	return Scene_MenuBase.prototype.isActive.call(this);
 };
 
+//==============================
+// * 空面板（菜单界面基类） - 当前角色切换时
+//==============================
+Scene_Drill_SEm.prototype.onActorChange = function() {
+	Scene_MenuBase.prototype.onActorChange.call(this);
+};
 //==============================
 // * 空面板（菜单界面基类） - 创建 - 菜单背景
 //==============================

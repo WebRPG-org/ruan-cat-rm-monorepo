@@ -212,7 +212,7 @@ Game_System.prototype.clearConsBat = function() {
 // * PluginCommand
 //==============================
 var _mog_cosBat_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_mog_cosBat_pluginCommand.call(this,command, args)
     this.setConsBattes(command, args);
 	return true;

@@ -119,7 +119,7 @@
  * @param 全局存储的文件路径
  * @type number
  * @min 1
- * @desc 指对应的文件路径ID，该插件的数据将存储到指定的文件路径中，具体去 全局存储核心 看看。
+ * @desc 指对应的文件路径ID,该插件的数据将存储到指定文件路径,具体看看"21.管理器 > 关于全局存储.docx"。
  * @default 1
  *
  * @param ---平铺GIF组 1至20---
@@ -843,7 +843,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_TTG_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_TTG_PluginTip_baseList.length == 0 ){ return ""; }
@@ -859,22 +859,22 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_TitleTiledGif = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_TitleTiledGif = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_TitleTiledGif');
 	
 	//==============================
 	// * 静态数据 - 平铺GIF
 	//				（~struct~TitleTiledGIF）
 	//==============================
-	DrillUp.drill_TTG_tiledGifInit = function( dataFrom ) {
+	DrillUp.drill_TTG_tiledGifInit = function( dataFrom ){
 		var data = {};
 		
 		// > 贴图
 		data['visible'] = String( dataFrom["初始是否显示"] || "false") == "true";
-		if( dataFrom["资源-平铺GIF"] != "" &&
-			dataFrom["资源-平铺GIF"] != undefined ){
+		if( dataFrom["资源-平铺GIF"] != undefined &&
+			dataFrom["资源-平铺GIF"] != "" ){
 			data['src_img'] = JSON.parse( dataFrom["资源-平铺GIF"] );
 		}else{
 			data['src_img'] = [];
@@ -905,12 +905,12 @@
 	}
 	
 	/*-----------------杂项------------------*/
-    DrillUp.g_TTG_dataFileId = Number(DrillUp.parameters['全局存储的文件路径'] || 1);
+    DrillUp.g_TTG_dataFileId = Number(DrillUp.parameters["全局存储的文件路径"] || 1);
 	
 	/*-----------------平铺GIF------------------*/
 	DrillUp.g_TTG_list_length = 80;
 	DrillUp.g_TTG_list = [];
-	for (var i = 0; i < DrillUp.g_TTG_list_length; i++) {
+	for( var i = 0; i < DrillUp.g_TTG_list_length; i++ ){
 		if( DrillUp.parameters["平铺GIF-" + String(i+1) ] != undefined &&
 			DrillUp.parameters["平铺GIF-" + String(i+1) ] != "" ){
 			var temp = JSON.parse(DrillUp.parameters['平铺GIF-' + String(i+1) ]);
@@ -930,10 +930,10 @@ if( Imported.Drill_CoreOfGlobalSave ){
 
 
 //=============================================================================
-// ** 全局存储
+// ** ☆全局存储
 //=============================================================================
 //==============================
-// * 全局 - 检查数据 - 显示情况
+// * 『全局存储』 - 载入时检查数据 - 显示情况
 //==============================
 DrillUp.drill_TTG_gCheckData_visible = function(){
 	for( var i = 0; i < DrillUp.g_TTG_list_length ; i++ ){
@@ -954,10 +954,10 @@ DrillUp.drill_TTG_gCheckData_visible = function(){
 	}
 }
 //==============================
-// * 全局 - 读取
+// * 『全局存储』 - 载入
 //==============================
 	var global_fileId = DrillUp.g_TTG_dataFileId;
-	var global_data = StorageManager.drill_COGS_loadData( global_fileId, "TTG" );
+	var global_data = StorageManager.drill_COGS_loadData( global_fileId, "TTG" );  //『全局存储执行函数』
 	
 	// > 显示情况
 	if( DrillUp.global_TTG_visibleTank == null ){			//（游戏没关时，不会为null)
@@ -968,21 +968,31 @@ DrillUp.drill_TTG_gCheckData_visible = function(){
 	}
 	
 //==============================
-// * 全局 - 存储
+// * 『全局存储』 - 存储
 //==============================
 StorageManager.drill_TTG_saveData = function(){
 	var file_id = DrillUp.g_TTG_dataFileId;
 	var data = {};
 	data["global_visibleTank"] = DrillUp.global_TTG_visibleTank;
-	this.drill_COGS_saveData( file_id, "TTG", data );
+	this.drill_COGS_saveData( file_id, "TTG", data );  //『全局存储执行函数』
 };
 
+
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_TTG_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_TTG_pluginCommand.call(this, command, args);
+	this.drill_TTG_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_TTG_pluginCommand = function( command, args ){
 	if( command === ">标题平铺GIF" ){
 		
 		if(args.length == 4){

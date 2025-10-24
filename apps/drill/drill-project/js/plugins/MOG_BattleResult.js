@@ -663,7 +663,7 @@
 // ** PLUGIN PARAMETERS
 //=============================================================================
 
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_BattleResult = true;
 　　var Moghunter = Moghunter || {}; 	
 	Moghunter.parameters = PluginManager.parameters('MOG_BattleResult');

@@ -87,7 +87,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_ActorTurnIndicator = true;
 　　var Moghunter = Moghunter || {}; 
 

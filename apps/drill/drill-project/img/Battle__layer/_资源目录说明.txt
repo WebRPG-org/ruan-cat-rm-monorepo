@@ -4,6 +4,7 @@
 	
 	来自插件：
 		Drill_BattleBackground	战斗 - 多层战斗背景
+		Drill_BattleParticle		战斗 - 多层战斗粒子
 		Drill_BattleCircle		战斗 - 多层战斗魔法圈
 	
 	相关文档：

@@ -3369,7 +3369,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_EnemyPoses = true;
 　　var Moghunter = Moghunter || {}; 
 

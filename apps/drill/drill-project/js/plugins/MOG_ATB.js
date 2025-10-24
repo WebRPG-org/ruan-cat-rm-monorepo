@@ -214,7 +214,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_ATB = true;
 　　var Moghunter = Moghunter || {}; 
 	Moghunter.drill_change_battle_mode = 1;
@@ -300,7 +300,7 @@ SoundManager.playSoundMX = function(fileName){
 // * PluginCommand
 //==============================
 var _mog_atb_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_mog_atb_pluginCommand.call(this,command, args);
 	this.setATBParInt(command, args);
 	return true;

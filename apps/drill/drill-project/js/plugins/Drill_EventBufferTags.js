@@ -163,7 +163,7 @@
 //		★时间复杂度		o(n)
 //		★性能测试因素	物体管理管理层
 //		★性能测试消耗	2024/8/8：
-//							》0.1ms（drill_EBT_setupMutiSwitch）
+//							》0.1ms（drill_EBT_event_readPage）
 //		★最坏情况		无
 //		
 //		★优化记录		暂无
@@ -221,7 +221,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_EBT_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_EBT_PluginTip_baseList.length == 0 ){ return ""; }
@@ -243,10 +243,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventBufferTags = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventBufferTags');
+	var Imported = Imported || {};
+	Imported.Drill_EventBufferTags = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventBufferTags');
 	
 	
 //=============================================================================
@@ -259,9 +259,18 @@ if( Imported.Drill_CoreOfString &&
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EBT_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_EBT_pluginCommand.call(this, command, args);
+	this.drill_EBT_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EBT_pluginCommand = function( command, args ){
 	if( command === ">事件的缓存标签" || command === ">标签核心" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -506,34 +515,34 @@ Game_Event.prototype.initMembers = function() {
 	this._drill_EBT_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定
+// * 事件注释 - 读取绑定
 //==============================
 var _drill_EBT_event_setupPage = Game_Event.prototype.setupPage;
 Game_Event.prototype.setupPage = function() {
 	_drill_EBT_event_setupPage.call(this);
-    this.drill_EBT_setupMutiSwitch();
+    this.drill_EBT_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定
+// * 事件注释 - 读取 页
 //==============================
-Game_Event.prototype.drill_EBT_setupMutiSwitch = function() {	
+Game_Event.prototype.drill_EBT_event_readPage = function() {	
 	
 	// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 	if( !this._erased && this.event() && this.event().pages[0] && this._drill_EBT_isFirstBirth == true ){ 
-		this._drill_EBT_isFirstBirth = undefined;		//『节约临时参数存储空间』
-		this.drill_EBT_readPage( this.event().pages[0].list );
+		this.drill_EBT_event_readList( this.event().pages[0].list );
+		this._drill_EBT_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 	}
 	
 	// > 读取当前页注释
 	if( !this._erased && this.page() ){ 
-		this.drill_EBT_readPage( this.list() );
+		this.drill_EBT_event_readList( this.list() );
 	}
 }
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_EBT_readPage = function( page_list ){
-	page_list.forEach( function( l ){
+Game_Event.prototype.drill_EBT_event_readList = function( pageOfList ){
+	pageOfList.forEach( function( l ){
 		if( l.code === 108 ){
 			
 			/*-----------------标准注释------------------*/

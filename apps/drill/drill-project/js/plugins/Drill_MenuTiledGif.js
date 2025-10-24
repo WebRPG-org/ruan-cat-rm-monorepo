@@ -868,16 +868,16 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_MenuTiledGif = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_MenuTiledGif = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_MenuTiledGif');
 	
 	//==============================
 	// * 静态数据 - 平铺GIF
 	//				（~struct~MenuTiledGIF）
 	//==============================
-	DrillUp.drill_MTG_tiledGifInit = function( dataFrom ) {
+	DrillUp.drill_MTG_tiledGifInit = function( dataFrom ){
 		var data = {};
 		
 		// > 绑定
@@ -931,14 +931,23 @@
 	}
 	
 	
-	
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_MTG_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_MTG_pluginCommand.call(this, command, args);
+	this.drill_MTG_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_MTG_pluginCommand = function( command, args ){
 	if( command === ">菜单平铺GIF" ){
+		
 		if(args.length == 4){
 			var temp1 = String(args[1]);
 			temp1 = temp1.replace("平铺GIF[","");

@@ -1,0 +1,9 @@
+	
+	资源目录：
+		 \img\Special__dialogCursor
+	
+	来自插件：
+		Drill_DialogCharCursor	窗口字符 - 逐个绘制的文本光标
+	
+	相关文档：
+		23.窗口字符 > 关于逐个绘制的文本光标.docx

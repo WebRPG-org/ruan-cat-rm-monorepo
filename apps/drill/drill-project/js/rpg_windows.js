@@ -54,17 +54,17 @@
 //								->绘制【基本文本】
 //								->绘制【扩展文本】
 //								->计算【扩展文本】高度
-//							->『窗口字符』（相关概念可以去看看"关于窗口字符.docx"）
+//							->『窗口字符核心』（相关概念可以去看看"关于窗口字符.docx"）
 //								->重置字体
 //								->逐一绘制
 //									->换行符
 //									->新建页符（子类用属性）
 //									->效果字符
-//									->一般字符
+//									->常规字符
 //								->指代字符
 //									->变量值
 //									->角色名字
-//									->队伍成员名字
+//									->玩家队员名字
 //									->金钱单位
 //								->效果字符
 //									->文本色字符
@@ -481,7 +481,7 @@ Window_Base.prototype.calcTextHeight = function( textState, all ){
 
 
 //==============================
-// * E绘制『窗口字符』 - 重置字体
+// * E绘制『窗口字符核心』 - 重置字体
 //==============================
 Window_Base.prototype.resetFontSettings = function(){
     this.contents.fontFace = this.standardFontFace();		//字体类型
@@ -489,7 +489,7 @@ Window_Base.prototype.resetFontSettings = function(){
     this.resetTextColor();									//字体颜色
 };
 //==============================
-// * E绘制『窗口字符』 - 扩展文本 - 指代字符转换
+// * E绘制『窗口字符核心』 - 扩展文本 - 指代字符转换
 //				
 //			说明：	> （\x1b = Escape字符）
 //					> 该函数先将 '\' 转成 '\x1b' Esc字符便于区分，在后面进行process绘制时，可以识别效果字符。
@@ -506,34 +506,34 @@ Window_Base.prototype.convertEscapeCharacters = function( text ){
     text = text.replace(/\x1bN\[(\d+)\]/gi, function(){		//'\n[5]'角色名字
         return this.actorName(parseInt(arguments[1]));
     }.bind(this));
-    text = text.replace(/\x1bP\[(\d+)\]/gi, function(){		//'\p[1]'队伍成员名字
+    text = text.replace(/\x1bP\[(\d+)\]/gi, function(){		//'\p[1]'玩家队员名字
         return this.partyMemberName(parseInt(arguments[1]));
     }.bind(this));
     text = text.replace(/\x1bG/gi, TextManager.currencyUnit);	//'\g'金钱单位
     return text;
 };
 //==============================
-// * E绘制『窗口字符』 - 扩展文本 - 指代字符 - 角色名字
+// * E绘制『窗口字符核心』 - 扩展文本 - 指代字符 - 角色名字
 //==============================
 Window_Base.prototype.actorName = function( n ){
     var actor = n >= 1 ? $gameActors.actor(n) : null;
     return actor ? actor.name() : '';
 };
 //==============================
-// * E绘制『窗口字符』 - 扩展文本 - 指代字符 - 队伍成员名字
+// * E绘制『窗口字符核心』 - 扩展文本 - 指代字符 - 玩家队员名字
 //==============================
 Window_Base.prototype.partyMemberName = function( n ){
-    var actor = n >= 1 ? $gameParty.members()[n - 1] : null;
+    var actor = n >= 1 ? $gameParty.members()[n - 1] : null;  //『玩家队员id』此处的定义已被修改(-2表示领队，1表示第一个跟随者)
     return actor ? actor.name() : '';
 };
 
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 从当前光标开始绘制
+// * E绘制『窗口字符核心』 - 逐一绘制 - 从当前光标开始绘制
 //				
 //			说明：	> 该函数是固定的结构，【不要继承此函数】。
 //					  （绘制概念可以去看看"关于窗口字符.docx"）
 //					> 如果你要写相关插件，需要确定你的是 效果字符 还是 指代字符，除此之外没有其他的情况。
-//					  （消息核心中的 消息输入字符 也属于效果字符，在 Window_Message 的processEscapeCharacter函数中。）
+//					  （消息输入字符 也属于效果字符，在 Window_Message 的processEscapeCharacter函数中。）
 //==============================
 Window_Base.prototype.processCharacter = function( textState ){
     switch (textState.text[textState.index] ){
@@ -552,7 +552,7 @@ Window_Base.prototype.processCharacter = function( textState ){
     }
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 一般字符
+// * E绘制『窗口字符核心』 - 逐一绘制 - 一般字符
 //==============================
 Window_Base.prototype.processNormalCharacter = function( textState ){
     var c = textState.text[textState.index++];
@@ -561,7 +561,7 @@ Window_Base.prototype.processNormalCharacter = function( textState ){
     textState.x += w;
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 换行符
+// * E绘制『窗口字符核心』 - 逐一绘制 - 换行符
 //==============================
 Window_Base.prototype.processNewLine = function( textState ){
     textState.x = textState.left;
@@ -570,13 +570,13 @@ Window_Base.prototype.processNewLine = function( textState ){
     textState.index++;
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 新建页符（子类用属性）
+// * E绘制『窗口字符核心』 - 逐一绘制 - 新建页符（子类用属性）
 //==============================
 Window_Base.prototype.processNewPage = function( textState ){
     textState.index++;
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 效果字符获取
+// * E绘制『窗口字符核心』 - 逐一绘制 - 效果字符获取
 //				
 //			说明：	> 获取Escape字符（\x1b）后面的全部非空格字符。
 //					> 该操作可以截断字符后的单词，并大写。如"aa\x1bderdrill eanmdop"截取"\x1bderdrill"，转换后为 "DERDRILL"。
@@ -593,7 +593,7 @@ Window_Base.prototype.obtainEscapeCode = function( textState ){
     }
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 效果字符参数
+// * E绘制『窗口字符核心』 - 逐一绘制 - 效果字符参数
 //				
 //			说明：	> 获取"DRILL[12]"字符中的数字 12 。
 //==============================
@@ -607,7 +607,7 @@ Window_Base.prototype.obtainEscapeParam = function( textState ){
     }
 };
 //==============================
-// * E绘制『窗口字符』 - 逐一绘制 - 效果字符功能
+// * E绘制『窗口字符核心』 - 逐一绘制 - 效果字符功能
 //==============================
 Window_Base.prototype.processEscapeCharacter = function( code, textState ){
     switch (code ){
@@ -626,14 +626,14 @@ Window_Base.prototype.processEscapeCharacter = function( code, textState ){
     }
 };
 //==============================
-// * E绘制『窗口字符』 - 效果字符 - 图标字符
+// * E绘制『窗口字符核心』 - 效果字符 - 图标字符
 //==============================
 Window_Base.prototype.processDrawIcon = function( iconIndex, textState ){
     this.drawIcon(iconIndex, textState.x + 2, textState.y + 2);		//（绘制图标时，预留2像素的内边距）
     textState.x += Window_Base._iconWidth + 4;
 };
 //==============================
-// * E绘制『窗口字符』 - 效果字符 - 字体放大
+// * E绘制『窗口字符核心』 - 效果字符 - 字体放大
 //==============================
 Window_Base.prototype.makeFontBigger = function(){
     if( this.contents.fontSize <= 96 ){
@@ -641,7 +641,7 @@ Window_Base.prototype.makeFontBigger = function(){
     }
 };
 //==============================
-// * E绘制『窗口字符』 - 效果字符 - 字体缩小
+// * E绘制『窗口字符核心』 - 效果字符 - 字体缩小
 //==============================
 Window_Base.prototype.makeFontSmaller = function(){
     if( this.contents.fontSize >= 24 ){
@@ -883,7 +883,7 @@ Window_Base.prototype.drawActorTp = function( actor, x, y, width ){
 //==============================
 // * E绘制 - 绘制基本文本 - 角色状态列表
 //
-//			说明：	用于角色状态窗口批量绘制。
+//			说明：	> 用于角色状态窗口批量绘制。
 //==============================
 Window_Base.prototype.drawActorSimpleStatus = function( actor, x, y, width ){
     var lineHeight = this.lineHeight();
@@ -899,7 +899,7 @@ Window_Base.prototype.drawActorSimpleStatus = function( actor, x, y, width ){
 //==============================
 // * E绘制 - 绘制基本文本 - 货币单位
 //
-//			说明：	绘制 值+单位，比如"100G"。
+//			说明：	> 绘制 值+单位，比如"100G"。
 //==============================
 Window_Base.prototype.drawCurrencyValue = function( value, unit, x, y, width ){
     var unitWidth = Math.min(80, this.textWidth(unit));

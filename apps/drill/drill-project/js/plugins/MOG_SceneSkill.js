@@ -1695,7 +1695,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_SceneSkill = true;
 　　var Moghunter = Moghunter || {}; 
 

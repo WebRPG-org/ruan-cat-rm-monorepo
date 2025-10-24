@@ -12,7 +12,7 @@ Yanfly.Core.version = 1.31;
 
 //=============================================================================
 /*:
- * @plugindesc v1.31 [v1.0]  系统 - 引擎核心
+ * @plugindesc v1.31 [v1.1]  系统 - 引擎核心
  * @author Yanfly Engine Plugins （drill_up翻译）
  *
  * @param ---屏幕---
@@ -965,27 +965,32 @@ Bitmap.prototype.drawCircle = function(x, y, r, c) {
 };
 //==============================
 // * 贴图基础 - 绘制文本内容（开放函数）
+//
+//			说明：	> 该函数被 系统-字符绘制核心 替代。
 //==============================
-Yanfly.Core.Bitmap_drawText = Bitmap.prototype.drawText;
-Bitmap.prototype.drawText = function(text, x, y, mW, l, align) {
-    x = Math.floor(x);
-    y = Math.floor(y);
-    if (mW < 0) mW = 0;
-    mW = Math.floor(mW);
-    l = Math.floor(l);
-    Yanfly.Core.Bitmap_drawText.call(this, text, x, y, mW, l, align);
-};
+//Yanfly.Core.Bitmap_drawText = Bitmap.prototype.drawText;
+//Bitmap.prototype.drawText = function(text, x, y, mW, l, align) {
+//    x = Math.floor(x);
+//    y = Math.floor(y);
+//    if (mW < 0) mW = 0;
+//    mW = Math.floor(mW);
+//    l = Math.floor(l);
+//    Yanfly.Core.Bitmap_drawText.call(this, text, x, y, mW, l, align);
+//};
+
 //==============================
 // * 贴图 - 执行渲染（继承至PIXI）
 //
-//			说明：	> 此处只优化排除 小数点的情况。
+//			说明：	> 注意，该函数会破坏pixi渲染的坐标定位，必须注释掉。『非整数坐标抖动问题』
 //==============================
+/*
 Yanfly.Core.Sprite_updateTransform = Sprite.prototype.updateTransform;
 Sprite.prototype.updateTransform = function() {
   Yanfly.Core.Sprite_updateTransform.call(this);
   this.worldTransform.tx = Math.floor(this.worldTransform.tx);
   this.worldTransform.ty = Math.floor(this.worldTransform.ty);
 };
+*/
 //==============================
 // * 屏幕贴图 - 1.3.0之前旧版本优化
 //==============================
@@ -1821,7 +1826,7 @@ Game_Interpreter.prototype.command355 = function() {
 
 Yanfly.Core.Game_Interpreter_pluginCommand =
     Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
     Yanfly.Core.Game_Interpreter_pluginCommand.call(this, command, args);
     if (command === 'GainGold') {
         $gameParty.gainGold(parseInt(args[0]));
@@ -2311,25 +2316,35 @@ Window_Base._faceWidth   = Yanfly.Param.FaceWidth;
 Window_Base._faceHeight  = Yanfly.Param.FaceHeight;
 //==============================
 // * 窗口控制 - 默认行高
+//
+//			说明：	> 此处由 『窗口字符-行高控制器』 插件替代。
 //==============================
 Window_Base.prototype.lineHeight = function() {
   return Yanfly.Param.LineHeight;
 };
 //==============================
 // * 窗口控制 - 默认字体大小
+//
+//			说明：	> 此处由 『窗口字符-字符大小控制器』 插件替代。
 //==============================
 Window_Base.prototype.standardFontSize = function() {
     return Yanfly.Param.FontSize;
 };
-
+//==============================
+// * 窗口控制 - 窗口内边距
+//==============================
 Window_Base.prototype.standardPadding = function() {
     return Yanfly.Param.WindowPadding;
 };
-
+//==============================
+// * 窗口控制 - 文本内边距
+//==============================
 Window_Base.prototype.textPadding = function() {
     return Yanfly.Param.TextPadding;
 };
-
+//==============================
+// * 窗口控制 - 背景透明度
+//==============================
 Window_Base.prototype.standardBackOpacity = function() {
     return Yanfly.Param.WindowOpacity;
 };
@@ -2476,6 +2491,9 @@ Window_Base.prototype.drawActorSimpleStatus = function(actor, x, y, width) {
     }
 };
 
+//==============================
+// * E绘制 - 绘制基本文本 - 货币单位 覆写函数
+//==============================
 Window_Base.prototype.drawCurrencyValue = function(value, unit, wx, wy, ww) {
     this.resetTextColor();
     this.contents.fontSize = Yanfly.Param.GoldFontSize;

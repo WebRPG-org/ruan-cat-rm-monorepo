@@ -182,7 +182,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_ComboCounter = true;
 　　var Moghunter = Moghunter || {}; 
 

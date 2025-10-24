@@ -944,17 +944,17 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_MenuGif = true;
-　　Imported.Drill_MenuGIF = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_MenuGif = true;
+	Imported.Drill_MenuGIF = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_MenuGif');
 	
 	//==============================
 	// * 静态数据 - GIF
 	//				（~struct~MenuGIF）
 	//==============================
-	DrillUp.drill_MGi_gifInit = function( dataFrom ) {
+	DrillUp.drill_MGi_gifInit = function( dataFrom ){
 		var data = {};
 		
 		// > 绑定
@@ -1032,12 +1032,22 @@
 	
 	
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_MGi_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_MGi_pluginCommand.call(this, command, args);
+	this.drill_MGi_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_MGi_pluginCommand = function( command, args ){
 	if( command === ">菜单GIF" || command === ">菜单gif" ){
+		
 		if(args.length == 4){
 			var temp1 = String(args[1]);
 			temp1 = temp1.replace("GIF[","");
@@ -1401,8 +1411,8 @@ Scene_MenuBase.prototype.drill_MGi_create = function() {
 			temp_sprite.skew.y = temp_sprite_data['skew_y'];
 			temp_sprite.visible = $gameSystem._drill_MGi_spriteTank_visible[i] || false;
 			
-			temp_sprite._breath = Math.random() * temp_sprite_data['breath_period'];
-			temp_sprite._breath_dir = Math.floor(Math.random() * 2);
+			temp_sprite._breath = Math.random() * temp_sprite_data['breath_period'];	//『随机因子-图像用』
+			temp_sprite._breath_dir = Math.floor(Math.random() * 2);	//『随机因子-图像用』
 			temp_sprite._f_time = 0;
 			this._drill_MGi_spriteTank.push(temp_sprite);
 			this._drill_MGi_dataTank.push(temp_sprite_data);

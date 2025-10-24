@@ -129,7 +129,7 @@
  * @param 全局存储的文件路径
  * @type number
  * @min 1
- * @desc 指对应的文件路径ID，该插件的数据将存储到指定的文件路径中，具体去 全局存储核心 看看。
+ * @desc 指对应的文件路径ID,该插件的数据将存储到指定文件路径,具体看看"21.管理器 > 关于全局存储.docx"。
  * @default 1
  *
  * @param ---背景组 1至20---
@@ -824,7 +824,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_TBa_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_TBa_PluginTip_baseList.length == 0 ){ return ""; }
@@ -840,16 +840,16 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_TitleBackground = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_TitleBackground = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_TitleBackground');
 	
 	//==============================
 	// * 静态数据 - 背景
 	//				（~struct~TitleBackground）
 	//==============================
-	DrillUp.drill_TBa_backgroundInit = function( dataFrom ) {
+	DrillUp.drill_TBa_backgroundInit = function( dataFrom ){
 		var data = {};
 		
 		// > 贴图
@@ -876,7 +876,7 @@
 	}
 	
 	/*-----------------杂项------------------*/
-    DrillUp.g_TBa_dataFileId = Number(DrillUp.parameters['全局存储的文件路径'] || 1);
+    DrillUp.g_TBa_dataFileId = Number(DrillUp.parameters["全局存储的文件路径"] || 1);
 	
 	/*-----------------背景------------------*/
 	DrillUp.g_TBa_list_length = 80;
@@ -901,10 +901,10 @@ if( Imported.Drill_CoreOfGlobalSave ){
 
 
 //=============================================================================
-// ** 全局存储
+// ** ☆全局存储
 //=============================================================================
 //==============================
-// * 全局 - 检查数据 - 显示情况
+// * 『全局存储』 - 载入时检查数据 - 显示情况
 //==============================
 DrillUp.drill_TBa_gCheckData_visible = function(){
 	for( var i = 0; i < DrillUp.g_TBa_list_length ; i++ ){
@@ -925,10 +925,10 @@ DrillUp.drill_TBa_gCheckData_visible = function(){
 	}
 }
 //==============================
-// * 全局 - 读取
+// * 『全局存储』 - 载入
 //==============================
 	var global_fileId = DrillUp.g_TBa_dataFileId;
-	var global_data = StorageManager.drill_COGS_loadData( global_fileId, "TBa" );
+	var global_data = StorageManager.drill_COGS_loadData( global_fileId, "TBa" );  //『全局存储执行函数』
 	
 	// > 显示情况
 	if( DrillUp.global_TBa_visibleTank == null ){			//（游戏没关时，不会为null)
@@ -939,22 +939,31 @@ DrillUp.drill_TBa_gCheckData_visible = function(){
 	}
 	
 //==============================
-// * 全局 - 存储
+// * 『全局存储』 - 存储
 //==============================
 StorageManager.drill_TBa_saveData = function(){
 	var file_id = DrillUp.g_TBa_dataFileId;
 	var data = {};
 	data["global_visibleTank"] = DrillUp.global_TBa_visibleTank;
-	this.drill_COGS_saveData( file_id, "TBa", data );
+	this.drill_COGS_saveData( file_id, "TBa", data );  //『全局存储执行函数』
 };
-	
+
 
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_TBa_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_TBa_pluginCommand.call(this, command, args);
+	this.drill_TBa_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_TBa_pluginCommand = function( command, args ){
 	if( command === ">标题背景" ){
 		
 		if(args.length == 4){

@@ -294,20 +294,20 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_ItemCategory = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_ItemCategory = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_ItemCategory');
 	
 	/*-----------------类型序列------------------*/
-	if( DrillUp.parameters["物品界面物品类型"] != "" &&
-		DrillUp.parameters["物品界面物品类型"] != undefined ){
+	if( DrillUp.parameters["物品界面物品类型"] != undefined &&
+		DrillUp.parameters["物品界面物品类型"] != "" ){
 		DrillUp.g_ICa_SenceItemType = JSON.parse(DrillUp.parameters["物品界面物品类型"]);
 	}else{
 		DrillUp.g_ICa_SenceItemType = ["物品","武器","护甲","重要物品"];
 	}
-	if( DrillUp.parameters["商店出售物品类型"] != "" &&
-		DrillUp.parameters["商店出售物品类型"] != undefined ){
+	if( DrillUp.parameters["商店出售物品类型"] != undefined &&
+		DrillUp.parameters["商店出售物品类型"] != "" ){
 		DrillUp.g_ICa_SenceShopType = JSON.parse(DrillUp.parameters["商店出售物品类型"]);
 	}else{
 		DrillUp.g_ICa_SenceShopType = ["物品","武器","护甲","重要物品"];
@@ -317,7 +317,8 @@
 	DrillUp.g_ICa_type_length = 10;
 	DrillUp.g_ICa_type = [];
 	for (var i = 0; i < DrillUp.g_ICa_type_length; i++) {
-		if( DrillUp.parameters["物品类型-" + String(i+1) ] != "" ){
+		if( DrillUp.parameters["物品类型-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["物品类型-" + String(i+1) ] != "" ){
 			DrillUp.g_ICa_type[i] = JSON.parse(DrillUp.parameters["物品类型-" + String(i+1) ]);
 			DrillUp.g_ICa_type[i]['name'] = String(DrillUp.g_ICa_type[i]["物品类型名"] || "");
 			DrillUp.g_ICa_type[i]['src_img'] = String(DrillUp.g_ICa_type[i]["资源-类型按钮"] || "");
@@ -327,13 +328,23 @@
 			DrillUp.g_ICa_type[i] = null;
 		}
 	}
-
+	
+	
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_ICa_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_ICa_pluginCommand.call(this, command, args);
+	this.drill_ICa_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_ICa_pluginCommand = function( command, args ){
 	if( command === ">物品类型" ){
 		if(args.length == 6){
 			var temp1 = String(args[1]);
@@ -685,17 +696,17 @@ if( Imported.Drill_SceneShop || Imported.Drill_SenceShop ){
 	//==============================
 	if( typeof(Drill_SSh_SellCategoryWindow) != "undefined" ){
 		Drill_SSh_SellCategoryWindow.prototype.makeCommandList = function() {
-			for (var i = 0; i < $gameSystem._drill_ICa_SenceShopType.length ; i++) {
+			for( var i = 0; i < $gameSystem._drill_ICa_SenceShopType.length; i++ ){
 				var symbol = $gameSystem._drill_ICa_SenceShopType[i];
-				if (symbol === "item" || symbol === "物品" || symbol === "道具") {
+				if( symbol === "item" || symbol === "物品" || symbol === "道具" ){
 					this.addCommand(TextManager.item, 'item');
-				} else if (symbol === "weapon" || symbol === "武器") {
+				}else if( symbol === "weapon" || symbol === "武器" ){
 					this.addCommand(TextManager.weapon, 'weapon');
-				} else if (symbol === "armor" || symbol === "护甲" || symbol === "防具") {
+				}else if( symbol === "armor" || symbol === "护甲" || symbol === "防具" ){
 					this.addCommand(TextManager.armor, 'armor');
-				} else if (symbol === "keyItem" || symbol === "重要物品") {
+				}else if( symbol === "keyItem" || symbol === "重要物品" ){
 					this.addCommand(TextManager.keyItem, 'keyItem');
-				} else {
+				}else{
 					this.addCommand(symbol, symbol);
 				}
 			}

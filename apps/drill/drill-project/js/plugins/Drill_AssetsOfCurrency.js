@@ -3,7 +3,7 @@
 //=============================================================================
 
 /*:
- * @plugindesc [v1.0]        管理器 - 货币素材库
+ * @plugindesc [v1.2]        管理器 - 货币素材库
  * @author Drill_up
  * 
  * @Drill_LE_param "货币样式-%d"
@@ -45,15 +45,16 @@
  * 要查看所有关联资源文件的插件，可以去看看"插件清单.xlsx"。
  * 需要配置资源文件：
  * 
- * 资源-透明小图
- * 资源-透明中型图
- * 资源-透明高清图
+ * 资源-小图
+ * 资源-中型图
+ * 资源-高清图
  * 
  * -----------------------------------------------------------------------------
  * ----可选设定
  * 你可以通过插件指令修改样式：
  * 
  * 插件指令：>货币素材库 : 修改样式 : 样式[1]
+ * 插件指令：>货币素材库 : 恢复默认样式
  * 
  * 1.注意，插件指令修改样式，只是给游戏默认的货币进行换皮。
  *   如果你希望定义多种不同的货币，建议直接用物品来作为特殊货币。
@@ -84,6 +85,10 @@
  * ----更新日志
  * [v1.0]
  * 完成插件ヽ(*。>Д<)o゜
+ * [v1.1]
+ * 兼容了新的窗口字符。
+ * [v1.2]
+ * 更新并兼容了新的窗口字符底层。
  *
  *
  *
@@ -100,7 +105,7 @@
  * @parent ---货币样式组---
  * @type struct<DrillAsOCStyle>
  * @desc 漂浮文字的内容配置信息。
- * @default {"标签":"==金币==","---常规---":"","用语-货币文本":"金币","用语-货币文本颜色":"17","货币图标":"536","---资源---":"","资源-透明小图":"金币_小图_64x64","资源-透明中型图":"金币_中型图_96x96","资源-透明高清图":"金币_高清图_512x512"}
+ * @default {"标签":"==金币==","---常规---":"","用语-货币文本":"金币","用语-货币文本颜色":"17","货币图标":"536","---资源---":"","资源-小图":"金币_64x64小图","资源-中型图":"金币_96x96中型图","资源-高清图":"金币_256x256高清图"}
  * 
  * @param 货币样式-2
  * @parent ---货币样式组---
@@ -190,26 +195,26 @@
  * @param ---资源---
  * @default 
  *
- * @param 资源-透明小图
+ * @param 资源-小图
  * @parent ---资源---
- * @desc 货币作为透明小图时的资源，建议大小为64x64。
- * @default (需配置)货币素材库-透明小图
+ * @desc 货币作为小图时的资源，大小为64x64，建议该资源背景为透明。
+ * @default (需配置)货币素材库-小图
  * @require 1
  * @dir img/Assets__Currency/
  * @type file
  *
- * @param 资源-透明中型图
+ * @param 资源-中型图
  * @parent ---资源---
- * @desc 货币作为透明中型图时的资源，建议大小为96x96。
- * @default (需配置)货币素材库-透明中型图
+ * @desc 货币作为中型图时的资源，大小为96x96，建议该资源背景为透明。
+ * @default (需配置)货币素材库-中型图
  * @require 1
  * @dir img/Assets__Currency/
  * @type file
  *
- * @param 资源-透明高清图
+ * @param 资源-高清图
  * @parent ---资源---
- * @desc 货币作为透明高清图时的资源，建议大小为512x512。
- * @default (需配置)货币素材库-透明高清图
+ * @desc 货币作为高清图时的资源，大小为256x256，建议该资源背景为透明。
+ * @default (需配置)货币素材库-高清图
  * @require 1
  * @dir img/Assets__Currency/
  * @type file
@@ -242,16 +247,18 @@
 //			->☆静态数据
 //			->☆插件指令
 //			->☆存储数据
+//			->☆预加载
 //			
-//			->☆素材库
+//			->☆素材库的窗口字符
 //				->样式变化（子插件继承用）
 //				->获取 - 货币文本
 //				->获取 - 货币文本颜色
 //				->获取 - 货币图标
 //				->获取 - 完整描述文本
-//				->获取 - 透明小图
-//				->获取 - 透明中型图
-//				->获取 - 透明高清图
+//			->☆素材库的资源
+//				->获取 - 小图
+//				->获取 - 中型图
+//				->获取 - 高清图
 //			
 //			
 //		★家谱：
@@ -264,7 +271,16 @@
 //			无
 //			
 //		★必要注意事项：
-//			暂无
+//			1.这个插件2023/5/21就写好了，然而现在已经2024年快2025年了，还是没开坑到这里。
+//			  群友："什么时候填坑？" 我："以后"。开坑喜+1。
+//				  ╭━━━━━━━━━━━╮
+//				  ┃╱╱╱╱╱╱╱┏┓╱╱┃
+//				  ┃╱╱┏┓╱╱┏╯┃╱╱┃
+//				  ┃╱┏┛┗┓╱┗┓┃╱╱┃
+//				  ┃╱┗┓┏┛╱╱┃┃╱╱┃
+//				  ┃╱╱┗┛╱╱╱┃┃╱╱┃
+//				  ┃╱╱╱╱╱╱╱┗┛╱╱┃
+//				  ╰━━━━━━━━━━━╯
 //
 //		★其它说明细节：
 //			暂无
@@ -287,17 +303,17 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_AssetsOfCurrency = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_AssetsOfCurrency');
+	var Imported = Imported || {};
+	Imported.Drill_AssetsOfCurrency = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_AssetsOfCurrency');
 	
 	
 	//==============================
 	// * 静态数据 - 货币样式
 	//				（~struct~DrillAsOCStyle）
 	//==============================
-	DrillUp.drill_AsOC_initStyle = function( dataFrom ) {
+	DrillUp.drill_AsOC_initStyle = function( dataFrom ){
 		var data = {};
 		
 		// > 常规
@@ -306,9 +322,9 @@
 		data['currency_icon'] = Number( dataFrom["货币图标"] || 536);
 		
 		// > 资源
-		data['currency_src_img_small'] = String( dataFrom["资源-透明小图"] || "");
-		data['currency_src_img_middle'] = String( dataFrom["资源-透明中型图"] || "");
-		data['currency_src_img_big'] = String( dataFrom["资源-透明高清图"] || "");
+		data['currency_src_img_small'] = String( dataFrom["资源-小图"] || "");
+		data['currency_src_img_middle'] = String( dataFrom["资源-中型图"] || "");
+		data['currency_src_img_big'] = String( dataFrom["资源-高清图"] || "");
 		
 		return data;
 	}
@@ -334,9 +350,18 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_AsOC_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_AsOC_pluginCommand.call(this, command, args);
+	this.drill_AsOC_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_AsOC_pluginCommand = function( command, args ){
 	if( command === ">货币素材库" ){
 		
 		/*-----------------修改样式------------------*/
@@ -347,6 +372,13 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 				temp1 = temp1.replace("样式[","");
 				temp1 = temp1.replace("]","");
 				$gameSystem._drill_AsOC_styleId = Number(temp1);
+				$gameTemp.drill_AsOC_dataChanged();
+			}
+		}
+		if( args.length == 2 ){
+			var type = String(args[1]);
+			if( type == "恢复默认样式" ){
+				$gameSystem._drill_AsOC_styleId = DrillUp.g_AsOC_defaultStyleId;
 				$gameTemp.drill_AsOC_dataChanged();
 			}
 		}
@@ -435,13 +467,64 @@ Game_System.prototype.drill_AsOC_checkSysData_Private = function() {
 	}
 	
 };
+	
+	
+//=============================================================================
+// ** ☆预加载
+//
+//			说明：	> 用过的bitmap，全部标记不删除，防止刷菜单时重建导致浪费资源。
+//					（插件完整的功能目录去看看：功能结构树）
+//=============================================================================
+DrillUp.g_AsOC_preloadEnabled = true;		//（预加载开关）
+if( DrillUp.g_AsOC_preloadEnabled == true ){
+	//==============================
+	// * 预加载 - 初始化
+	//==============================
+	var _drill_AsOC_preload_initialize = Game_Temp.prototype.initialize;
+	Game_Temp.prototype.initialize = function() {
+		_drill_AsOC_preload_initialize.call(this);
+		this.drill_AsOC_preloadInit();
+	}
+	//==============================
+	// * 预加载 - 版本校验
+	//==============================
+	if( Utils.generateRuntimeId == undefined ){
+		alert( DrillUp.drill_AsOC_getPluginTip_LowVersion() );
+	}
+	//==============================
+	// * 预加载 - 执行资源预加载
+	//
+	//			说明：	> 遍历全部资源，提前预加载标记过的资源。
+	//==============================
+	Game_Temp.prototype.drill_AsOC_preloadInit = function() {
+		this._drill_AsOC_cacheId = Utils.generateRuntimeId();	//资源缓存id
+		this._drill_AsOC_preloadTank = [];						//bitmap容器
+		for( var i = 0; i < DrillUp.g_AsOC_style.length; i++ ){
+			var temp_data = DrillUp.g_AsOC_style[i];
+			if( temp_data == undefined ){ continue; }
+			
+			this._drill_AsOC_preloadTank.push( 
+				ImageManager.reserveBitmap( "img/Assets__Currency/", temp_data['currency_src_img_small'], 0, true, this._drill_AsOC_cacheId ) 
+			);
+			this._drill_AsOC_preloadTank.push( 
+				ImageManager.reserveBitmap( "img/Assets__Currency/", temp_data['currency_src_img_middle'], 0, true, this._drill_AsOC_cacheId ) 
+			);
+			this._drill_AsOC_preloadTank.push( 
+				ImageManager.reserveBitmap( "img/Assets__Currency/", temp_data['currency_src_img_big'], 0, true, this._drill_AsOC_cacheId ) 
+			);
+		}
+	}
+}
 
 
 //=============================================================================
-// ** ☆素材库
+// ** ☆素材库的窗口字符
+//
+//			说明：	> 该模块提供 素材库 功能。
+//					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
-// * 素材库 - 样式变化（子插件继承用）
+// * 素材库的窗口字符 - 样式变化（子插件继承用）
 //==============================
 Game_Temp.prototype.drill_AsOC_dataChanged = function() {
 	//（当样式发生变化时，此函数会被调用，子插件可以继承此函数，即时监听并变化）
@@ -449,28 +532,28 @@ Game_Temp.prototype.drill_AsOC_dataChanged = function() {
 };
 
 //==============================
-// * 素材库 - 获取 - 货币文本（开放函数）
+// * 素材库的窗口字符 - 获取 - 货币文本（开放函数）
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataText = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];
 	return data['currency_text'];
 };
 //==============================
-// * 素材库 - 获取 - 货币文本颜色（开放函数）
+// * 素材库的窗口字符 - 获取 - 货币文本颜色（开放函数）
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataTextColor = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];
 	return data['currency_textColor'];
 };
 //==============================
-// * 素材库 - 获取 - 货币图标（开放函数）
+// * 素材库的窗口字符 - 获取 - 货币图标（开放函数）
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataIcon = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];
 	return data['currency_icon'];
 };
 //==============================
-// * 素材库 - 获取 - 完整描述文本（开放函数）
+// * 素材库的窗口字符 - 获取 - 完整描述文本（开放函数）
 //
 //			说明：	> type（只图标/只文本/图标+文本）
 //==============================
@@ -481,35 +564,86 @@ Game_Temp.prototype.drill_AsOC_getFullTextByType = function( type ){
 		context += "\\i[" + data['currency_icon'] + "]";
 	}
 	if( type == "只文本" ){
-		context += "\\csave\\c[" + data['currency_textColor'] + "]";
+		if( Imported.Drill_CoreOfColor ){ context += "\\cc[oSave]"; }
+		context += "\\c[" + data['currency_textColor'] + "]";
 		context += data['currency_text'];
-		context += "\\cload";
+		if( Imported.Drill_CoreOfColor ){ context += "\\cc[oLoad]"; }
 	}
 	if( type == "图标+文本" ){
 		context += "\\i[" + data['currency_icon'] + "]";
-		context += "\\csave\\c[" + data['currency_textColor'] + "]";
+		if( Imported.Drill_CoreOfColor ){ context += "\\cc[oSave]"; }
+		context += "\\c[" + data['currency_textColor'] + "]";
 		context += data['currency_text'];
-		context += "\\cload";
+		if( Imported.Drill_CoreOfColor ){ context += "\\cc[oLoad]"; }
 	}
 	return context;
 };
 
+
+//=============================================================================
+// ** ☆素材库的资源
+//
+//			说明：	> 该模块管理 资源贴图 。
+//					（插件完整的功能目录去看看：功能结构树）
+//=============================================================================
+//##############################
+// * 『素材库的资源』 - 货币 - 获取图标【标准函数】
+//
+//			说明：	> 大小为32x32，返回的bitmap资源一定为isReady状态。
+//##############################
+Game_Temp.prototype.drill_AsOC_getBitmap64x64_currency = function() {
+	return null;
+	//....（此函数还没被用）
+}
+//##############################
+// * 『素材库的资源』 - 货币 - 获取小图【标准函数】
+//
+//			说明：	> 大小为64x64，返回的bitmap资源一定为isReady状态。
+//##############################
+Game_Temp.prototype.drill_AsOC_getBitmap64x64_currency = function() {
+	return this.drill_AsOC_getDataSrcImg_Small();
+	//....（此函数还没被用）
+}
+//##############################
+// * 『素材库的资源』 - 货币 - 获取中型图【标准函数】
+//
+//			说明：	> 大小为96x96，返回的bitmap资源一定为isReady状态。
+//##############################
+Game_Temp.prototype.drill_AsOC_getBitmap96x96_currency = function() {
+	return this.drill_AsOC_getDataSrcImg_Middle();
+	//....（此函数还没被用）
+}
+//##############################
+// * 『素材库的资源』 - 货币 - 获取高清图【标准函数】
+//
+//			说明：	> 大小为256x256，返回的bitmap资源一定为isReady状态。（512x512太占内存了，所以不要太大）
+//##############################
+Game_Temp.prototype.drill_AsOC_getBitmap256x256_currency = function() {
+	return this.drill_AsOC_getDataSrcImg_Big();
+	//....（此函数还没被用）
+}
 //==============================
-// * 素材库 - 获取 - 透明小图（开放函数）
+// * 素材库的资源 - 获取 - 小图（开放函数）
+//
+//			说明：	> 大小为64x64。
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataSrcImg_Small = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];
 	return ImageManager.loadBitmap( "img/Assets__Currency/", data['currency_src_img_small'], 0, true );
 };
 //==============================
-// * 素材库 - 获取 - 透明中型图（开放函数）
+// * 素材库的资源 - 获取 - 中型图（开放函数）
+//
+//			说明：	> 大小为96x96。
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataSrcImg_Middle = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];
 	return ImageManager.loadBitmap( "img/Assets__Currency/", data['currency_src_img_middle'], 0, true );
 };
 //==============================
-// * 素材库 - 获取 - 透明高清图（开放函数）
+// * 素材库的资源 - 获取 - 高清图（开放函数）
+//
+//			说明：	> 大小为256x256。
 //==============================
 Game_Temp.prototype.drill_AsOC_getDataSrcImg_Big = function() {
 	var data = DrillUp.g_AsOC_style[ $gameSystem._drill_AsOC_styleId-1 ];

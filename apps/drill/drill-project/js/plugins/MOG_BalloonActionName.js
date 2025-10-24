@@ -87,7 +87,7 @@
 // ** PLUGIN PARAMETERS
 //=============================================================================
 
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_BalloonActionName = true;
 　　var Moghunter = Moghunter || {}; 	
 	Moghunter.parameters = PluginManager.parameters('MOG_BalloonActionName');

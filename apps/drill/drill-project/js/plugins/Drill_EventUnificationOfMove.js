@@ -201,11 +201,16 @@
 //			无
 //		
 //		★必要注意事项：
-//			1.执行move命令的时候，事件的update是依次执行的。被牵动的事件会因为当前帧update了，不执行移动操作。
-//			  要实现整体移动，当前帧需要等一帧，确保下一帧所有事件都统一开始移动。
-//			2.【该插件使用了事件容器】，必须考虑三种情况：初始化、切换地图时、切换贴图时，不然会出现指针错误！
-//				只要是装事件的容器，都需要考虑指针问题，不管是放在$gameMap还是$gameTemp中。
-//				另外，帧刷新判断时，最好每次变化直接【刷新统计】。
+//			1.最初写这个插件，到现在进行大幅度插件改进，功能其实没啥本质变化。
+//			  主要是没能全面地介绍/使用这个插件。
+//			  那什么时候开坑呢？放一个坦克助力我开坑吧，一体化坦克，前进中。（2024/2/2）
+//				                         | 
+//				                  __\--__|_
+//				  II=========OOO[/ EUOM ___|
+//				            _____\______|/-----.
+//				          /____________________|
+//				           \◎◎◎◎◎◎◎◎◎◎◎◎◎◎◎◎/
+//				             ~~~~~~~~~~~~~~~~
 //
 //		★其它说明细节：
 //			1.移动一体化：拦截含有移动标签的事件，统一移动。需要确保只有一个动力源。
@@ -227,7 +232,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_EUOM_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_EUOM_PluginTip_baseList.length == 0 ){ return ""; }
@@ -255,10 +260,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_EventUnificationOfMove = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_EventUnificationOfMove');
+	var Imported = Imported || {};
+	Imported.Drill_EventUnificationOfMove = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_EventUnificationOfMove');
 	
 	
 	/*-----------------杂项------------------*/
@@ -278,9 +283,18 @@ if( Imported.Drill_EventThrough ){
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_EUOM_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args ){
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_EUOM_pluginCommand.call(this, command, args);
+	this.drill_EUOM_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_EUOM_pluginCommand = function( command, args ){
 	if( command === ">一体化&移动" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -413,34 +427,34 @@ Game_Event.prototype.initMembers = function() {
 	this._drill_EUOM_isFirstBirth = true;
 };
 //==============================
-// * 事件注释 - 第一页绑定
+// * 事件注释 - 读取绑定
 //==============================
 var _drill_EUOM_event_setupPage = Game_Event.prototype.setupPage;
 Game_Event.prototype.setupPage = function() {
 	_drill_EUOM_event_setupPage.call(this);
-    this.drill_EUOM_setupEvent();
+    this.drill_EUOM_event_readPage();
 };
 //==============================
-// * 事件注释 - 初始化绑定
+// * 事件注释 - 读取 页
 //==============================
-Game_Event.prototype.drill_EUOM_setupEvent = function() {	
+Game_Event.prototype.drill_EUOM_event_readPage = function() {	
 	
 	// > 第一次出生，强制读取第一页注释（防止离开地图后，回来，开关失效）
 	if( !this._erased && this.event() && this.event().pages[0] && this._drill_EUOM_isFirstBirth == true ){ 
-		this._drill_EUOM_isFirstBirth = undefined;		//『节约临时参数存储空间』
-		this.drill_EUOM_readPage( this.event().pages[0].list );
+		this.drill_EUOM_event_readList( this.event().pages[0].list );
+		this._drill_EUOM_isFirstBirth = undefined;		//『节约临时参数存储空间』（放后面，注释通过这个识别"跨事件页/不跨事件页"。"跨事件页"的注释必须放在第一页才能生效。）
 	}
 	
 	// > 读取当前页注释
 	if( !this._erased && this.page() ){ 
-		this.drill_EUOM_readPage( this.list() );
+		this.drill_EUOM_event_readList( this.list() );
 	}
 }
 //==============================
-// * 事件注释 - 初始化
+// * 事件注释 - 读取 注释
 //==============================
-Game_Event.prototype.drill_EUOM_readPage = function( page_list ){
-	page_list.forEach( function( l ){
+Game_Event.prototype.drill_EUOM_event_readList = function( pageOfList ){
+	pageOfList.forEach( function( l ){
 		if( l.code === 108 ){
 			var l_str = l.parameters[0];
 			var args = l_str.split(' ');

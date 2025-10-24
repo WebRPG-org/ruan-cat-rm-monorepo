@@ -1,0 +1,9 @@
+	
+	资源目录：
+		 \img\Special__dialogRoller
+	
+	来自插件：
+		Drill_DialogSingleRollerSprite	对话框 - 滚动的长画布贴图
+
+	相关文档：
+		18.面板 > 关于长画布贴图核心.docx

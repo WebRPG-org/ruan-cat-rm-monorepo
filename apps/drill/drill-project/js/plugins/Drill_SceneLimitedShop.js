@@ -3,7 +3,7 @@
 //=============================================================================
 
 /*:
- * @plugindesc [v1.5]        面板 - 限量商店
+ * @plugindesc [v1.6]        面板 - 限量商店
  * @author Drill_up
  * 
  * @Drill_LE_param "限量商店-%d"
@@ -29,7 +29,7 @@
  * 该插件 不能 单独使用。
  * 必须基于核心插件才能运行。
  * 基于：
- *   - Drill_CoreOfWindowAuxiliary  系统-窗口辅助核心
+ *   - Drill_CoreOfWindowAuxiliary  系统-窗口辅助核心★★v2.2及以上★★
  *   - Drill_CoreOfWaitressSprite   主菜单-服务员核心
  *     必须基于上述插件才能显示控制窗口移动、服务员动作。
  *
@@ -200,6 +200,8 @@
  * 兼容 窗口辅助核心 2.0。
  * [v1.5]
  * 添加了 变量设置限制数量 的功能。
+ * [v1.6]
+ * 更新并兼容了新的窗口字符底层。
  * 
  * 
  * 
@@ -1444,7 +1446,15 @@
 //					->买/卖的越多，服务员穿的越少?
 //				->特殊
 //					->库存控制
-//
+//			
+//			->限量商店【Scene_Drill_SLS】
+//			->☆原型链规范（Scene_Drill_SLS）
+//			
+//			->金钱窗口【Drill_SLS_GoldWindow】
+//				->C开关动画
+//				->2A私有函数
+//				->2B金钱数据
+//					->只金钱
 //
 //		★家谱：
 //			无
@@ -1473,16 +1483,18 @@
 //			  确认窗口固定只有两个按钮，且贴在底部。（注意open和close函数）
 //			  金钱窗口只是单纯的绘制，流程中偶尔执行refresh。
 //			3.服务员与窗口【完全独立】，只是流程中会插入一些动作: drill_COWS_playAct("")
-//			4. 2020/3/22 
+//			4.[2020/3/22] 
 //				两个商店界面的整理，以及代码结构修改，花了整整9天的时间。
 //				相当于平时2.5个星期的工作量。内容并不复杂，但就是太多了。
 //				直接写定制代码大概需要3天，直接用插件定制商店需要花1天。
 //				我的插件仅仅缩短了一般制作者2天的工作量。却花了9天来弥补，后期可能还需要更多维护。
 //				可能，一个插件活着的意义就在于此吧。如果没有人去用它，那么它的生命也就失去了意义。
-//			   2020/3/28
+//			  [2020/3/28]
 //				跑来把按钮组功能加上了，粗暴实现，没有对象化。
 //				按钮的实现原理看文档就能明白，只是这里由于按钮应该是sprite还是window的问题纠结了很久。
 //				文字滤镜和高级颜色必须要window才能实现，这种情况下，有点让人不安，毕竟窗口没有sprite那么灵活。
+//			5.[2025/2/1]，最近注释了窗口很多内容，感觉可以吧这块的功能重新梳理一下。
+//			  但是失败了，梳理了一点点，架不住代码太多，窗口字符鸽了4个月了，这边反正也没问题了，先完成主要任务去。
 //
 //		★存在的问题：
 //			暂无
@@ -1503,7 +1515,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_SLS_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_SLS_PluginTip_baseList.length == 0 ){ return ""; }
@@ -1531,46 +1543,52 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_SceneLimitedShop = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_SceneLimitedShop');
+	var Imported = Imported || {};
+	Imported.Drill_SceneLimitedShop = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_SceneLimitedShop');
 
 
 	//==============================
 	// * 静态数据 - 指针与边框
 	//				（~struct~DrillCursor）
 	//==============================
-	DrillUp.drill_SLS_initMenuCursor = function( dataFrom ) {
+	DrillUp.drill_SLS_initMenuCursor = function( dataFrom ){
 		var data = {};
+		
 		//data['mog_enabled'] = String( dataFrom["是否启用mog菜单指针"] || "true") == "true";
 		//data['mog_borderEnabled'] = String( dataFrom["是否启用mog菜单边框"] || "true") == "true";
+		
 		data['MCu_enabled'] = String( dataFrom["是否显示菜单指针"] || "true") == "true";
 		data['MCu_lock'] = String( dataFrom["是否锁定菜单指针样式"] || "false") == "true";
 		data['MCu_style'] = Number( dataFrom["锁定的菜单指针样式"] || 1);
+		
 		data['MCB_rectEnabled'] = String( dataFrom["是否启用闪烁白矩形"] || "true") == "true";
 		data['MCB_enabled'] = String( dataFrom["是否启用菜单边框"] || "true") == "true";
 		data['MCB_lock'] = String( dataFrom["是否锁定菜单边框样式"] || "false") == "true";
 		data['MCB_style'] = Number( dataFrom["锁定的菜单边框样式"] || 1);
+		
 		data['MSB_enabled'] = String( dataFrom["是否启用滚动条"] || "true") == "true";
 		data['MSB_lock'] = String( dataFrom["是否锁定滚动条样式"] || "false") == "true";
 		data['MSB_style'] = Number( dataFrom["锁定的滚动条样式"] || 1);
+		
 		return data;
 	}
 	
-    DrillUp.g_SLS_layout = String(DrillUp.parameters['资源-整体布局'] || "");
+	/*-----------------杂项------------------*/
+    DrillUp.g_SLS_layout = String(DrillUp.parameters["资源-整体布局"] || "");
 	
 	/*-----------------商品窗口参数------------------*/
-	DrillUp.g_SLS_goodsWin_x = Number(DrillUp.parameters['商品窗口 X'] || 130);
-	DrillUp.g_SLS_goodsWin_y = Number(DrillUp.parameters['商品窗口 Y'] || 75);
-	DrillUp.g_SLS_goodsWin_width = Number(DrillUp.parameters['商品窗口宽度'] || 430);
-	DrillUp.g_SLS_goodsWin_height = Number(DrillUp.parameters['商品窗口高度'] || 435);
-	DrillUp.g_SLS_goodsWin_col = Number(DrillUp.parameters['商品窗口列数'] || 1);
-	DrillUp.g_SLS_goodsWin_fontsize = Number(DrillUp.parameters['商品窗口字体大小'] || 22);
-	DrillUp.g_SLS_goodsWin_lineHeight = Number(DrillUp.parameters['商品窗口行高'] || 64);
-	if( DrillUp.parameters['商品窗口移动动画'] != "" &&
-		DrillUp.parameters['商品窗口移动动画'] != undefined ){
-		DrillUp.g_SLS_goodsWin_slideAnim = JSON.parse( DrillUp.parameters['商品窗口移动动画'] );
+	DrillUp.g_SLS_goodsWin_x = Number(DrillUp.parameters["商品窗口 X"] || 130);
+	DrillUp.g_SLS_goodsWin_y = Number(DrillUp.parameters["商品窗口 Y"] || 75);
+	DrillUp.g_SLS_goodsWin_width = Number(DrillUp.parameters["商品窗口宽度"] || 430);
+	DrillUp.g_SLS_goodsWin_height = Number(DrillUp.parameters["商品窗口高度"] || 435);
+	DrillUp.g_SLS_goodsWin_col = Number(DrillUp.parameters["商品窗口列数"] || 1);
+	DrillUp.g_SLS_goodsWin_fontsize = Number(DrillUp.parameters["商品窗口字体大小"] || 22);
+	DrillUp.g_SLS_goodsWin_lineHeight = Number(DrillUp.parameters["商品窗口行高"] || 64);
+	if( DrillUp.parameters["商品窗口移动动画"] != undefined &&
+		DrillUp.parameters["商品窗口移动动画"] != "" ){
+		DrillUp.g_SLS_goodsWin_slideAnim = JSON.parse( DrillUp.parameters["商品窗口移动动画"] );
 		DrillUp.g_SLS_goodsWin_slideAnim['slideMoveType'] = String(DrillUp.g_SLS_goodsWin_slideAnim['移动类型'] || "弹性移动");
 		DrillUp.g_SLS_goodsWin_slideAnim['slideTime'] = Number(DrillUp.g_SLS_goodsWin_slideAnim['移动时长'] || 30);
 		DrillUp.g_SLS_goodsWin_slideAnim['slideDelay'] = Number(DrillUp.g_SLS_goodsWin_slideAnim['移动延迟'] || 0);
@@ -1582,9 +1600,9 @@
 	}else{
 		DrillUp.g_SLS_goodsWin_slideAnim = {};
 	}
-	if( DrillUp.parameters['商品窗口布局'] != "" &&
-		DrillUp.parameters['商品窗口布局'] != undefined ){
-		DrillUp.g_SLS_goodsWin_layout = JSON.parse( DrillUp.parameters['商品窗口布局'] );
+	if( DrillUp.parameters["商品窗口布局"] != undefined &&
+		DrillUp.parameters["商品窗口布局"] != "" ){
+		DrillUp.g_SLS_goodsWin_layout = JSON.parse( DrillUp.parameters["商品窗口布局"] );
 		DrillUp.g_SLS_goodsWin_layout['layoutType'] = String(DrillUp.g_SLS_goodsWin_layout['布局类型'] || "默认皮肤");
 		DrillUp.g_SLS_goodsWin_layout['layoutSrc'] = String(DrillUp.g_SLS_goodsWin_layout['资源-贴图'] || "");
 		DrillUp.g_SLS_goodsWin_layout['layoutSrcFile'] = "img/Menu__limitShop/";
@@ -1593,28 +1611,28 @@
 	}else{
 		DrillUp.g_SLS_goodsWin_layout = {};
 	}
-	if( DrillUp.parameters['商品窗口指针与边框'] != "" && 
-		DrillUp.parameters['商品窗口指针与边框'] != undefined ){
-		var cursor = JSON.parse( DrillUp.parameters['商品窗口指针与边框'] );
+	if( DrillUp.parameters["商品窗口指针与边框"] != undefined && 
+		DrillUp.parameters["商品窗口指针与边框"] != "" ){
+		var cursor = JSON.parse( DrillUp.parameters["商品窗口指针与边框"] );
 		DrillUp.g_SLS_goodsWin_cursor = DrillUp.drill_SLS_initMenuCursor( cursor );
 	}else{
 		DrillUp.g_SLS_goodsWin_cursor = null;
 	}
 	
 	/*-----------------商品按钮组参数------------------*/
-	DrillUp.g_SLS_goodsBtn_width = Number(DrillUp.parameters['按钮宽度'] || 430);
-	DrillUp.g_SLS_goodsBtn_height = Number(DrillUp.parameters['按钮高度'] || 64);
-	DrillUp.g_SLS_goodsBtn_fontsize = Number(DrillUp.parameters['按钮字体大小'] || 22);
-	DrillUp.g_SLS_goodsBtn_keyReverse = String(DrillUp.parameters['键盘按键是否反向'] || "true") === "true";
-	DrillUp.g_SLS_goodsBtn_upPoint = String(DrillUp.parameters['上限隐藏点'] || "(0,0)");
-	DrillUp.g_SLS_goodsBtn_centerPoints = String(DrillUp.parameters['中间序列点列表'] || "(0,0)");
-	DrillUp.g_SLS_goodsBtn_downPoint = String(DrillUp.parameters['下限隐藏点'] || "(0,0)");
-	DrillUp.g_SLS_goodsBtn_availableIndex = Number(DrillUp.parameters['有效点'] || 1);
-	DrillUp.g_SLS_goodsBtn_btnActived = String(DrillUp.parameters['资源-激活的按钮'] || "");
-	DrillUp.g_SLS_goodsBtn_btnDeactived = String(DrillUp.parameters['资源-未激活的按钮'] || "");
-	if( DrillUp.parameters['按钮移动动画'] != "" &&
-		DrillUp.parameters['按钮移动动画'] != undefined ){
-		DrillUp.g_SLS_goodsBtn_slideAnim = JSON.parse( DrillUp.parameters['按钮移动动画'] );
+	DrillUp.g_SLS_goodsBtn_width = Number(DrillUp.parameters["按钮宽度"] || 430);
+	DrillUp.g_SLS_goodsBtn_height = Number(DrillUp.parameters["按钮高度"] || 64);
+	DrillUp.g_SLS_goodsBtn_fontsize = Number(DrillUp.parameters["按钮字体大小"] || 22);
+	DrillUp.g_SLS_goodsBtn_keyReverse = String(DrillUp.parameters["键盘按键是否反向"] || "true") === "true";
+	DrillUp.g_SLS_goodsBtn_upPoint = String(DrillUp.parameters["上限隐藏点"] || "(0,0)");
+	DrillUp.g_SLS_goodsBtn_centerPoints = String(DrillUp.parameters["中间序列点列表"] || "(0,0)");
+	DrillUp.g_SLS_goodsBtn_downPoint = String(DrillUp.parameters["下限隐藏点"] || "(0,0)");
+	DrillUp.g_SLS_goodsBtn_availableIndex = Number(DrillUp.parameters["有效点"] || 1);
+	DrillUp.g_SLS_goodsBtn_btnActived = String(DrillUp.parameters["资源-激活的按钮"] || "");
+	DrillUp.g_SLS_goodsBtn_btnDeactived = String(DrillUp.parameters["资源-未激活的按钮"] || "");
+	if( DrillUp.parameters["按钮移动动画"] != undefined &&
+		DrillUp.parameters["按钮移动动画"] != "" ){
+		DrillUp.g_SLS_goodsBtn_slideAnim = JSON.parse( DrillUp.parameters["按钮移动动画"] );
 		DrillUp.g_SLS_goodsBtn_slideAnim['slideMoveType'] = String(DrillUp.g_SLS_goodsBtn_slideAnim['移动类型'] || "弹性移动");
 		DrillUp.g_SLS_goodsBtn_slideAnim['slideTime'] = Number(DrillUp.g_SLS_goodsBtn_slideAnim['移动时长'] || 30);
 		DrillUp.g_SLS_goodsBtn_slideAnim['slideDelay'] = Number(DrillUp.g_SLS_goodsBtn_slideAnim['移动延迟'] || 0);
@@ -1629,21 +1647,21 @@
 	
 	
 	/*-----------------确认窗口参数------------------*/
-	DrillUp.g_SLS_confirmWin_x = Number(DrillUp.parameters['确认窗口 X'] || 180);
-	DrillUp.g_SLS_confirmWin_y = Number(DrillUp.parameters['确认窗口 Y'] || 230);
-	DrillUp.g_SLS_confirmWin_width = Number(DrillUp.parameters['确认窗口宽度'] || 450);
-	DrillUp.g_SLS_confirmWin_height = Number(DrillUp.parameters['确认窗口高度'] || 130);
-	DrillUp.g_SLS_confirmWin_fontsize = Number(DrillUp.parameters['确认窗口字体大小'] || 22);
-	var temp = String(DrillUp.parameters['用语-购买询问'] || "\"是否花费<商品价格>\\G购买此商品？\"");
+	DrillUp.g_SLS_confirmWin_x = Number(DrillUp.parameters["确认窗口 X"] || 180);
+	DrillUp.g_SLS_confirmWin_y = Number(DrillUp.parameters["确认窗口 Y"] || 230);
+	DrillUp.g_SLS_confirmWin_width = Number(DrillUp.parameters["确认窗口宽度"] || 450);
+	DrillUp.g_SLS_confirmWin_height = Number(DrillUp.parameters["确认窗口高度"] || 130);
+	DrillUp.g_SLS_confirmWin_fontsize = Number(DrillUp.parameters["确认窗口字体大小"] || 22);
+	var temp = String(DrillUp.parameters["用语-购买询问"] || "\"是否花费<商品价格>\\G购买此商品？\"");
 	temp = temp.substring(1,temp.length-1);
 	temp = temp.replace(/\\\\/g,"\\");
 	temp = temp.split(/\\n/);
 	DrillUp.g_SLS_confirmWin_question = temp;
-	DrillUp.g_SLS_confirmWin_ok = String(DrillUp.parameters['用语-确认购买'] || "是的！");
-	DrillUp.g_SLS_confirmWin_cancel = String(DrillUp.parameters['用语-取消购买'] || "不对！不对！");
-	if( DrillUp.parameters['确认窗口移动动画'] != "" &&
-		DrillUp.parameters['确认窗口移动动画'] != undefined ){
-		DrillUp.g_SLS_confirmWin_slideAnim = JSON.parse( DrillUp.parameters['确认窗口移动动画'] );
+	DrillUp.g_SLS_confirmWin_ok = String(DrillUp.parameters["用语-确认购买"] || "是的！");
+	DrillUp.g_SLS_confirmWin_cancel = String(DrillUp.parameters["用语-取消购买"] || "不对！不对！");
+	if( DrillUp.parameters["确认窗口移动动画"] != undefined &&
+		DrillUp.parameters["确认窗口移动动画"] != "" ){
+		DrillUp.g_SLS_confirmWin_slideAnim = JSON.parse( DrillUp.parameters["确认窗口移动动画"] );
 		DrillUp.g_SLS_confirmWin_slideAnim['slideMoveType'] = String(DrillUp.g_SLS_confirmWin_slideAnim['移动类型'] || "弹性移动");
 		DrillUp.g_SLS_confirmWin_slideAnim['slideTime'] = Number(DrillUp.g_SLS_confirmWin_slideAnim['移动时长'] || 15);
 		DrillUp.g_SLS_confirmWin_slideAnim['slideDelay'] = Number(DrillUp.g_SLS_confirmWin_slideAnim['移动延迟'] || 0);
@@ -1655,9 +1673,9 @@
 	}else{
 		DrillUp.g_SLS_confirmWin_slideAnim = {};
 	}
-	if( DrillUp.parameters['确认窗口布局'] != "" &&
-		DrillUp.parameters['确认窗口布局'] != undefined ){
-		DrillUp.g_SLS_confirmWin_layout = JSON.parse( DrillUp.parameters['确认窗口布局'] );
+	if( DrillUp.parameters["确认窗口布局"] != undefined &&
+		DrillUp.parameters["确认窗口布局"] != "" ){
+		DrillUp.g_SLS_confirmWin_layout = JSON.parse( DrillUp.parameters["确认窗口布局"] );
 		DrillUp.g_SLS_confirmWin_layout['layoutType'] = String(DrillUp.g_SLS_confirmWin_layout['布局类型'] || "默认皮肤");
 		DrillUp.g_SLS_confirmWin_layout['layoutSrc'] = String(DrillUp.g_SLS_confirmWin_layout['资源-贴图'] || "");
 		DrillUp.g_SLS_confirmWin_layout['layoutSrcFile'] = "img/Menu__limitShop/";
@@ -1666,23 +1684,23 @@
 	}else{
 		DrillUp.g_SLS_confirmWin_layout = {};
 	}
-	if( DrillUp.parameters['确认窗口指针与边框'] != "" && 
-		DrillUp.parameters['确认窗口指针与边框'] != undefined ){
-		var cursor = JSON.parse( DrillUp.parameters['确认窗口指针与边框'] );
+	if( DrillUp.parameters["确认窗口指针与边框"] != undefined && 
+		DrillUp.parameters["确认窗口指针与边框"] != "" ){
+		var cursor = JSON.parse( DrillUp.parameters["确认窗口指针与边框"] );
 		DrillUp.g_SLS_confirmWin_cursor = DrillUp.drill_SLS_initMenuCursor( cursor );
 	}else{
 		DrillUp.g_SLS_confirmWin_cursor = null;
 	}
 	
 	/*-----------------帮助窗口参数------------------*/
-	DrillUp.g_SLS_helpWin_x = Number(DrillUp.parameters['帮助窗口 X'] || 80);
-	DrillUp.g_SLS_helpWin_y = Number(DrillUp.parameters['帮助窗口 Y'] || 500);
-	DrillUp.g_SLS_helpWin_width = Number(DrillUp.parameters['帮助窗口宽度'] || 540);
-	DrillUp.g_SLS_helpWin_height = Number(DrillUp.parameters['帮助窗口高度'] || 120);
-	DrillUp.g_SLS_helpWin_fontsize = Number(DrillUp.parameters['帮助窗口字体大小'] || 22);
-	if( DrillUp.parameters['帮助窗口移动动画'] != "" &&
-		DrillUp.parameters['帮助窗口移动动画'] != undefined ){
-		DrillUp.g_SLS_helpWin_slideAnim = JSON.parse( DrillUp.parameters['帮助窗口移动动画'] );
+	DrillUp.g_SLS_helpWin_x = Number(DrillUp.parameters["帮助窗口 X"] || 80);
+	DrillUp.g_SLS_helpWin_y = Number(DrillUp.parameters["帮助窗口 Y"] || 500);
+	DrillUp.g_SLS_helpWin_width = Number(DrillUp.parameters["帮助窗口宽度"] || 540);
+	DrillUp.g_SLS_helpWin_height = Number(DrillUp.parameters["帮助窗口高度"] || 120);
+	DrillUp.g_SLS_helpWin_fontsize = Number(DrillUp.parameters["帮助窗口字体大小"] || 22);
+	if( DrillUp.parameters["帮助窗口移动动画"] != undefined &&
+		DrillUp.parameters["帮助窗口移动动画"] != "" ){
+		DrillUp.g_SLS_helpWin_slideAnim = JSON.parse( DrillUp.parameters["帮助窗口移动动画"] );
 		DrillUp.g_SLS_helpWin_slideAnim['slideMoveType'] = String(DrillUp.g_SLS_helpWin_slideAnim['移动类型'] || "弹性移动");
 		DrillUp.g_SLS_helpWin_slideAnim['slideTime'] = Number(DrillUp.g_SLS_helpWin_slideAnim['移动时长'] || 40);
 		DrillUp.g_SLS_helpWin_slideAnim['slideDelay'] = Number(DrillUp.g_SLS_helpWin_slideAnim['移动延迟'] || 0);
@@ -1694,9 +1712,9 @@
 	}else{
 		DrillUp.g_SLS_helpWin_slideAnim = {};
 	}
-	if( DrillUp.parameters['帮助窗口布局'] != "" &&
-		DrillUp.parameters['帮助窗口布局'] != undefined ){
-		DrillUp.g_SLS_helpWin_layout = JSON.parse( DrillUp.parameters['帮助窗口布局'] );
+	if( DrillUp.parameters["帮助窗口布局"] != undefined &&
+		DrillUp.parameters["帮助窗口布局"] != "" ){
+		DrillUp.g_SLS_helpWin_layout = JSON.parse( DrillUp.parameters["帮助窗口布局"] );
 		DrillUp.g_SLS_helpWin_layout['layoutType'] = String(DrillUp.g_SLS_helpWin_layout['布局类型'] || "默认皮肤");
 		DrillUp.g_SLS_helpWin_layout['layoutSrc'] = String(DrillUp.g_SLS_helpWin_layout['资源-贴图'] || "");
 		DrillUp.g_SLS_helpWin_layout['layoutSrcFile'] = "img/Menu__limitShop/";
@@ -1707,14 +1725,14 @@
 	}
 	
 	/*-----------------金钱窗口参数------------------*/
-	DrillUp.g_SLS_goldWin_x = Number(DrillUp.parameters['金钱窗口 X'] || 590);
-	DrillUp.g_SLS_goldWin_y = Number(DrillUp.parameters['金钱窗口 Y'] || 40);
-	DrillUp.g_SLS_goldWin_width = Number(DrillUp.parameters['金钱窗口宽度'] || 210);
-	DrillUp.g_SLS_goldWin_height = Number(DrillUp.parameters['金钱窗口高度'] || 80);
-	DrillUp.g_SLS_goldWin_fontsize = Number(DrillUp.parameters['金钱窗口字体大小'] || 22);
-	if( DrillUp.parameters['金钱窗口移动动画'] != "" &&
-		DrillUp.parameters['金钱窗口移动动画'] != undefined ){
-		DrillUp.g_SLS_goldWin_slideAnim = JSON.parse( DrillUp.parameters['金钱窗口移动动画'] );
+	DrillUp.g_SLS_goldWin_x = Number(DrillUp.parameters["金钱窗口 X"] || 590);
+	DrillUp.g_SLS_goldWin_y = Number(DrillUp.parameters["金钱窗口 Y"] || 40);
+	DrillUp.g_SLS_goldWin_width = Number(DrillUp.parameters["金钱窗口宽度"] || 210);
+	DrillUp.g_SLS_goldWin_height = Number(DrillUp.parameters["金钱窗口高度"] || 80);
+	DrillUp.g_SLS_goldWin_fontsize = Number(DrillUp.parameters["金钱窗口字体大小"] || 22);
+	if( DrillUp.parameters["金钱窗口移动动画"] != undefined &&
+		DrillUp.parameters["金钱窗口移动动画"] != "" ){
+		DrillUp.g_SLS_goldWin_slideAnim = JSON.parse( DrillUp.parameters["金钱窗口移动动画"] );
 		DrillUp.g_SLS_goldWin_slideAnim['slideMoveType'] = String(DrillUp.g_SLS_goldWin_slideAnim['移动类型'] || "弹性移动");
 		DrillUp.g_SLS_goldWin_slideAnim['slideTime'] = Number(DrillUp.g_SLS_goldWin_slideAnim['移动时长'] || 60);
 		DrillUp.g_SLS_goldWin_slideAnim['slideDelay'] = Number(DrillUp.g_SLS_goldWin_slideAnim['移动延迟'] || 0);
@@ -1726,9 +1744,9 @@
 	}else{
 		DrillUp.g_SLS_goldWin_slideAnim = {};
 	}
-	if( DrillUp.parameters['金钱窗口布局'] != "" &&
-		DrillUp.parameters['金钱窗口布局'] != undefined ){
-		DrillUp.g_SLS_goldWin_layout = JSON.parse( DrillUp.parameters['金钱窗口布局'] );
+	if( DrillUp.parameters["金钱窗口布局"] != undefined &&
+		DrillUp.parameters["金钱窗口布局"] != "" ){
+		DrillUp.g_SLS_goldWin_layout = JSON.parse( DrillUp.parameters["金钱窗口布局"] );
 		DrillUp.g_SLS_goldWin_layout['layoutType'] = String(DrillUp.g_SLS_goldWin_layout['布局类型'] || "默认皮肤");
 		DrillUp.g_SLS_goldWin_layout['layoutSrc'] = String(DrillUp.g_SLS_goldWin_layout['资源-贴图'] || "");
 		DrillUp.g_SLS_goldWin_layout['layoutSrcFile'] = "img/Menu__limitShop/";
@@ -1743,17 +1761,17 @@
 	// * 静态数据 - 限量商店
 	//				（~struct~DrillSLSshop）
 	//==============================
-	DrillUp.drill_SLS_initShopData = function( dataFrom ) {
+	DrillUp.drill_SLS_initShopData = function( dataFrom ){
 		var data = {};
 		// > 商店
-		data['autoHide'] = String( dataFrom['卖完后是否隐藏商品'] || "false") == "true" ;
-		data['waitress_id'] = Number( dataFrom['商店服务员'] || 0);
-		data['shopMode'] = String( dataFrom['商品陈列模式'] || "按钮组模式") ;
+		data['autoHide'] = String( dataFrom["卖完后是否隐藏商品"] || "false") == "true" ;
+		data['waitress_id'] = Number( dataFrom["商店服务员"] || 0);
+		data['shopMode'] = String( dataFrom["商品陈列模式"] || "按钮组模式") ;
 		
 		data['list'] = [];
-		if( dataFrom['商品列表'] != "" &&
-			dataFrom['商品列表'] != undefined ){
-			data['list_params'] = JSON.parse( dataFrom['商品列表'] );
+		if( dataFrom["商品列表"] != undefined &&
+			dataFrom["商品列表"] != "" ){
+			data['list_params'] = JSON.parse( dataFrom["商品列表"] );
 		}else{
 			data['list_params'] = [];
 		}
@@ -1788,9 +1806,9 @@
 	DrillUp.g_SLS_shop_list_length = 30;
 	DrillUp.g_SLS_shop_list = [];
 	for( var i = 0; i < DrillUp.g_SLS_shop_list_length ; i++ ){
-		if( DrillUp.parameters['限量商店-' + String(i+1) ] != "" &&
-			DrillUp.parameters['限量商店-' + String(i+1) ] != undefined ){
-			var shop_params = JSON.parse(DrillUp.parameters['限量商店-' + String(i+1)] );
+		if( DrillUp.parameters["限量商店-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["限量商店-" + String(i+1) ] != "" ){
+			var shop_params = JSON.parse(DrillUp.parameters["限量商店-" + String(i+1)] );
 			DrillUp.g_SLS_shop_list[i] = DrillUp.drill_SLS_initShopData( shop_params );
 		}else{
 			DrillUp.g_SLS_shop_list[i] = null;
@@ -1801,30 +1819,30 @@
 	// * 静态数据 - 服务员行为
 	//				（~struct~DrillSLSWaitressAct）
 	//==============================
-	DrillUp.drill_SLS_convertWaitressAct = function( dataFrom ) {		//服务员行为数据转换
+	DrillUp.drill_SLS_convertWaitressAct = function( dataFrom ){		//服务员行为数据转换
 		var data = {};
-		data['enable'] = String(dataFrom['是否启用该行为'] || "false") == "true" ;
-		data['sustain'] = Number(dataFrom['动作持续时间'] || 60);
-		data['delay'] = Number(dataFrom['动作延迟'] || 0);
-		data['se'] = String(dataFrom['资源-动作声音'] || "");
-		data['gif_src'] = JSON.parse( dataFrom['资源-动作GIF'] || []);
+		data['enable'] = String(dataFrom["是否启用该行为"] || "false") == "true" ;
+		data['sustain'] = Number(dataFrom["动作持续时间"] || 60);
+		data['delay'] = Number(dataFrom["动作延迟"] || 0);
+		data['se'] = String(dataFrom["资源-动作声音"] || "");
+		data['gif_src'] = JSON.parse( dataFrom["资源-动作GIF"] || []);
 		data['gif_src_file'] = "img/Menu__limitShop/";
-		data['gif_interval'] = Number(dataFrom['帧间隔'] || 4);
-		data['gif_back_run'] = String(dataFrom['是否倒放'] || "false") == "true" ;
-		data['gif_replay'] = String(dataFrom['GIF到末尾是否重播'] || "true") == "true" ;
+		data['gif_interval'] = Number(dataFrom["帧间隔"] || 4);
+		data['gif_back_run'] = String(dataFrom["是否倒放"] || "false") == "true" ;
+		data['gif_replay'] = String(dataFrom["GIF到末尾是否重播"] || "true") == "true" ;
 		return data;
 	}
 	//==============================
 	// * 静态数据 - 服务员
-	//				（~struct~DrillSShWaitress）
+	//				（~struct~DrillSLSWaitress）
 	//==============================
-	DrillUp.drill_SLS_convertWaitress = function( dataFrom ) {
+	DrillUp.drill_SLS_convertWaitress = function( dataFrom ){
 		var waitress = {}
-		waitress['x'] = Number(dataFrom['服务员 X'] || 580);
-		waitress['y'] = Number(dataFrom['服务员 Y'] || 200);
-		if( dataFrom['服务员移动动画'] != "" && 
-			dataFrom['服务员移动动画'] != undefined ){
-			var waitress_slide = JSON.parse( dataFrom['服务员移动动画'] );
+		waitress['x'] = Number(dataFrom["服务员 X"] || 580);
+		waitress['y'] = Number(dataFrom["服务员 Y"] || 200);
+		if( dataFrom["服务员移动动画"] != undefined && 
+			dataFrom["服务员移动动画"] != "" ){
+			var waitress_slide = JSON.parse( dataFrom["服务员移动动画"] );
 			waitress['slideMoveType'] = String(waitress_slide['移动类型'] || "匀速移动");
 			waitress['slideTime'] = Number(waitress_slide['移动时长'] || 20);
 			waitress['slideDelay'] = Number(waitress_slide['移动延迟'] || 0);
@@ -1834,9 +1852,9 @@
 			waitress['slideAbsoluteX'] = Number(waitress_slide['起点-绝对坐标 X'] || 0);
 			waitress['slideAbsoluteY'] = Number(waitress_slide['起点-绝对坐标 Y'] || 0);
 		}
-		if( dataFrom['行为-默认'] != "" && 
-			dataFrom['行为-默认'] != undefined ){
-			var act_default = JSON.parse( dataFrom['行为-默认'] || {} );
+		if( dataFrom["行为-默认"] != undefined && 
+			dataFrom["行为-默认"] != "" ){
+			var act_default = JSON.parse( dataFrom["行为-默认"] || {} );
 			act_default['gif_src'] = JSON.parse( act_default['资源-动作GIF'] || []);
 			act_default['gif_src_file'] = "img/Menu__limitShop/";
 			act_default['gif_interval'] = Number(act_default['帧间隔'] || 4);
@@ -1845,44 +1863,44 @@
 		}else{
 			waitress['act-default'] = {};
 		}
-		if( dataFrom['行为-欢迎光临'] != "" && 
-			dataFrom['行为-欢迎光临'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-欢迎光临'] || {} );
+		if( dataFrom["行为-欢迎光临"] != undefined && 
+			dataFrom["行为-欢迎光临"] != "" ){
+			var act = JSON.parse( dataFrom["行为-欢迎光临"] || {} );
 			waitress['act-welcome'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-welcome'] = {};
 		}
-		if( dataFrom['行为-购买一个物品'] != "" && 
-			dataFrom['行为-购买一个物品'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-购买一个物品'] || {} );
+		if( dataFrom["行为-购买一个物品"] != undefined && 
+			dataFrom["行为-购买一个物品"] != "" ){
+			var act = JSON.parse( dataFrom["行为-购买一个物品"] || {} );
 			waitress['act-buyOne'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-buyOne'] = {};
 		}
-		if( dataFrom['行为-余额不足'] != "" && 
-			dataFrom['行为-余额不足'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-余额不足'] || {} );
+		if( dataFrom["行为-余额不足"] != undefined && 
+			dataFrom["行为-余额不足"] != "" ){
+			var act = JSON.parse( dataFrom["行为-余额不足"] || {} );
 			waitress['act-goldNotEnough'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-goldNotEnough'] = {};
 		}
-		if( dataFrom['行为-库存不足'] != "" && 
-			dataFrom['行为-库存不足'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-库存不足'] || {} );
+		if( dataFrom["行为-库存不足"] != undefined && 
+			dataFrom["行为-库存不足"] != "" ){
+			var act = JSON.parse( dataFrom["行为-库存不足"] || {} );
 			waitress['act-storeNotEnough'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-storeNotEnough'] = {};
 		}
-		if( dataFrom['行为-背包满了'] != "" && 
-			dataFrom['行为-背包满了'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-背包满了'] || {} );
+		if( dataFrom["行为-背包满了"] != undefined && 
+			dataFrom["行为-背包满了"] != "" ){
+			var act = JSON.parse( dataFrom["行为-背包满了"] || {} );
 			waitress['act-inventoryIsFull'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-inventoryIsFull'] = {};
 		}
-		if( dataFrom['行为-库存全部卖完'] != "" && 
-			dataFrom['行为-库存全部卖完'] != undefined ){
-			var act = JSON.parse( dataFrom['行为-库存全部卖完'] || {} );
+		if( dataFrom["行为-库存全部卖完"] != undefined && 
+			dataFrom["行为-库存全部卖完"] != "" ){
+			var act = JSON.parse( dataFrom["行为-库存全部卖完"] || {} );
 			waitress['act-allSoldOut'] = DrillUp.drill_SLS_convertWaitressAct( act );
 		}else{
 			waitress['act-allSoldOut'] = {};
@@ -1893,10 +1911,10 @@
 	/*-----------------服务员参数------------------*/
 	DrillUp.g_SLS_waitress_list_length = 30;
 	DrillUp.g_SLS_waitress_list = [];
-	for (var i = 0; i < DrillUp.g_SLS_waitress_list_length ; i++ ) {
-		if( DrillUp.parameters['服务员-' + String(i+1) ] != "" &&
-			DrillUp.parameters['服务员-' + String(i+1) ] != undefined ){
-			var waitress_params = JSON.parse(DrillUp.parameters['服务员-' + String(i+1)] );
+	for( var i = 0; i < DrillUp.g_SLS_waitress_list_length; i++ ){
+		if( DrillUp.parameters["服务员-" + String(i+1) ] != undefined &&
+			DrillUp.parameters["服务员-" + String(i+1) ] != "" ){
+			var waitress_params = JSON.parse(DrillUp.parameters["服务员-" + String(i+1)] );
 			DrillUp.g_SLS_waitress_list[i] = DrillUp.drill_SLS_convertWaitress( waitress_params );
 		}else{
 			DrillUp.g_SLS_waitress_list[i] = null;
@@ -1918,12 +1936,22 @@ ImageManager.load_MenuLimitShop = function(filename) {
     return this.loadBitmap('img/Menu__limitShop/', filename, 0, true);
 };
 
+
 //=============================================================================
-// * 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_SLS_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_SLS_pluginCommand.call(this, command, args);
+	this.drill_SLS_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_SLS_pluginCommand = function( command, args ){
 	if( command === ">限量商店" ){
 		
 		/*-----------------对象组获取------------------*/
@@ -2239,7 +2267,26 @@ Game_System.prototype.drill_SLS_isAllSoldOut = function( shop_index ){
 
 //=============================================================================
 // ** 限量商店【Scene_Drill_SLS】
-//
+// **
+// **		作用域：	菜单界面
+// **		主功能：	限量商店的基本功能。
+// **		子功能：
+// **					->界面重要函数
+// **						> 初始化（initialize）
+// **						> 创建（create）
+// **						> 帧刷新（update）
+// **						x> 开始运行（start）
+// **						x> 结束运行（stop）
+// **						x> 忙碌状态（isBusy）
+// **						x> 析构函数（terminate）
+// **						x> 判断加载完成（isReady）
+// **						x> 判断是否激活/启动（isActive）
+// **						x> 当前角色切换时（onActorChange）
+// **						x> 创建 - 菜单背景（createBackground）
+// **						> 创建 - 帮助窗口（createHelpWindow）
+// **		界面成员：
+// **					
+// **		说明：	
 //=============================================================================
 //==============================
 // * 限量商店 - 定义
@@ -2250,7 +2297,7 @@ function Scene_Drill_SLS() {
 Scene_Drill_SLS.prototype = Object.create(Scene_MenuBase.prototype);
 Scene_Drill_SLS.prototype.constructor = Scene_Drill_SLS;
 //==============================
-// * 限量商店 - 初始化
+// * 限量商店 - 初始化（继承）
 //==============================
 Scene_Drill_SLS.prototype.initialize = function() {
     Scene_MenuBase.prototype.initialize.call(this);
@@ -2260,7 +2307,7 @@ Scene_Drill_SLS.prototype.initialize = function() {
 	this._drill_curBtnIndex = 0;
 };
 //==============================
-// * 限量商店 - 创建
+// * 限量商店 - 创建（继承）
 //==============================
 Scene_Drill_SLS.prototype.create = function() {
     Scene_MenuBase.prototype.create.call(this);
@@ -2276,21 +2323,12 @@ Scene_Drill_SLS.prototype.create = function() {
 	this.createWaitress();					//服务员
 };
 //==============================
-// * 限量商店 - 帧刷新
+// * 限量商店 - 帧刷新（继承）
 //==============================
 Scene_Drill_SLS.prototype.update = function() { 
 	Scene_MenuBase.prototype.update.call(this);	
 	
-	this._window_goods.drill_COWA_CPD_update();			//商品窗口
-	this._window_help.drill_COWA_CPD_update();			//帮助窗口
-	this._window_gold.drill_COWA_CPD_update();			//金钱窗口
-	this._window_confirm.drill_COWA_CPD_update();		//确认窗口
-	
-	
 	if( this._drill_shopData['shopMode'] == "按钮组模式" ){
-		for( var i=0; i < this._drill_btns.length; i++ ){	//商品按钮组
-			this._drill_btns[i].drill_COWA_SBM_update();
-		}
 		this._window_goods.y = Graphics.boxHeight + 1000;
 	}
 	
@@ -2333,7 +2371,7 @@ Scene_Drill_SLS.prototype.createGoodsWindow = function() {
 		"layoutSrcFile": DrillUp.g_SLS_goodsWin_layout['layoutSrcFile'],
 	}
 	this._window_goods = new Drill_SLS_GoodsWindow(0, 0, 0, 0, this._drill_shopData);
-	this._window_goods.drill_COWA_changeParamData( data );			//辅助核心 - 控制窗口基本属性
+	this._window_goods.drill_COWA_changeParamData( data ); //『辅助核心初始化』-窗口基本属性
 	this._window_goods.refresh();
 	this._window_goods.initSelect();
 	
@@ -2383,7 +2421,7 @@ Scene_Drill_SLS.prototype.createGoodsBtn = function() {
 			"layoutSrcFile": "img/Menu__limitShop/",
 		}
 		var temp_window = new Drill_SLS_GoodsButtonWindow(0,0,0,0,temp_item );
-		temp_window.drill_COWA_changeParamData( data );			//辅助核心 - 控制窗口基本属性	
+		temp_window.drill_COWA_changeParamData( data ); //『辅助核心初始化』-窗口基本属性
 		
 		this._drill_btns.push( temp_window );
 		temp_layer.addChild( temp_window );
@@ -2394,7 +2432,7 @@ Scene_Drill_SLS.prototype.createGoodsBtn = function() {
 	this.drill_SLS_resetBtn();
 };
 //==============================
-// * 创建 - 帮助窗口
+// * 创建 - 帮助窗口（继承）
 //==============================
 Scene_Drill_SLS.prototype.createHelpWindow = function() {
 	var data = {
@@ -2420,7 +2458,7 @@ Scene_Drill_SLS.prototype.createHelpWindow = function() {
 		"layoutSrcFile": DrillUp.g_SLS_helpWin_layout['layoutSrcFile'],
 	}
 	this._window_help = new Window_Help();
-	this._window_help.drill_COWA_changeParamData( data );			//辅助核心 - 控制窗口基本属性
+	this._window_help.drill_COWA_changeParamData( data ); //『辅助核心初始化』-窗口基本属性
 	
 	this.addChild(this._window_help);
 };
@@ -2451,10 +2489,10 @@ Scene_Drill_SLS.prototype.createGoldWindow = function() {
 		"layoutSrcFile": DrillUp.g_SLS_goldWin_layout['layoutSrcFile'],
 	}
 	this._window_gold = new Drill_SLS_GoldWindow(0, 0, 0, 0);
-	this._window_gold.drill_COWA_changeParamData( data );			//辅助核心 - 控制窗口基本属性
-	this._window_gold.refresh();
-	
+	this._window_gold.drill_COWA_changeParamData( data ); //『辅助核心初始化』-窗口基本属性
 	this.addChild(this._window_gold);
+	
+	this._window_gold.drill_SLS_refresh();
 };
 //==============================
 // * 创建 - 确认窗口
@@ -2483,7 +2521,7 @@ Scene_Drill_SLS.prototype.createConfirmWindow = function() {
 		"layoutSrcFile": DrillUp.g_SLS_confirmWin_layout['layoutSrcFile'],
 	}
 	this._window_confirm = new Drill_SLS_ConfirmWindow(0, 0, 0, 0);
-	this._window_confirm.drill_COWA_changeParamData( data );			//辅助核心 - 控制窗口基本属性
+	this._window_confirm.drill_COWA_changeParamData( data ); //『辅助核心初始化』-窗口基本属性
 	
 	this._window_confirm.setHandler('ok',   this.drill_SLS_selectConfirm.bind(this));		//流程 - 确认窗口选择一个选项
 	this._window_confirm.setHandler('cancel',   this.drill_SLS_cancelConfirm.bind(this));	//流程 - 取消确认
@@ -2513,7 +2551,7 @@ Scene_Drill_SLS.prototype.createWaitress = function() {
 		"slideAbsoluteY": waitress['slideAbsoluteY'],
 	}
 	this._sprite_waitress = new Drill_SLS_WaitressSprite( waitress["act-default"], waitress );
-	this._sprite_waitress.drill_COWA_setButtonMove( data );										//辅助核心 - 控制按钮基本属性
+	this._sprite_waitress.drill_COWA_setAttrMove( data ); //『辅助核心初始化』-贴图基本属性
 	this._sprite_waitress.drill_COWS_pushNewAct("act-welcome", waitress["act-welcome"]);		//服务员核心 - 初始化指令内容
 	this._sprite_waitress.drill_COWS_pushNewAct("act-buyOne", waitress["act-buyOne"]);
 	this._sprite_waitress.drill_COWS_pushNewAct("act-goldNotEnough", waitress["act-goldNotEnough"]);
@@ -2560,8 +2598,8 @@ Scene_Drill_SLS.prototype.drill_SLS_resetBtn = function() {
 			"slideAbsoluteX": temp_sprite.x,	//所在点
 			"slideAbsoluteY": temp_sprite.y,
 		}
-		temp_sprite.drill_COWA_setButtonMove( data );		//辅助核心 - 按钮移动（不包括透明度）
-		temp_sprite.drill_SLS_redraw();						//刷新bitmap
+		temp_sprite.drill_COWA_setAttrMove( data ); //『辅助核心初始化』-贴图基本属性
+		temp_sprite.drill_SLS_redraw();
 	}
 	
 };
@@ -2651,7 +2689,8 @@ Scene_Drill_SLS.prototype.drill_SLS_chooseAItem = function() {
 	
 	// > 显示确认窗口
 	this._window_confirm.refresh( price );
-	this._window_confirm.drill_COWA_CPD_resetMove();
+	this._window_confirm.drill_COWA_resetAttrMove(); //『辅助核心动画』-重播窗口动画
+	this._window_confirm.drill_COWA_resetAttrOpacity(); //『辅助核心动画』-重播窗口动画
 	this._window_confirm.open();
 	this._window_confirm.activate();
 	this._window_confirm.select(0);
@@ -2675,7 +2714,7 @@ Scene_Drill_SLS.prototype.drill_SLS_selectConfirm = function() {
 		this._window_confirm.close();
 		
 		this._sprite_waitress.drill_COWS_playAct("act-buyOne");
-		this._window_gold.refresh();
+		this._window_gold.drill_SLS_refresh();
 		this._window_goods.refresh();
 		this._window_goods.activate();
 		this.drill_SLS_resetBtn();
@@ -2737,10 +2776,10 @@ Scene_Drill_SLS.prototype.stop = function() {
     Scene_MenuBase.prototype.stop.call(this);
 };
 //==============================
-// * 限量商店（场景基类） - 判断是否激活/启动
+// * 限量商店（场景基类） - 忙碌状态
 //==============================
-Scene_Drill_SLS.prototype.isActive = function() {
-	return Scene_MenuBase.prototype.isActive.call(this);
+Scene_Drill_SLS.prototype.isBusy = function() {
+	return Scene_MenuBase.prototype.isBusy.call(this);
 };
 //==============================
 // * 限量商店（场景基类） - 析构函数
@@ -2748,7 +2787,6 @@ Scene_Drill_SLS.prototype.isActive = function() {
 Scene_Drill_SLS.prototype.terminate = function() {
     Scene_MenuBase.prototype.terminate.call(this);
 };
-
 //==============================
 // * 限量商店（场景基类） - 判断加载完成
 //==============================
@@ -2756,12 +2794,18 @@ Scene_Drill_SLS.prototype.isReady = function() {
 	return Scene_MenuBase.prototype.isReady.call(this);
 };
 //==============================
-// * 限量商店（场景基类） - 忙碌状态
+// * 限量商店（场景基类） - 判断是否激活/启动
 //==============================
-Scene_Drill_SLS.prototype.isBusy = function() {
-	return Scene_MenuBase.prototype.isBusy.call(this);
+Scene_Drill_SLS.prototype.isActive = function() {
+	return Scene_MenuBase.prototype.isActive.call(this);
 };
 
+//==============================
+// * 限量商店（菜单界面基类） - 当前角色切换时
+//==============================
+Scene_Drill_SLS.prototype.onActorChange = function() {
+	Scene_MenuBase.prototype.onActorChange.call(this);
+};
 //==============================
 // * 限量商店（菜单界面基类） - 创建 - 菜单背景
 //==============================
@@ -3122,11 +3166,11 @@ Drill_SLS_GoodsButtonWindow.prototype.drill_SLS_redraw = function() {
 	var item_data = this._drill_item_data;
 	//alert(JSON.stringify(temp_item));
 	
-	// > 重刷背景
+	// > 重刷 背景容器层
 	if( this.drill_SLS_isEnabled() ){
-		this._drill_COWA_skinBackground.bitmap = ImageManager.load_MenuLimitShop(DrillUp.g_SLS_goodsBtn_btnActived);
+		this._drill_COWA_skinBackground.bitmap = ImageManager.load_MenuLimitShop(DrillUp.g_SLS_goodsBtn_btnActived); //『辅助核心动画』背景容器层
 	}else{
-		this._drill_COWA_skinBackground.bitmap = ImageManager.load_MenuLimitShop(DrillUp.g_SLS_goodsBtn_btnDeactived);
+		this._drill_COWA_skinBackground.bitmap = ImageManager.load_MenuLimitShop(DrillUp.g_SLS_goodsBtn_btnDeactived); //『辅助核心动画』背景容器层
 	}
 	
 	// > 重绘文本（与商品窗口相似）
@@ -3318,21 +3362,24 @@ Drill_SLS_ConfirmWindow.prototype.itemRect = function(index) {
 //==============================
 // * 确认窗口 - 重绘内容（手动调用）
 //==============================
-Drill_SLS_ConfirmWindow.prototype.refresh = function( price ) {
-	this._list = [];
-	this._list.push( DrillUp.g_SLS_confirmWin_ok );
-	this._list.push( DrillUp.g_SLS_confirmWin_cancel );
+Drill_SLS_ConfirmWindow.prototype.refresh = function( price ){
 	
-	var str_list = [];
+	// > 绘制确认文本
+	var text = "";
 	for( var i=0; i < DrillUp.g_SLS_confirmWin_question.length; i++ ){
 		var temp_str = DrillUp.g_SLS_confirmWin_question[i];
 		temp_str = temp_str.replace( "<商品价格>",String(price) );
-		str_list.push(temp_str);
+		text += temp_str;
+		text += "\n";
 	}
-	
 	this.createContents();
-	this.drill_COWA_drawTextListEx(str_list);
-	this.drawAllItems();	//绘制选项内容
+	this.drawText( text, 0,0 );
+	
+	// > 绘制选项内容
+	this._list = [];
+	this._list.push( DrillUp.g_SLS_confirmWin_ok );
+	this._list.push( DrillUp.g_SLS_confirmWin_cancel );
+	this.drawAllItems();
 }
 //==============================
 // * 确认窗口 - 绘制选项
@@ -3342,7 +3389,7 @@ Drill_SLS_ConfirmWindow.prototype.drawItem = function(index) {
     var rect = this.itemRect(index);
     rect.width -= this.textPadding();
 	
-	this.drawText(text, rect.x, rect.y , rect.width, 'center');
+	this.drawText(text, rect.x,rect.y, rect.width, 'center');
 };
 //==============================
 // * 确认窗口 - 兼容 - 【Drill_MenuCursor 主菜单 - 多样式菜单指针】
@@ -3396,7 +3443,17 @@ if( Imported.Drill_MenuScrollBar == true && DrillUp.g_SLS_confirmWin_cursor != n
 
 //=============================================================================
 // ** 金钱窗口【Drill_SLS_GoldWindow】
-//
+// **		
+// **		作用域：	菜单界面
+// **		主功能：	定义一个显示金钱数值的窗口。
+// **		子功能：	
+// **					->窗口
+// **						->帧刷新
+// **					->C开关动画
+// **					->2A私有函数
+// **					->2B金钱数据
+// **		
+// **		说明：	> 无。
 //=============================================================================
 //==============================
 // * 金钱窗口 - 定义
@@ -3419,14 +3476,32 @@ Drill_SLS_GoldWindow.prototype.update = function() {
 	Window_Base.prototype.update.call(this);
 };
 //==============================
-// * 金钱窗口 - 刷新内容（覆写）
+// * C开关动画 - 打开窗口（继承）
 //==============================
-Drill_SLS_GoldWindow.prototype.refresh = function() {
-    var x = this.textPadding();
-    var width = this.contents.width - this.textPadding() * 2;
-    this.contents.clear();
-	
-	this.drawCurrencyValue($gameParty.gold(), TextManager.currencyUnit, x, 0, width);	//货币单位，强制右对齐
+Drill_SLS_GoldWindow.prototype.open = function() {
+    this.drill_SLS_refresh();
+    Window_Base.prototype.open.call(this);
+};
+
+//==============================
+// * 2A私有函数 - 刷新内容
+//==============================
+Drill_SLS_GoldWindow.prototype.drill_SLS_refresh = function() {
+	this.contents.clear();
+	this.drawCurrencyValue( this.drill_SLS_value(), this.drill_SLS_currencyUnit(), 0, 0, this.contentsWidth() ); //（右对齐时需要输入宽度值）
+};
+
+//==============================
+// * 2B金钱数据 - 当前货币数
+//==============================
+Drill_SLS_GoldWindow.prototype.drill_SLS_value = function() {
+	return $gameParty.gold();
+};
+//==============================
+// * 2B金钱数据 - 当前货币单位
+//==============================
+Drill_SLS_GoldWindow.prototype.drill_SLS_currencyUnit = function() {
+	return TextManager.currencyUnit;
 };
 
 

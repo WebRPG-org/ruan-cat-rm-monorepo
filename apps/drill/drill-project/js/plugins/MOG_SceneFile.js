@@ -951,7 +951,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_SceneFile = true;
 　　var Moghunter = Moghunter || {}; 
   　Moghunter.parameters = PluginManager.parameters('MOG_SceneFile');

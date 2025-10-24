@@ -223,7 +223,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_PFi_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_PFi_PluginTip_baseList.length == 0 ){ return ""; }
@@ -245,10 +245,10 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_PictureFilter = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_PictureFilter');
+	var Imported = Imported || {};
+	Imported.Drill_PictureFilter = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_PictureFilter');
 
 	
 //=============================================================================
@@ -258,11 +258,20 @@ if( Imported.Drill_CoreOfFilter ){
 
 	
 //=============================================================================
-// ** 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_PFi_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_PFi_pluginCommand.call(this, command, args);
+	this.drill_PFi_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_PFi_pluginCommand = function( command, args ){
 	if( command === ">图片滤镜" ){		// >图片滤镜 : 图片[10] : 纯色滤镜 : 纯蓝 : 155 : 60
 		
 		/*-----------------对象获取------------------*/
@@ -379,7 +388,7 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 	}
 };
 //==============================
-// ** 插件指令 - 图片检查
+// * 插件指令 - 图片检查
 //==============================
 Game_Screen.prototype.drill_PFi_isPictureExist = function( pic_id ){
 	if( pic_id == 0 ){ return false; }
@@ -391,6 +400,25 @@ Game_Screen.prototype.drill_PFi_isPictureExist = function( pic_id ){
 	}
 	return true;
 };
+//==============================
+// * 插件指令 - STG兼容『STG的插件指令』
+//==============================
+if( Imported.Drill_STG__objects ){
+	
+	//==============================
+	// * 插件指令 - STG指令绑定
+	//==============================
+	var _drill_STG_PFi_pluginCommand = Drill_STG_GameInterpreter.prototype.pluginCommand;
+	Drill_STG_GameInterpreter.prototype.pluginCommand = function( command, args ){
+		_drill_STG_PFi_pluginCommand.call(this, command, args);
+		this.drill_PFi_pluginCommand( command, args );
+	}
+	//==============================
+	// * 插件指令 - STG指令执行
+	//==============================
+	Drill_STG_GameInterpreter.prototype.drill_PFi_pluginCommand = Game_Interpreter.prototype.drill_PFi_pluginCommand;
+};
+
 
 //=============================================================================
 // ** 图片
@@ -424,8 +452,12 @@ Game_Picture.prototype.initialize = function() {
 //==============================
 var _drill_PFi_sp_initialize = Sprite_Picture.prototype.initialize;
 Sprite_Picture.prototype.initialize = function( pictureId ){
-	_drill_PFi_sp_initialize.call( this, pictureId );
+	
+	// > 初始化（要放前面，因为 图片贴图initialize中会执行一次update）
 	this._drill_PFi_filterOpened = false;		//滤镜开启标记（部分情况下 图片贴图的存活时间比数据的 要长）
+	
+	// > 原函数
+	_drill_PFi_sp_initialize.call( this, pictureId );
 }
 //==============================
 // * 图片贴图 - 帧刷新

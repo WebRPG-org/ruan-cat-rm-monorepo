@@ -182,7 +182,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_GoldHud = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -242,7 +242,7 @@ Game_System.prototype.initialize = function() {
 // * PluginCommand
 //==============================
 var _alias_mog_goldhud_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_goldhud_pluginCommand.call(this,command, args)
 	if (command === "show_gold_hud")  { $gameSystem._ghud_visible = true};
 	if (command === "hide_gold_hud")  { $gameSystem._ghud_visible = false};

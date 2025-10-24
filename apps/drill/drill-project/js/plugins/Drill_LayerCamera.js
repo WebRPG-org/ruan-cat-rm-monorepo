@@ -579,7 +579,16 @@
 //			  外部贴图用 == 在图层外 == 图片层、最顶层
 //			3.该插件比 战斗镜头，多了 循环积累值 Acc 的情况。
 //			  每次都是对Acc进行赋值，Acc经过取余后才会赋值给 _displayX 。
-//	
+//			4.我就简单改改这个插件，怎么又天黑了。（2022/9/10）
+//				  * :∴★ ∵* .'∴:∵ *'★ ∴
+//				  ███████. ★.∵★∵ ∴' . 
+//				  █田█田█* : ..∴. :∵. 
+//				  █田█田█★∵∴★.:∵ ∴. ★∴
+//				  █田█田█∵. ∵∴★.*. ' *
+//				  █田█田█ ★∴ ∵★∴ .:' .
+//				  ███████.   _  _  _   
+//				 /███□███\___|__|__|__
+//			
 //		★其它说明细节：
 //			1.镜头实际上只操作 地图Spriteset_Map（继承于Spriteset_Base）。
 //			2.Spriteset_Map无法设置圆心，所以只能通过修改xy圆形的坐标位置，再进行一次逆旋转。
@@ -618,7 +627,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_LCa_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_LCa_PluginTip_baseList.length == 0 ){ return ""; }
@@ -641,15 +650,29 @@
 	DrillUp.drill_LCa_getPluginTip_ParamIsNaN = function( param_name ){
 		return "【" + DrillUp.g_LCa_PluginTip_curName + "】\n检测到参数"+param_name+"出现了NaN值，请及时检查你的函数。";
 	};
+	//==============================
+	// * 提示信息 - 报错 - 漏洞函数警告
+	//==============================
+	DrillUp.drill_LCa_getPluginTip_TransformBugWarning = function(){
+		return "【" + DrillUp.g_LCa_PluginTip_curName + "】\n注意，检测到函数Yanfly.Core.Sprite_updateTransform，该函数会破坏pixi渲染底层，从而引入像素抖动问题。\n目前已知危害到了镜头插件、对话框插件。\n去看看文档 \"0.问题解答集合（FAQ） > Rmmv中的罕见问题.docx\" 的章节 \"偶尔1像素缝隙抖动问题\" 来解决。";
+	};
+	//==============================
+	// * 提示信息 - 报错 - 漏洞函数警告 - 检测『非整数坐标抖动问题』
+	//==============================
+	if( Yanfly != undefined && 
+		Yanfly.Core != undefined && 
+		Yanfly.Core.Sprite_updateTransform != undefined ){
+		alert( DrillUp.drill_LCa_getPluginTip_TransformBugWarning() );
+	};
 	
 	
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_LayerCamera = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_LayerCamera');
+	var Imported = Imported || {};
+	Imported.Drill_LayerCamera = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_LayerCamera');
 
 
 	/*-----------------常规------------------*/
@@ -945,9 +968,18 @@ Game_Map.prototype.displayY = function(){ return this._displayY; };
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_LCa_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_LCa_pluginCommand.call(this, command, args);
+	this.drill_LCa_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_LCa_pluginCommand = function( command, args ){
 	if( command === ">地图镜头" ){
 		
 		/*-----------------镜头控制器------------------*/
@@ -1670,6 +1702,13 @@ Game_System.prototype.drill_LCa_mapToCameraY = function( y ){
 //==============================
 var _drill_LCa_setup = Game_Map.prototype.setup;
 Game_Map.prototype.setup = function( mapId ){
+	
+	// > F固定看向（切换地图时，解除固定看向）
+	if( this._mapId != mapId ){
+		$gameSystem.drill_LCa_setUnlock();
+	}
+	
+	// > 原函数
 	_drill_LCa_setup.call( this, mapId );
 	
 	// > B镜头架 设置
@@ -1755,15 +1794,11 @@ Spriteset_Map.prototype.drill_LCa_updateCameraControl = function(){
 
 //=============================================================================
 // ** 镜头控制器【Drill_LCa_Controller】
-// **			
-// **		索引：	LCa（可从子插件搜索到函数、类用法）
-// **		来源：	独立数据
-// **		实例：	> 见当前插件 _drill_LCa_sys_initialize 函数
-// **		应用：	> 见当前插件 drill_LCa_updateCameraControl 函数
 // **		
-// **		作用域：	地图界面、战斗界面、菜单界面
-// **		主功能：	> 定义一个专门控制镜头变化的数据类。
-// **		子功能：	->控制器
+// **		作用域：	地图界面
+// **		主功能：	定义一个专门控制镜头变化的数据类。
+// **		子功能：	
+// **					->控制器
 // **						->启用/关闭
 // **						->暂停/继续
 // **						> 平移
@@ -1869,7 +1904,7 @@ Drill_LCa_Controller.prototype.isLoopVertical = function(){ return $gameMap.isLo
 //==============================
 Drill_LCa_Controller.prototype.initialize = function( data ){
 	this._drill_data = {};
-	this._drill_controllerSerial = new Date().getTime() + Math.random();	//（生成一个不重复的序列号）
+	this._drill_controllerSerial = new Date().getTime() + Math.random();	//『生成一个不重复的序列号』
     this.drill_controller_initData();										//初始化数据
     this.drill_controller_initChild();										//初始化子功能
 	if( data == undefined ){ data = {}; }
@@ -2505,7 +2540,7 @@ Drill_LCa_Controller.prototype.drill_LCa_resetData_Private = function( data ){
 	
 	// > 执行重置
 	this._drill_data = JSON.parse(JSON.stringify( data ));					//深拷贝
-	this._drill_controllerSerial = new Date().getTime() + Math.random();	//（生成一个不重复的序列号）
+	this._drill_controllerSerial = new Date().getTime() + Math.random();	//『生成一个不重复的序列号』
     this.drill_controller_initData();										//初始化数据
     this.drill_controller_initChild();										//初始化子功能
 }
@@ -5625,19 +5660,21 @@ if( DrillUp.g_LCa_debugEnabled == true ){
 
 //=============================================================================
 // ** 镜头对齐框 贴图【Drill_LCa_DebugSprite】
-//			
-//			主功能：	> 定义一个debug镜头对齐框贴图。
-//			子功能：	->自定义颜色
-//						->自定义边框
-//						
-//			说明：	> 该贴图的中心锚点均为左上角，对齐用。
-//					
-// 			代码：	> 范围 - 该类只根据点变化显示图块贴图。
-//					> 结构 - [ ●合并 /分离/混乱] 
-//					> 数量 - [单个/ ●多个 ] 
-//					> 创建 - [ ●一次性 /自延迟/外部延迟] 
-//					> 销毁 - [不考虑/自销毁/ ●外部销毁 ] 
-//					> 样式 - [ ●不可修改 /自变化/外部变化] 
+// **		
+// **		作用域：	地图界面
+// **		主功能：	定义一个debug镜头对齐框贴图。
+// **		子功能：	
+// **					->自定义颜色
+// **					->自定义边框
+// **					
+// **		说明：	> 该贴图的中心锚点均为左上角，对齐用。
+// **				
+// **		代码：	> 范围 - 该类只根据点变化显示图块贴图。
+// **				> 结构 - [ ●合并 /分离/混乱] 
+// **				> 数量 - [单个/ ●多个 ] 
+// **				> 创建 - [ ●一次性 /自延迟/外部延迟] 
+// **				> 销毁 - [不考虑/自销毁/ ●外部销毁 ] 
+// **				> 样式 - [ ●不可修改 /自变化/外部变化] 
 //=============================================================================
 //==============================
 // * 对齐框贴图 - 定义

@@ -142,7 +142,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_BattleCursor = true;
 　　var Moghunter = Moghunter || {}; 
 

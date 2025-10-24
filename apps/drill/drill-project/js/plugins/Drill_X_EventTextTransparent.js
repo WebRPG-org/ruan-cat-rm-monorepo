@@ -455,7 +455,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_XETT_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_XETT_PluginTip_baseList.length == 0 ){ return ""; }
@@ -477,10 +477,10 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_X_EventTextTransparent = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_X_EventTextTransparent');
+	var Imported = Imported || {};
+	Imported.Drill_X_EventTextTransparent = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_X_EventTextTransparent');
 	
 	
 	/*-----------------杂项------------------*/
@@ -501,22 +501,22 @@
 	//==============================
 	DrillUp.drill_XETT_initSoundGroup = function( dataFrom ){
 		var data = {};
-		if( dataFrom["声音-漂浮文字显现时"] != "" &&
-			dataFrom["声音-漂浮文字显现时"] != undefined ){
+		if( dataFrom["声音-漂浮文字显现时"] != undefined &&
+			dataFrom["声音-漂浮文字显现时"] != "" ){
 			var p_data = JSON.parse( dataFrom["声音-漂浮文字显现时"] );
 			data['se_text'] = DrillUp.drill_XETT_initSound( p_data );
 		}else{
 			data['se_text'] = DrillUp.drill_XETT_initSound( {} );
 		}
-		if( dataFrom["声音-批注线显现时"] != "" &&
-			dataFrom["声音-批注线显现时"] != undefined ){
+		if( dataFrom["声音-批注线显现时"] != undefined &&
+			dataFrom["声音-批注线显现时"] != "" ){
 			var p_data = JSON.parse( dataFrom["声音-批注线显现时"] );
 			data['se_line'] = DrillUp.drill_XETT_initSound( p_data );
 		}else{
 			data['se_line'] = DrillUp.drill_XETT_initSound( {} );
 		}
-		if( dataFrom["声音-背景显现时"] != "" &&
-			dataFrom["声音-背景显现时"] != undefined ){
+		if( dataFrom["声音-背景显现时"] != undefined &&
+			dataFrom["声音-背景显现时"] != "" ){
 			var p_data = JSON.parse( dataFrom["声音-背景显现时"] );
 			data['se_background'] = DrillUp.drill_XETT_initSound( p_data );
 		}else{
@@ -543,8 +543,8 @@
 	DrillUp.g_XETT_soundList_length = 10;
 	DrillUp.g_XETT_soundList = [];
 	for (var i = 0; i < DrillUp.g_XETT_soundList_length; i++) {
-		if( DrillUp.parameters["声音集合-" + String(i+1) ] != "" && 
-			DrillUp.parameters["声音集合-" + String(i+1) ] != undefined ){
+		if( DrillUp.parameters["声音集合-" + String(i+1) ] != undefined && 
+			DrillUp.parameters["声音集合-" + String(i+1) ] != "" ){
 			var temp = JSON.parse(DrillUp.parameters["声音集合-" + String(i+1) ]);
 			DrillUp.g_XETT_soundList[i] = DrillUp.drill_XETT_initSoundGroup( temp );
 		}else{
@@ -562,9 +562,18 @@ if( Imported.Drill_EventText ){
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_XETT_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_XETT_pluginCommand.call(this, command, args);
+	this.drill_XETT_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_XETT_pluginCommand = function( command, args ){
 	if( command === ">事件漂浮文字自动显现" ){
 		
 		/*-----------------单事件获取------------------*/

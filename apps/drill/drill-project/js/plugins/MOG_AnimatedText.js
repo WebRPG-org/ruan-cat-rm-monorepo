@@ -79,7 +79,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_AnimatedText = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -95,7 +95,7 @@
 // * PluginCommand
 //==============================
 var _mog_infoText_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
     _mog_infoText_pluginCommand.call(this,command, args);
     if (command === "infotext")  {
 		$gameSystem._infoTextDataRefresh = true;

@@ -2280,7 +2280,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_ATB_Gauge = true;
 　　var Moghunter = Moghunter || {}; 	
 

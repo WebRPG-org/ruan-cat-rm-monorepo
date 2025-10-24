@@ -146,7 +146,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_Compass = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -198,7 +198,7 @@ Game_System.prototype.initialize = function() {
 // * PluginCommand
 //==============================
 var _alias_mog_compass_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_compass_pluginCommand.call(this,command, args)
 	if (command === "show_compass")  {$gameSystem._compass_visible = true;};
 	if (command === "hide_compass")  {$gameSystem._compass_visible = false;};

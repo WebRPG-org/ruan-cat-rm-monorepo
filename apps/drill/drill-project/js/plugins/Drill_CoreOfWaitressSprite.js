@@ -100,7 +100,7 @@
 //			* 服务员【Drill_COWS_WaitressSprite】
 //		
 //		★核心说明：
-//			1.整个核心只提供了一个封装好的【Sprite独立子类】。
+//			1.整个核心只提供了一个封装好的 独立贴图。
 //			  具体见类的说明。
 //		
 //		★必要注意事项：
@@ -131,17 +131,19 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_CoreOfWaitressSprite = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_CoreOfWaitressSprite');
+	var Imported = Imported || {};
+	Imported.Drill_CoreOfWaitressSprite = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_CoreOfWaitressSprite');
 
 
 //=============================================================================
 // ** 服务员【Drill_COWS_WaitressSprite】
 // **
 // **		作用域：	菜单界面
-// **		主功能：	> 通过输入指令，让贴图呈现不同的形态序列。
+// **		主功能：	通过输入指令，让贴图呈现不同的形态序列。
+// **		子功能：	
+// **					->帧刷新
 // **		
 // **		说明：	> 初始化后bitmap加载可能会要一些时间，期间不会显示出任何图片。
 // **				> 此核心为 GIF动画序列 的初版雏形，不确定后期是否要推翻。

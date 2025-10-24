@@ -457,7 +457,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_CharSelect = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -528,7 +528,7 @@ ImageManager.loadMenusActorFace = function(filename) {
 // * PluginCommand
 //==============================
 var _alias_mog_charSelect_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_charSelect_pluginCommand.call(this,command, args)
 	if (command === "character_select")  {
 		if(args.length == 2){

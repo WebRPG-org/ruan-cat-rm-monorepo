@@ -3,7 +3,7 @@
 //=============================================================================
 
 /*:
- * @plugindesc [v1.8]        面板 - 全自定义主菜单面板
+ * @plugindesc [v1.9]        面板 - 全自定义主菜单面板
  * @author Drill_up
  * 
  * @Drill_LE_param "角色固定框样式-%d"
@@ -29,10 +29,10 @@
  * 该插件 不能 单独使用。
  * 必须基于核心插件才能运行。被扩展的部分插件可以不加。
  * 基于：
- *   - Drill_CoreOfWindowAuxiliary  系统-窗口辅助核心
+ *   - Drill_CoreOfWindowAuxiliary  系统-窗口辅助核心★★v2.2及以上★★
+ *   - Drill_CoreOfSelectableButton 系统-按钮组核心★★v1.8及以上★★
  *   - Drill_CoreOfGaugeMeter       系统-参数条核心
  *   - Drill_CoreOfGaugeNumber      系统-参数数字核心
- *   - Drill_CoreOfSelectableButton 系统-按钮组核心
  * 被扩展：
  *   - Drill_WindowMenuButton       控件-主菜单选项按钮管理器
  *     通过该插件，你可以更灵活地添加/修改主菜单的选项/按钮。
@@ -235,6 +235,8 @@
  * 修复了开启参数条游标时出错的bug。
  * [v1.8]
  * 修复了 无角色时 显示不了空的角色框的bug。
+ * [v1.9]
+ * 更新并兼容了新的窗口字符底层。
  * 
  * 
  * @param ----杂项----
@@ -2603,6 +2605,7 @@
 //				->其它
 //					->mog时间系统的框
 //			
+//			->☆原型链规范（Scene_Menu）
 //			
 //		★家谱：
 //			无
@@ -2612,7 +2615,7 @@
 //		
 //		★插件私有类：
 //			* 角色固定框【Drill_SMa_ActorSprite】
-//			* 对象界面【Scene_Drill_SMa_Formation】
+//			* 队形界面【Scene_Drill_SMa_Formation】
 //			* 队形窗口【Window_Drill_SMa_Formation】
 //		
 //		★必要注意事项：
@@ -2649,7 +2652,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_SMa_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_SMa_PluginTip_baseList.length == 0 ){ return ""; }
@@ -2691,10 +2694,10 @@
 //=============================================================================
 // ** 静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_SceneMain = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_SceneMain');
+	var Imported = Imported || {};
+	Imported.Drill_SceneMain = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_SceneMain');
 	
 	//			~struct~DrillWindowMoving:			窗口移动动画（窗口辅助核心-通用）
 	//			~struct~DrillWindowLayout:			窗口布局（窗口辅助核心-通用）
@@ -2719,15 +2722,15 @@
 	// * 静态数据 - 金钱显示 - 金钱窗口参数（必须写在前面）
 	//				（~struct~DrillSMaGoldWindow）
 	//==============================
-	DrillUp.drill_SMa_initGoldWindow = function( dataFrom ) {
+	DrillUp.drill_SMa_initGoldWindow = function( dataFrom ){
 		var data = {};
 		data['x'] = Number( dataFrom["金钱窗口 X"] || 0);
 		data['y'] = Number( dataFrom["金钱窗口 Y"] || 0);
 		data['width'] = Number( dataFrom["金钱窗口宽度"] || 100);
 		data['height'] = Number( dataFrom["金钱窗口高度"] || 100);
 		data['fontsize'] = Number( dataFrom["金钱窗口字体大小"] || 22);
-		if( dataFrom["金钱窗口移动动画"] != "" &&
-			dataFrom["金钱窗口移动动画"] != undefined ){
+		if( dataFrom["金钱窗口移动动画"] != undefined &&
+			dataFrom["金钱窗口移动动画"] != "" ){
 			var slideAnim = JSON.parse( dataFrom["金钱窗口移动动画"] );
 			data['slideMoveType'] = String( slideAnim["移动类型"] || "匀速移动");
 			data['slideTime'] = Number( slideAnim["移动时长"] || 20);
@@ -2738,8 +2741,8 @@
 			data['slideAbsoluteX'] = Number( slideAnim["起点-绝对坐标 X"] || 0);
 			data['slideAbsoluteY'] = Number( slideAnim["起点-绝对坐标 Y"] || 0);
 		}
-		if( dataFrom["金钱窗口布局"] != "" &&
-			dataFrom["金钱窗口布局"] != undefined ){
+		if( dataFrom["金钱窗口布局"] != undefined &&
+			dataFrom["金钱窗口布局"] != "" ){
 			var layout = JSON.parse( dataFrom["金钱窗口布局"] );
 			data['layoutType'] = String( layout["布局类型"] || "默认皮肤");
 			data['layoutSrc'] = String( layout["资源-贴图"] || "");
@@ -2753,7 +2756,7 @@
 	// * 静态数据 - 金钱显示 - 金钱数字参数（必须写在前面）
 	//				（~struct~DrillSMaGoldNumber）
 	//==============================
-	DrillUp.drill_SMa_initGoldNumber = function( dataFrom ) {
+	DrillUp.drill_SMa_initGoldNumber = function( dataFrom ){
 		var data = {};
 		data = DrillUp.drill_COGN_initStyle( dataFrom );	//使用数字核心初始化部分参数
 		data['x'] = Number( dataFrom["金钱数字 X"] || 0);
@@ -2767,27 +2770,32 @@
 	// * 静态数据 - 指针与边框
 	//				（~struct~DrillCursor）
 	//==============================
-	DrillUp.drill_SMa_initMenuCursor = function( dataFrom ) {
+	DrillUp.drill_SMa_initMenuCursor = function( dataFrom ){
 		var data = {};
+		
 		//data['mog_enabled'] = String( dataFrom["是否启用mog菜单指针"] || "true") == "true";
 		//data['mog_borderEnabled'] = String( dataFrom["是否启用mog菜单边框"] || "true") == "true";
+		
 		data['MCu_enabled'] = String( dataFrom["是否显示菜单指针"] || "true") == "true";
 		data['MCu_lock'] = String( dataFrom["是否锁定菜单指针样式"] || "false") == "true";
 		data['MCu_style'] = Number( dataFrom["锁定的菜单指针样式"] || 1);
+		
 		data['MCB_rectEnabled'] = String( dataFrom["是否启用闪烁白矩形"] || "true") == "true";
 		data['MCB_enabled'] = String( dataFrom["是否启用菜单边框"] || "true") == "true";
 		data['MCB_lock'] = String( dataFrom["是否锁定菜单边框样式"] || "false") == "true";
 		data['MCB_style'] = Number( dataFrom["锁定的菜单边框样式"] || 1);
+		
 		data['MSB_enabled'] = String( dataFrom["是否启用滚动条"] || "true") == "true";
 		data['MSB_lock'] = String( dataFrom["是否锁定滚动条样式"] || "false") == "true";
 		data['MSB_style'] = Number( dataFrom["锁定的滚动条样式"] || 1);
+		
 		return data;
 	}
 	//==============================
 	// * 静态数据 - 菜单选项 - 菜单选项窗口参数（必须写在前面）
 	//				（~struct~DrillSMaCommandWindow）
 	//==============================
-	DrillUp.drill_SMa_initCommandWindow = function( dataFrom ) {
+	DrillUp.drill_SMa_initCommandWindow = function( dataFrom ){
 		var data = {};
 		data['x'] = Number( dataFrom["菜单选项窗口 X"] || 0);
 		data['y'] = Number( dataFrom["菜单选项窗口 Y"] || 0);
@@ -2795,8 +2803,8 @@
 		data['height'] = Number( dataFrom["菜单选项窗口高度"] || 100);
 		data['col'] = Number( dataFrom["菜单选项窗口列数"] || 1);
 		data['fontsize'] = Number( dataFrom["菜单选项窗口字体大小"] || 22);
-		if( dataFrom["菜单选项窗口移动动画"] != "" &&
-			dataFrom["菜单选项窗口移动动画"] != undefined ){
+		if( dataFrom["菜单选项窗口移动动画"] != undefined &&
+			dataFrom["菜单选项窗口移动动画"] != "" ){
 			var slideAnim = JSON.parse( dataFrom["菜单选项窗口移动动画"] );
 			data['slideMoveType'] = String( slideAnim["移动类型"] || "匀速移动");
 			data['slideTime'] = Number( slideAnim["移动时长"] || 20);
@@ -2807,8 +2815,8 @@
 			data['slideAbsoluteX'] = Number( slideAnim["起点-绝对坐标 X"] || 0);
 			data['slideAbsoluteY'] = Number( slideAnim["起点-绝对坐标 Y"] || 0);
 		}
-		if( dataFrom["菜单选项窗口布局"] != "" &&
-			dataFrom["菜单选项窗口布局"] != undefined ){
+		if( dataFrom["菜单选项窗口布局"] != undefined &&
+			dataFrom["菜单选项窗口布局"] != "" ){
 			var layout = JSON.parse( dataFrom["菜单选项窗口布局"] );
 			data['layoutType'] = String( layout["布局类型"] || "默认皮肤");
 			data['layoutSrc'] = String( layout["资源-贴图"] || "");
@@ -2817,8 +2825,8 @@
 			data['layoutY'] = Number( layout["贴图位置修正 Y"] || 0);
 		}
 		data['align'] = String( dataFrom["菜单选项对齐方式"] || "左对齐");
-		if( dataFrom["菜单选项窗口指针与边框"] != "" &&
-			dataFrom["菜单选项窗口指针与边框"] != undefined ){
+		if( dataFrom["菜单选项窗口指针与边框"] != undefined &&
+			dataFrom["菜单选项窗口指针与边框"] != "" ){
 			var cursor = JSON.parse( dataFrom["菜单选项窗口指针与边框"] );
 			data['cursor'] = DrillUp.drill_SMa_initMenuCursor( cursor );
 		}else{
@@ -2830,7 +2838,7 @@
 	// * 静态数据 - 菜单选项 - 菜单选项按钮组（必须写在前面）
 	//				（~struct~DrillSMaCommandButton）
 	//==============================
-	DrillUp.drill_SMa_initCommandButton = function( dataFrom ) {
+	DrillUp.drill_SMa_initCommandButton = function( dataFrom ){
 		var data = {};
 		data['debug_search'] = String( dataFrom["DEBUG-按钮关键字搜索"] || "false") == "true";
 		
@@ -2843,8 +2851,8 @@
 		// > 按钮组 - 按钮贴图
 		data['btn_src_default'] = String( dataFrom["默认按钮贴图"] || "");
 		data['btn_src_file'] = "img/Menu__main/";
-		if( dataFrom["按钮贴图序列"] != "" &&
-			dataFrom["按钮贴图序列"] != undefined ){
+		if( dataFrom["按钮贴图序列"] != undefined &&
+			dataFrom["按钮贴图序列"] != "" ){
 			var seq = JSON.parse( dataFrom["按钮贴图序列"] );
 			data['btn_src'] = [];
 			data['btn_srcKeyword'] = [];
@@ -2889,27 +2897,29 @@
 	// * 静态数据 - 角色头像 - 角色头像按钮组（必须写在前面）
 	//				（~struct~DrillSMaActorButton）
 	//==============================
-	DrillUp.drill_SMa_initActorAvatarButton = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorAvatarButton = function( dataFrom ){
 		var data = {};
-		
-		// > 按钮组 - 主体
 		data['style_id'] = Number( dataFrom["按钮组样式"] || 0);
+		
+		// > 按钮组 - A主体
 		data['x'] = Number( dataFrom["平移-按钮组 X"] || 0);
 		data['y'] = Number( dataFrom["平移-按钮组 Y"] || 0);
+		
+		// > 按钮组 - B父窗口
 		data['btn_constructor'] = "Window_Selectable";
 		
-		// > 按钮组 - 按钮贴图
+		// > 按钮组 - B父窗口（资源）
 		data['btn_src_default'] = String( dataFrom["默认头像按钮贴图"] || "");
 		data['btn_src_file'] = "img/Menu__actorFaces/";
-		if( dataFrom["头像按钮贴图序列"] != "" &&
-			dataFrom["头像按钮贴图序列"] != undefined ){
+		if( dataFrom["头像按钮贴图序列"] != undefined &&
+			dataFrom["头像按钮贴图序列"] != "" ){
 			data['btn_src'] = JSON.parse( dataFrom["头像按钮贴图序列"] );
 		}else{
 			data['btn_src'] = [];
 		}
 		data['btn_srcKeyword'] = [];
 		
-		// > 按钮组 - 激活
+		// > 按钮组 - F激活
 		data['active_enableMouseOk'] = true;	//（鼠标ok点击 开启）
 		data['active_hide'] = false;			//（激活后是否瞬间隐藏，克隆选中按钮用）
 		data['active_out'] = false;				//（激活后不出列）
@@ -2922,7 +2932,7 @@
 	// * 静态数据 - 角色固定框样式 - 参数条
 	//				（~struct~DrillActorMeter）
 	//==============================
-	DrillUp.drill_SMa_initActorBoardMeter = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorBoardMeter = function( dataFrom ){
 		var data = {};
 		
 		// > 主体
@@ -2997,7 +3007,7 @@
 	// * 静态数据 - 角色固定框样式 - 参数数字
 	//				（~struct~DrillActorNumber）
 	//==============================
-	DrillUp.drill_SMa_initActorBoardNumber = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorBoardNumber = function( dataFrom ){
 		var data = {};
 		
 		// > 主体
@@ -3044,7 +3054,7 @@
 	// * 静态数据 - 角色固定框样式
 	//				（~struct~DrillSMaActorBoardStyle）
 	//==============================
-	DrillUp.drill_SMa_initActorBoardStyle = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorBoardStyle = function( dataFrom ){
 		var data = {};
 		// > 参数条
 		data['hp_meter_enable'] = String( dataFrom["生命-是否显示参数条"] || "false") === "true";
@@ -3160,7 +3170,7 @@
 	// * 静态数据 - 角色框设置
 	//				（~struct~DrillSMaActorBoardBind）
 	//==============================
-	DrillUp.drill_SMa_initActorBoardBind = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorBoardBind = function( dataFrom ){
 		var data = {};
 		// > 绑定
 		data['style_id'] = Number( dataFrom["绑定的样式"] || 1 );
@@ -3191,7 +3201,7 @@
 	// * 静态数据 - 角色固定框组设置
 	//				（~struct~DrillSMaActorBoardArrange）
 	//==============================
-	DrillUp.drill_SMa_initActorBoardArrange = function( dataFrom ) {
+	DrillUp.drill_SMa_initActorBoardArrange = function( dataFrom ){
 		var data = {};
 		// > 主体
 		data['x'] = Number( dataFrom["平移-固定框组 X"] || 0 );
@@ -3237,8 +3247,8 @@
 		data['arrange_col'] = Number( dataFrom["矩阵列数"] || 1);
 		data['arrange_width'] = Number( dataFrom["矩阵列宽"] || 10);
 		data['arrange_height'] = Number( dataFrom["矩阵行高"] || 10);
-		if( dataFrom["固定离散位置序列"] != "" &&
-			dataFrom["固定离散位置序列"] != undefined ){
+		if( dataFrom["固定离散位置序列"] != undefined &&
+			dataFrom["固定离散位置序列"] != "" ){
 			data['arrange_squeeze'] = JSON.parse( dataFrom["固定离散位置序列"] );
 		}else{
 			data['arrange_squeeze'] = [];
@@ -3386,9 +3396,10 @@ if( Imported.Drill_CoreOfWindowAuxiliary &&
 	
 	
 //=============================================================================
-// ** 原型链规范
+// ** ☆原型链规范（Scene_Menu）
 //
 //			说明：	> 此处专门补上缺失的原型链，未缺失的则注释掉。
+//					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
 // * 主菜单界面（场景基类） - 初始化
@@ -3421,10 +3432,10 @@ Scene_Menu.prototype.stop = function() {
     Scene_MenuBase.prototype.stop.call(this);
 };
 //==============================
-// * 主菜单界面（场景基类） - 判断是否激活/启动
+// * 主菜单界面（场景基类） - 忙碌状态
 //==============================
-Scene_Menu.prototype.isActive = function() {
-	return Scene_MenuBase.prototype.isActive.call(this);
+Scene_Menu.prototype.isBusy = function() {
+	return Scene_MenuBase.prototype.isBusy.call(this);
 };
 //==============================
 // * 主菜单界面（场景基类） - 析构函数
@@ -3432,7 +3443,6 @@ Scene_Menu.prototype.isActive = function() {
 Scene_Menu.prototype.terminate = function() {
     Scene_MenuBase.prototype.terminate.call(this);
 };
-
 //==============================
 // * 主菜单界面（场景基类） - 判断加载完成
 //==============================
@@ -3440,12 +3450,18 @@ Scene_Menu.prototype.isReady = function() {
 	return Scene_MenuBase.prototype.isReady.call(this);
 };
 //==============================
-// * 主菜单界面（场景基类） - 忙碌状态
+// * 主菜单界面（场景基类） - 判断是否激活/启动
 //==============================
-Scene_Menu.prototype.isBusy = function() {
-	return Scene_MenuBase.prototype.isBusy.call(this);
+Scene_Menu.prototype.isActive = function() {
+	return Scene_MenuBase.prototype.isActive.call(this);
 };
 
+//==============================
+// * 主菜单界面（菜单界面基类） - 当前角色切换时
+//==============================
+Scene_Menu.prototype.onActorChange = function() {
+	Scene_MenuBase.prototype.onActorChange.call(this);
+};
 //==============================
 // * 主菜单界面（菜单界面基类） - 创建 - 菜单背景
 //==============================
@@ -3462,12 +3478,21 @@ Scene_Menu.prototype.createHelpWindow = function() {
 
 
 //=============================================================================
-// ** 插件指令
+// ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_SMa_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_SMa_pluginCommand.call(this, command, args);
-	if(command === ">主菜单面板"){
+	this.drill_SMa_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_SMa_pluginCommand = function( command, args ){
+	if( command === ">主菜单面板" ){
 		if( args.length == 2 ){
 			var type = String(args[1]);
 			if( type == "打开面板" ){			//打开菜单
@@ -3790,7 +3815,7 @@ var _drill_SMa_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
 Scene_Menu.prototype.createCommandWindow = function() {
 	_drill_SMa_createCommandWindow.call( this );
 	if( DrillUp.g_SMa_command_mode == "窗口模式" ){
-		this._commandWindow.drill_COWA_changeParamData( DrillUp.g_SMa_command_window );
+		this._commandWindow.drill_COWA_changeParamData( DrillUp.g_SMa_command_window ); //『辅助核心初始化』-窗口基本属性
 		this._commandWindow.maxCols = function(){ return DrillUp.g_SMa_command_window['col']; }
 		this._commandWindow.itemTextAlign = function(){
 			if( DrillUp.g_SMa_command_window['align'] == "居中" ){ return "center"; }
@@ -3851,7 +3876,7 @@ var _drill_SMa_createGoldWindow = Scene_Menu.prototype.createGoldWindow;
 Scene_Menu.prototype.createGoldWindow = function() {
 	_drill_SMa_createGoldWindow.call( this );
 	if( DrillUp.g_SMa_gold_mode == "窗口模式" ){
-		this._goldWindow.drill_COWA_changeParamData( DrillUp.g_SMa_gold_window );
+		this._goldWindow.drill_COWA_changeParamData( DrillUp.g_SMa_gold_window ); //『辅助核心初始化』-窗口基本属性
 		this._goldWindow.refresh();
 	}
 }
@@ -3870,17 +3895,17 @@ Scene_Menu.prototype.createStatusWindow = function() {
 // * 创建 - 层级
 //==============================
 Scene_Menu.prototype.drill_SMa_createLayer = function() {
-	this._layer_context = new Sprite();		//内容层
-	this.addChild( this._layer_context );
-	this._layer_outer = new Sprite();		//外层
-	this.addChild( this._layer_outer );
+	this._drill_contextLayer = new Sprite();		//内容层
+	this.addChild( this._drill_contextLayer );
+	this._drill_outerLayer = new Sprite();		//外层
+	this.addChild( this._drill_outerLayer );
 }
 //==============================
 // * 创建 - 整体布局
 //==============================
 Scene_Menu.prototype.drill_SMa_createLayout = function() {
 	var temp_sprite = new Sprite( ImageManager.load_MenuMain( DrillUp.g_SMa_layout_src ) );
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_layoutSprite = temp_sprite;
 }
 //==============================
@@ -3902,7 +3927,7 @@ Scene_Menu.prototype.drill_SMa_createMapName = function() {
 	if( DrillUp.g_SMa_mapName_align == "左对齐" ){ align = "left"; }
 	temp_sprite.bitmap.drawText( $gameMap.displayName(),0,0, 320, DrillUp.g_SMa_mapName_fontSize + 4, align );
 	
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_mapNameSprite = temp_sprite;
 }
 //==============================
@@ -3921,7 +3946,7 @@ Scene_Menu.prototype.drill_SMa_createPlayTime = function() {
 	temp_sprite.bitmap.drawText( temp_str,0,0,250,32,"center" );
 	//（固定居中，如果可设置对齐方式反而不自然）
 	
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_playTimeSprite = temp_sprite;
 	this._drill_SMa_playTime = $gameSystem.playtime() % 60;
 }
@@ -3940,7 +3965,7 @@ Scene_Menu.prototype.drill_SMa_createRealTime = function() {
 	var temp_str = new Date().drill_SMa_getDateTextByFormat( DrillUp.g_SMa_realTime_format );
 	temp_sprite.bitmap.drawText( temp_str,0,0,250,32,"center" );
 	
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_realTimeSprite = temp_sprite;
 	this._drill_SMa_realTimeString = temp_str;
 }
@@ -3960,7 +3985,7 @@ Scene_Menu.prototype.drill_SMa_createGameWorldTime = function() {
 	var temp_str = $gameSystem.drill_SMa_getGameWorldTimeTextByFormat( DrillUp.g_SMa_gameWorldTime_format );
 	temp_sprite.bitmap.drawText( temp_str,0,0,250,32,"center" );
 	
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_gameWorldTimeSprite = temp_sprite;
 }
 //==============================
@@ -3970,7 +3995,7 @@ Scene_Menu.prototype.drill_SMa_createGoldNumber = function() {
 	if( DrillUp.g_SMa_gold_mode != "参数数字模式" ){ return; }
 	
 	var temp_sprite = new Drill_COGN_NumberSprite( DrillUp.g_SMa_gold_number );
-	this._layer_outer.addChild( temp_sprite );
+	this._drill_outerLayer.addChild( temp_sprite );
 	this._drill_SMa_goldNumberSprite = temp_sprite;
 }
 //==============================
@@ -3997,7 +4022,7 @@ Scene_Menu.prototype.drill_SMa_createCommandButton = function() {
 	
 	// > 建立按钮组层
 	var temp_sprite = new Drill_COSB_LayerSprite( data_style, this._commandWindow );
-	this._layer_context.addChild( temp_sprite );
+	this._drill_contextLayer.addChild( temp_sprite );
 	this._drill_SMa_commandButtonSprite = temp_sprite;
 }
 //==============================
@@ -4016,7 +4041,7 @@ Scene_Menu.prototype.drill_SMa_createActorAvatarButton = function() {
 	
 	// > 建立按钮组层
 	var temp_sprite = new Drill_COSB_LayerSprite( data_style, this._statusWindow );
-	this._layer_context.addChild( temp_sprite );
+	this._drill_contextLayer.addChild( temp_sprite );
 	this._drill_SMa_actorAvatarButtonSprite = temp_sprite;
 }
 //==============================
@@ -4029,7 +4054,7 @@ Scene_Menu.prototype.drill_SMa_createActorBoard = function() {
 	var temp_layer = new Sprite();
 	temp_layer.x = temp_data['x'];		//固定框组整体位置
 	temp_layer.y = temp_data['y'];		//
-	this._layer_context.addChild( temp_layer );
+	this._drill_contextLayer.addChild( temp_layer );
 	this._drill_SMa_actorLayerSprite = temp_layer;
 	
 	// > 角色固定框容器
@@ -4139,14 +4164,14 @@ Scene_Menu.prototype.drill_SMa_updateOrgWindow = function() {
 		this._commandWindow.y = Graphics.boxHeight * 2;
 	}
 	if( DrillUp.g_SMa_command_mode == "窗口模式" ){
-		this._commandWindow.drill_COWA_CPD_update();
+		//（不操作，动画自己会帧刷新）
 	}
 	// > 金钱窗口
 	if( DrillUp.g_SMa_gold_mode == "参数数字模式" ){
 		this._goldWindow.y = Graphics.boxHeight * 2;
 	}
 	if( DrillUp.g_SMa_gold_mode == "窗口模式" ){
-		this._goldWindow.drill_COWA_CPD_update();
+		//（不操作，动画自己会帧刷新）
 	}
 	// > 角色控制窗口（直接屏蔽）
 	this._statusWindow.y = Graphics.boxHeight * 2;

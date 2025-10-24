@@ -3,7 +3,7 @@
 //=============================================================================
 
 /*:
- * @plugindesc [v1.2]        行走图 - 行走图优化核心
+ * @plugindesc [v1.4]        行走图 - 行走图优化核心
  * @author Drill_up
  * 
  * 
@@ -85,6 +85,10 @@
  * 添加了部分脚本的规范。
  * [v1.2]
  * 添加了碰撞体的定义，堆叠级的定义。
+ * [v1.3]
+ * 修复了切换地图时悬停判定未刷新的bug。
+ * [v1.4]
+ * 优化了碰撞体的功能细节。
  * 
  */
  
@@ -122,6 +126,8 @@
 //							》200个事件：229.3ms（drill_COEF_updateValue_BlockX）191.2ms（drill_COEF_updateValue_PatternWidth）
 //							》50个事件：24.5ms（drill_COEF_updateValue_BlockX）26.0ms（drill_COEF_updateValue_PatternWidth）
 //							》堆叠级相关消耗：28.8ms（drill_COEF_refreshSortValue）
+//						2025/7/8：
+//							》动画序列管理层100个事件：284.7ms（drill_COEF_refreshSortBefore）78.6ms（drill_COEF_updateImportant）
 //		★最坏情况		暂无
 //		★备注			设置了 优化策略 之后，优化的是其他子插件的性能。
 //						当前插件的消耗并没有优化多少。
@@ -135,7 +141,7 @@
 //			->☆静态数据
 //			->☆插件指令
 //			->☆存储数据
-//			->☆物体贴图
+//			->☆场景容器之物体贴图
 //			
 //			->☆管辖权 - 行走图数据
 //			->☆管辖权 - 行走图贴图【全权接管 Sprite_Character】
@@ -205,8 +211,6 @@
 //				->数据
 //					->初始化 数据
 //					->删除数据
-//					->消除行走图
-//					->消除行走图（command235）
 //			->☆碰撞体赋值
 //				->最后继承2级
 //				->刷新 锚点/位置/缩放/斜切/旋转
@@ -222,11 +226,17 @@
 //				->所有点是否在当前碰撞体内【标准函数】
 //				->获取当前碰撞体的全部顶点【标准函数】
 //			->☆碰撞体判定实现
-//				->获取矩形的四个顶点
+//				->点是否在当前碰撞体内（私有）
 //				->数学工具
-//					->矩阵点的变换/点A绕点B旋转缩放斜切
 //					->获取两点的叉乘/向量积
 //					->判断点是否在凸多边形内
+//			->☆碰撞体与点变换
+//				->获取矩形的四个顶点
+//				->某点经过碰撞体的正向变换
+//				->某点经过碰撞体的反向变换
+//				->数学工具
+//					->矩阵点的变换/点A绕点B旋转缩放斜切
+//					->矩阵点的变换（逆向）/点A绕点B旋转缩放斜切（逆向）
 //			->☆DEBUG碰撞体范围
 //			
 //			
@@ -249,7 +259,7 @@
 //			7.行走图 > 关于行走图优化核心（脚本）.docx
 //		
 //		★插件私有类：
-//			无
+//			* 碰撞体 实体类【Drill_COEF_CollisionBean】
 //		
 //		★核心说明：
 //			无
@@ -325,9 +335,9 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_CoreOfEventFrame = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_CoreOfEventFrame = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_CoreOfEventFrame');
 	
 	
@@ -335,9 +345,18 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_COEF_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_COEF_pluginCommand.call(this, command, args);
+	this.drill_COEF_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_COEF_pluginCommand = function( command, args ){
 	if( command === ">行走图优化核心" ){
 		
 		/*-----------------DEBUG------------------*/
@@ -345,19 +364,19 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 			var temp1 = String(args[1]);
 			var temp2 = String(args[3]);
 			if( temp1 == "DEBUG碰撞体查看" ){
-				if( temp2 == "开启" ){
+				if( temp2 == "启用" || temp2 == "开启" || temp2 == "打开" || temp2 == "启动" ){
 					$gameSystem._drill_COEF_DebugEnabled = true;
 					$gameSystem._drill_COEFWM_DebugEnabled = false;	//（【行走图-行走图优化核心】防止重叠显示）
 				}
-				if( temp2 == "关闭" ){
+				if( temp2 == "关闭" || temp2 == "禁用" ){
 					$gameSystem._drill_COEF_DebugEnabled = false;
 				}
 			}
 			if( temp1 == "DEBUG堆叠级查看" ){
-				if( temp2 == "开启" ){
+				if( temp2 == "启用" || temp2 == "开启" || temp2 == "打开" || temp2 == "启动" ){
 					$gameSystem._drill_COEF_DebugZIndexEnabled = true;
 				}
-				if( temp2 == "关闭" ){
+				if( temp2 == "关闭" || temp2 == "禁用" ){
 					$gameSystem._drill_COEF_DebugZIndexEnabled = false;
 				}
 			}
@@ -450,10 +469,10 @@ Game_System.prototype.drill_COEF_checkSysData_Private = function() {
 
 
 //#############################################################################
-// ** 【标准模块】物体贴图 ☆物体贴图
+// ** 【标准模块】物体贴图容器 ☆场景容器之物体贴图
 //#############################################################################
 //##############################
-// * 物体贴图 - 获取 - 容器指针【标准函数】
+// * 物体贴图容器 - 获取 - 容器指针【标准函数】
 //			
 //			参数：	> 无
 //			返回：	> 贴图数组     （物体贴图）
@@ -464,7 +483,7 @@ Game_Temp.prototype.drill_COEF_getCharacterSpriteTank = function(){
 	return this.drill_COEF_getCharacterSpriteTank_Private();
 }
 //##############################
-// * 物体贴图 - 获取 - 根据事件ID【标准函数】
+// * 物体贴图容器 - 获取 - 根据事件ID【标准函数】
 //			
 //			参数：	> event_id 数字（事件ID）
 //			返回：	> 贴图对象     （事件贴图）
@@ -476,7 +495,7 @@ Game_Temp.prototype.drill_COEF_getCharacterSpriteByEventId = function( event_id 
 	return this.drill_COEF_getCharacterSpriteByEventId_Private( event_id );
 }
 //##############################
-// * 物体贴图 - 获取 - 根据玩家队员索引【标准函数】
+// * 物体贴图容器 - 获取 - 根据玩家队员索引【标准函数】
 //			
 //			参数：	> follower_index 数字（玩家队员索引）
 //			返回：	> 贴图对象           （玩家队员贴图）
@@ -488,7 +507,7 @@ Game_Temp.prototype.drill_COEF_getCharacterSpriteByFollowerIndex = function( fol
 	return this.drill_COEF_getCharacterSpriteByFollowerIndex_Private( follower_index );
 }
 //=============================================================================
-// ** 物体贴图（接口实现）
+// ** 场景容器之物体贴图（实现）
 //=============================================================================
 //==============================
 // * 物体贴图容器 - 获取 - 容器指针（私有）
@@ -533,7 +552,7 @@ Game_Temp.prototype.drill_COEF_getCharacterSpriteByFollowerIndex_Private = funct
 			sprite._character == $gamePlayer ){
 			return sprite;
 		}
-		if( sprite._character._memberIndex == follower_index &&
+		if( sprite._character._memberIndex == follower_index &&  //『玩家队员id』
 			sprite._character.isVisible() ){
 			return sprite;
 		}
@@ -1521,7 +1540,7 @@ Sprite_Character.prototype.drill_COEF_updateRotation = function() {
 //					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
-// * 贴图参数 - 初始化
+// * 贴图参数优化 - 初始化
 //==============================
 var _drill_COEF_sp_frame_initialize = Sprite_Character.prototype.initialize;
 Sprite_Character.prototype.initialize = function( character ){
@@ -1534,7 +1553,7 @@ Sprite_Character.prototype.initialize = function( character ){
 	this._drill_COEF_PatternHeight = 0;		//行走图高度
 }
 //==============================
-// * 贴图参数 - 帧刷新
+// * 贴图参数优化 - 帧刷新
 //==============================
 var _drill_COEF_sp_frame_update = Sprite_Character.prototype.update;
 Sprite_Character.prototype.update = function(){
@@ -1551,7 +1570,7 @@ Sprite_Character.prototype.update = function(){
 	_drill_COEF_sp_frame_update.call(this);
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 横向帧数
+// * 贴图参数优化 - 帧刷新 - 横向帧数
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_BlockX = function(){
 	if( this._character == undefined ){ return; }
@@ -1570,7 +1589,7 @@ Sprite_Character.prototype.drill_COEF_updateValue_BlockX = function(){
 	this._drill_COEF_BlockX = xx;
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 纵向帧数
+// * 贴图参数优化 - 帧刷新 - 纵向帧数
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_BlockY = function(){
 	if( this._character == undefined ){ return; }
@@ -1589,21 +1608,21 @@ Sprite_Character.prototype.drill_COEF_updateValue_BlockY = function(){
 	this._drill_COEF_BlockY = yy;
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 所在列
+// * 贴图参数优化 - 帧刷新 - 所在列
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_PatternX = function(){
 	if( this._character == undefined ){ return; }
 	this._drill_COEF_PatternX = this._character.pattern();
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 所在行
+// * 贴图参数优化 - 帧刷新 - 所在行
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_PatternY = function(){
 	if( this._character == undefined ){ return; }
     this._drill_COEF_PatternY = (this._character.direction() - 2) / 2;
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 宽度
+// * 贴图参数优化 - 帧刷新 - 宽度
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_PatternWidth = function(){
 	if( this.bitmap == undefined ){ return; }
@@ -1625,7 +1644,7 @@ Sprite_Character.prototype.drill_COEF_updateValue_PatternWidth = function(){
 	this._drill_COEF_PatternWidth = ww;
 }
 //==============================
-// * 贴图参数 - 帧刷新 - 高度
+// * 贴图参数优化 - 帧刷新 - 高度
 //==============================
 Sprite_Character.prototype.drill_COEF_updateValue_PatternHeight = function(){
 	if( this.bitmap == undefined ){ return; }
@@ -1648,37 +1667,37 @@ Sprite_Character.prototype.drill_COEF_updateValue_PatternHeight = function(){
 }
 
 //==============================
-// * 贴图参数 - 横向帧数（覆写）
+// * 贴图参数优化 - 横向帧数（覆写）
 //==============================
 Sprite_Character.prototype.characterBlockX = function(){
 	return this._drill_COEF_BlockX;
 }
 //==============================
-// * 贴图参数 - 纵向帧数（覆写）
+// * 贴图参数优化 - 纵向帧数（覆写）
 //==============================
 Sprite_Character.prototype.characterBlockY = function(){
 	return this._drill_COEF_BlockY;
 }
 //==============================
-// * 贴图参数 - 所在列（覆写）
+// * 贴图参数优化 - 所在列（覆写）
 //==============================
 Sprite_Character.prototype.characterPatternX = function(){
 	return this._drill_COEF_PatternX;
 }
 //==============================
-// * 贴图参数 - 所在列（覆写）
+// * 贴图参数优化 - 所在列（覆写）
 //==============================
 Sprite_Character.prototype.characterPatternY = function(){
 	return this._drill_COEF_PatternY;
 }
 //==============================
-// * 贴图参数 - 所在列（覆写）
+// * 贴图参数优化 - 所在列（覆写）
 //==============================
 Sprite_Character.prototype.patternWidth = function(){
 	return this._drill_COEF_PatternWidth;
 }
 //==============================
-// * 贴图参数 - 所在列（覆写）
+// * 贴图参数优化 - 所在列（覆写）
 //==============================
 Sprite_Character.prototype.patternHeight = function(){
 	return this._drill_COEF_PatternHeight;
@@ -1987,13 +2006,25 @@ Sprite_Character.prototype.drill_COEF__refreshFrame = function(){
 	if( this._character == undefined ){ return; }
 	if( this._character._drill_COEF_collisionBean == undefined ){ return; }
 	
-	// > 条件 - 未读取时不赋值
-	if( this.bitmap == undefined ){ return; }
-	if( this.bitmap.isReady() == false ){ return; }
+	// > 『贴图框架值归零』 - 未读取时不赋值
+	if( this.bitmap == undefined ){
+		this._character._drill_COEF_collisionBean.drill_bean_resetFrame(0,0,0,0);
+		return;
+	}
+	if( this.bitmap.isReady() == false ){
+		this._character._drill_COEF_collisionBean.drill_bean_resetFrame(0,0,0,0);
+		return;
+	}
 	
-	// > 条件 - 不接受宽度为0的标记
-	if( this._realFrame.width == 0 ){ return; }
-	if( this._realFrame.height == 0 ){ return; }
+	// > 『贴图框架值归零』 - 不接受宽度为0的标记
+	if( this._realFrame.width == 0  ){
+		this._character._drill_COEF_collisionBean.drill_bean_resetFrame(0,0,0,0);
+		return;
+	}
+	if( this._realFrame.height == 0 ){
+		this._character._drill_COEF_collisionBean.drill_bean_resetFrame(0,0,0,0);
+		return;
+	}
 	
 	// > 刷新框架
 	this._character._drill_COEF_collisionBean.drill_bean_resetFrame(
@@ -2009,8 +2040,9 @@ Sprite_Character.prototype.drill_COEF__refreshFrame = function(){
 // ** 碰撞体 实体类【Drill_COEF_CollisionBean】
 // **		
 // **		作用域：	地图界面
-// **		主功能：	> 定义一个专门的实体类数据类。
-// **		子功能：	->无帧刷新
+// **		主功能：	定义一个专门的实体类数据类。
+// **		子功能：	
+// **					->无帧刷新
 // **					->重设数据
 // **						->序列号
 // **					->被动赋值（Sprite_Character）
@@ -2216,95 +2248,6 @@ Game_CharacterBase.prototype.drill_COEF_isPointInCollisionBean_Private = functio
 	return false;
 }
 //==============================
-// * 碰撞体判定实现 - 获取矩形的四个顶点
-//
-//			说明：	> 返回 缩放/旋转/斜切 变换后的四个顶点。如果为null表示无法获取。
-//==============================
-Game_Temp.prototype.drill_COEF_getRectPointByBean = function( bean ){
-	
-	// > 缩放/旋转值
-	var rotation = bean['_drill_rotate'];	//（弧度值）
-	var scale_x = bean['_drill_scale_x'];
-	var scale_y = bean['_drill_scale_y'];
-	var skew_x = bean['_drill_skew_x'];
-	var skew_y = bean['_drill_skew_y'];
-	
-	// > 矩形的四个点 + 执行缩放/旋转（顺时针顺序）
-	var ww = bean['_drill_frameW'];
-	var hh = bean['_drill_frameH'];
-	if( ww == 0 ){ return null; }
-	if( hh == 0 ){ return null; }
-	
-	var x0 = bean['_drill_x'];					//（矩形的中心点，就是xy位置）
-	var y0 = bean['_drill_y'];
-	var xx = x0 - ww * bean['_drill_anchor_x'];	//（矩形的左上角点）
-	var yy = y0 - hh * bean['_drill_anchor_y'];
-	var p1 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+0,  yy+0,  x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
-	var p2 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+ww, yy+0,  x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
-	var p3 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+ww, yy+hh, x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
-	var p4 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+0,  yy+hh, x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
-	
-	// > 顶点列表
-	var point_list = [];
-	point_list.push( p1 );
-	point_list.push( p2 );
-	point_list.push( p3 );
-	point_list.push( p4 );
-	return point_list;
-}
-
-//==============================
-// * 碰撞体判定实现 - 数学工具 - 矩阵点的变换/点A绕点B旋转缩放斜切
-//			
-//			参数：	> cur_x,cur_y 数字       （需要变换的点）
-//					> center_x,center_y 数字 （矩形中心点）
-//					> rotation 数字          （旋转度数，弧度）
-//					> scale_x,scale_y 数字   （缩放比例XY，默认1.00）
-//					> skew_x,skew_y 数字     （斜切比例XY，默认0.00）
-//			返回：	> { x:0, y:0 }           （变换后的坐标）
-//			
-//			说明：	> 矩阵内或矩阵外一个点，能够根据矩阵的 旋转+缩放+斜切 一并变换。
-//					  旋转+缩放+斜切 可为负数。
-//==============================
-Game_Temp.prototype.drill_COEF_Math2D_getPointWithTransform = function( 
-					cur_x,cur_y,						//需要变换的点 
-					center_x,center_y, 					//矩形中心点 
-					rotation,							//变换的值（旋转）
-					scale_x, scale_y,					//变换的值（缩放）
-					skew_x, skew_y  ){					//变换的值（斜切）
-	
-	if( scale_x == undefined ){ scale_x = 1; }
-	if( scale_y == undefined ){ scale_y = 1; }
-	if( skew_x == undefined ){ skew_x = 0; }
-	if( skew_y == undefined ){ skew_y = 0; }
-	
-	// > 参数准备 （来自 Pixi.Transform）
-    var _cx = 1; // cos rotation + skewY;
-    var _sx = 0; // sin rotation + skewY;
-    var _cy = 0; // cos rotation + Math.PI/2 - skewX;
-    var _sy = 1; // sin rotation + Math.PI/2 - skewX;
-	
-	// > 旋转+斜切 （来自 Pixi.Transform.prototype.updateSkew）
-    _cx = Math.cos( rotation + skew_y );
-    _sx = Math.sin( rotation + skew_y );
-    _cy = -Math.sin( rotation - skew_x ); // cos, added PI/2
-    _sy = Math.cos( rotation - skew_x ); // sin, added PI/2
-	
-	// > 缩放 （来自 Pixi.Transform.prototype.updateLocalTransform）
-    var a = _cx * scale_x;
-    var b = _sx * scale_x;
-    var c = _cy * scale_y;
-    var d = _sy * scale_y;
-	
-	// > 将参数应用到坐标
-	var dx = (cur_x - center_x);
-	var dy = (cur_y - center_y);
-    var tar_x = center_x + (dx * a + dy * c);
-    var tar_y = center_y + (dx * b + dy * d);
-	
-	return { "x":tar_x, "y":tar_y };
-}
-//==============================
 // * 碰撞体判定实现 - 数学工具 - 获取两点的叉乘/向量积
 //			
 //			参数：	> x1,y1 数字   （第1个点）
@@ -2366,6 +2309,187 @@ Game_Temp.prototype.drill_COEF_Math2D_isPointInConvexPolygon = function( x0,y0, 
 
 
 //=============================================================================
+// ** ☆碰撞体与点变换
+//
+//			说明：	> 此模块管理 鼠标与实体类 的判定。
+//					（插件完整的功能目录去看看：功能结构树）
+//=============================================================================
+//==============================
+// * 碰撞体与点变换 - 获取矩形的四个顶点
+//
+//			说明：	> 返回 缩放/旋转/斜切 变换后的四个顶点。如果为null表示无法获取。
+//==============================
+Game_Temp.prototype.drill_COEF_getRectPointByBean = function( bean ){
+	
+	// > 缩放/旋转值
+	var rotation = bean['_drill_rotate'];	//（弧度值）
+	var scale_x = bean['_drill_scale_x'];
+	var scale_y = bean['_drill_scale_y'];
+	var skew_x = bean['_drill_skew_x'];
+	var skew_y = bean['_drill_skew_y'];
+	
+	// > 矩形的四个点 + 执行缩放/旋转（顺时针顺序）
+	var ww = bean['_drill_frameW'];
+	var hh = bean['_drill_frameH'];
+	if( ww == 0 ){ return null; }
+	if( hh == 0 ){ return null; }
+	
+	var x0 = bean['_drill_x'];					//（矩形的中心点，就是xy位置）
+	var y0 = bean['_drill_y'];
+	var xx = x0 - ww * bean['_drill_anchor_x'];	//（矩形的左上角点）
+	var yy = y0 - hh * bean['_drill_anchor_y'];
+	var p1 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+0,  yy+0,  x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
+	var p2 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+ww, yy+0,  x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
+	var p3 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+ww, yy+hh, x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
+	var p4 = $gameTemp.drill_COEF_Math2D_getPointWithTransform( xx+0,  yy+hh, x0,y0, rotation,scale_x,scale_y,skew_x,skew_y );
+	
+	// > 顶点列表
+	var point_list = [];
+	point_list.push( p1 );
+	point_list.push( p2 );
+	point_list.push( p3 );
+	point_list.push( p4 );
+	return point_list;
+}
+//==============================
+// * 碰撞体与点变换 - 某点经过碰撞体的正向变换（开放函数）
+//
+//			说明：	> 返回 缩放/旋转/斜切 变换后的顶点。如果为null表示无法获取。
+//==============================
+Game_Temp.prototype.drill_COEF_getPointByBeanTransform = function( x,y, bean ){
+	if( bean['_drill_frameW'] == 0 ){ return null; }
+	if( bean['_drill_frameH'] == 0 ){ return null; }
+	return $gameTemp.drill_COEF_Math2D_getPointWithTransform(
+			x,y,
+			bean['_drill_x'],bean['_drill_y'],	//（矩形的中心点，就是xy位置）
+			bean['_drill_rotate'],				//（弧度值）
+			bean['_drill_scale_x'],bean['_drill_scale_y'],
+			bean['_drill_skew_x'],bean['_drill_skew_y']
+		);
+}
+//==============================
+// * 碰撞体与点变换 - 某点经过碰撞体的反向变换（开放函数）
+//
+//			说明：	> 已知变换后的点，返回 缩放/旋转/斜切 变换前的点。如果为null表示无法获取。
+//==============================
+Game_Temp.prototype.drill_COEF_getPointByBeanTransformInversed = function( x,y, bean ){
+	if( bean['_drill_frameW'] == 0 ){ return null; }
+	if( bean['_drill_frameH'] == 0 ){ return null; }
+	return $gameTemp.drill_COEF_Math2D_getPointWithTransformInversed(
+			x,y,
+			bean['_drill_x'],bean['_drill_y'],	//（矩形的中心点，就是xy位置）
+			bean['_drill_rotate'],				//（弧度值）
+			bean['_drill_scale_x'],bean['_drill_scale_y'],
+			bean['_drill_skew_x'],bean['_drill_skew_y']
+		);
+}
+//==============================
+// * 碰撞体与点变换 - 数学工具 - 矩阵点的变换/点A绕点B旋转缩放斜切
+//			
+//			参数：	> cur_x,cur_y 数字       （需要变换的点）
+//					> center_x,center_y 数字 （矩形中心点）
+//					> rotation 数字          （旋转度数，弧度）
+//					> scale_x,scale_y 数字   （缩放比例XY，默认1.00）
+//					> skew_x,skew_y 数字     （斜切比例XY，默认0.00）
+//			返回：	> { x:0, y:0 }           （变换后的坐标）
+//			
+//			说明：	> 矩阵内或矩阵外一个点，能够根据矩阵的 旋转+缩放+斜切 一并变换。
+//					  旋转+缩放+斜切 可为负数。
+//==============================
+Game_Temp.prototype.drill_COEF_Math2D_getPointWithTransform = function( 
+					cur_x,cur_y,						//需要变换的点 
+					center_x,center_y, 					//矩形中心点 
+					rotation,							//变换的值（旋转）
+					scale_x, scale_y,					//变换的值（缩放）
+					skew_x, skew_y  ){					//变换的值（斜切）
+	
+	if( scale_x == undefined ){ scale_x = 1; }
+	if( scale_y == undefined ){ scale_y = 1; }
+	if( skew_x == undefined ){ skew_x = 0; }
+	if( skew_y == undefined ){ skew_y = 0; }
+	
+	// > 参数准备 （来自 Pixi.Transform）
+    var _cx = 1; // cos rotation + skewY;
+    var _sx = 0; // sin rotation + skewY;
+    var _cy = 0; // cos rotation + Math.PI/2 - skewX;
+    var _sy = 1; // sin rotation + Math.PI/2 - skewX;
+	
+	// > 旋转+斜切 （来自 Pixi.Transform.prototype.updateSkew）
+    _cx = Math.cos( rotation + skew_y );
+    _sx = Math.sin( rotation + skew_y );
+    _cy = -Math.sin( rotation - skew_x ); // cos, added PI/2
+    _sy = Math.cos( rotation - skew_x ); // sin, added PI/2
+	
+	// > 缩放 （来自 Pixi.Transform.prototype.updateLocalTransform）
+    var a = _cx * scale_x;
+    var b = _sx * scale_x;
+    var c = _cy * scale_y;
+    var d = _sy * scale_y;
+	
+	// > 将参数应用到坐标
+	var dx = (cur_x - center_x);
+	var dy = (cur_y - center_y);
+    var tar_x = center_x + (dx * a + dy * c);
+    var tar_y = center_y + (dx * b + dy * d);
+	
+	return { "x":tar_x, "y":tar_y };
+}
+//==============================
+// * 碰撞体与点变换 - 数学工具 - 矩阵点的变换（逆向）/点A绕点B旋转缩放斜切（逆向）
+//			
+//			参数：	> tar_x,tar_y 数字       （变换后的坐标）
+//					> center_x,center_y 数字 （矩形中心点）
+//					> rotation 数字          （旋转度数，弧度）
+//					> scale_x,scale_y 数字   （缩放比例XY，默认1.00）
+//					> skew_x,skew_y 数字     （斜切比例XY，默认0.00）
+//			返回：	> { x:0, y:0 }           （变换前的点）
+//			
+//			说明：	> 同样的函数，能够将正向函数的结果值，扳回成正向函数的最初值。
+//==============================
+Game_Temp.prototype.drill_COEF_Math2D_getPointWithTransformInversed = function( 
+					tar_x,tar_y,						//需要变换的点 
+					center_x,center_y, 					//矩形中心点 
+					rotation,							//变换的值（旋转）
+					scale_x, scale_y,					//变换的值（缩放）
+					skew_x, skew_y  ){					//变换的值（斜切）
+	
+	if( scale_x == undefined ){ scale_x = 1; }
+	if( scale_y == undefined ){ scale_y = 1; }
+	if( skew_x == undefined ){ skew_x = 0; }
+	if( skew_y == undefined ){ skew_y = 0; }
+	
+	// > 参数准备 （来自 Pixi.Transform）
+    var _cx = 1; // cos rotation + skewY;
+    var _sx = 0; // sin rotation + skewY;
+    var _cy = 0; // cos rotation + Math.PI/2 - skewX;
+    var _sy = 1; // sin rotation + Math.PI/2 - skewX;
+	
+	// > 旋转+斜切 （来自 Pixi.Transform.prototype.updateSkew）
+    _cx = Math.cos( rotation + skew_y );
+    _sx = Math.sin( rotation + skew_y );
+    _cy = -Math.sin( rotation - skew_x ); // cos, added PI/2
+    _sy = Math.cos( rotation - skew_x ); // sin, added PI/2
+	
+	// > 缩放 （来自 Pixi.Transform.prototype.updateLocalTransform）
+    var a = _cx * scale_x;
+    var b = _sx * scale_x;
+    var c = _cy * scale_y;
+    var d = _sy * scale_y;
+	
+	// > 逆向公式
+	var cur_y = (-tar_x*b +tar_y*a +center_x*b +center_y*(d*a - c*b - a)) / (d*a - c*b);
+	var cur_x;
+	if( Math.abs(a) > 0.01 ){	//（rotation为 0.5π/1.5π时，a无限接近0，所以换另一个公式）
+		cur_x = (-tar_x + center_x - center_x*a + cur_y*c - center_y*c )/(-a);
+	}else{
+		cur_x = (-tar_y + center_y - center_x*b + cur_y*d - center_y*d )/(-b);
+	}
+	
+	return { "x":cur_x, "y":cur_y };
+}
+
+
+//=============================================================================
 // ** ☆DEBUG碰撞体范围
 //
 //			说明：	> 此模块专门管理 DEBUG碰撞体范围 显示功能。
@@ -2391,6 +2515,8 @@ Scene_Map.prototype.drill_COEF_updateDrawBeanRangeSprite = function() {
 		
 		// > 销毁贴图
 		if( this._drill_COEF_DebugSprite != undefined ){
+			this._drill_COEF_DebugSprite.bitmap.clear();
+			this._drill_COEF_DebugSprite.bitmap = null;
 			this._spriteset._drill_mapUpArea.removeChild(this._drill_COEF_DebugSprite);
 			this._drill_COEF_DebugSprite = undefined;
 		}
@@ -2964,6 +3090,8 @@ Scene_Map.prototype.drill_COEF_updateDrawZIndexSprite = function() {
 		
 		// > 销毁贴图
 		if( this._drill_COEF_DebugZIndexSprite != undefined ){
+			this._drill_COEF_DebugZIndexSprite.bitmap.clear();
+			this._drill_COEF_DebugZIndexSprite.bitmap = null;
 			this._spriteset._drill_mapUpArea.removeChild(this._drill_COEF_DebugZIndexSprite);
 			this._drill_COEF_DebugZIndexSprite = undefined;
 		}

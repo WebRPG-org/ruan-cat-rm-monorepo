@@ -470,16 +470,16 @@
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_BattleVideo = true;
-　　var DrillUp = DrillUp || {}; 
+	var Imported = Imported || {};
+	Imported.Drill_BattleVideo = true;
+	var DrillUp = DrillUp || {}; 
 	DrillUp.parameters = PluginManager.parameters('Drill_BattleVideo');
 
 	//==============================
 	// * 静态数据 - 视频
 	//				（~struct~TitleVideo）
 	//==============================
-	DrillUp.drill_BVi_videoInit = function( dataFrom ) {
+	DrillUp.drill_BVi_videoInit = function( dataFrom ){
 		var data = {};
 		data['src'] = String( dataFrom["资源-视频动画"] || "");
 		//data['src_mask'] = String( dataFrom["资源-视频遮罩"] || "");
@@ -529,9 +529,18 @@
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_BVi_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_BVi_pluginCommand.call(this, command, args);
+	this.drill_BVi_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_BVi_pluginCommand = function( command, args ){
 	
 	/*-----------------创建指令（固定）------------------*/
 	if( command === ">创建战斗视频" ){

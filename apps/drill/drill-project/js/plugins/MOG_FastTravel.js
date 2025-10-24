@@ -1744,7 +1744,7 @@
  *
  */
  // ☢CAUTION!!☢ Don't Touch.^_^ ----------------------------------------
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_FastTravel = true;
 　　var Moghunter = Moghunter || {}; 
 	Moghunter.fastTravel_Towns = [];
@@ -1926,7 +1926,7 @@ ImageManager.loadfasttravel = function(filename) {
 // * PluginCommand
 //==============================
 var _mog_fastravel_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
     _mog_fastravel_pluginCommand.call(this,command, args)
 	if (command === "fast_travel")  {
         SceneManager.push(Scene_Fast_Travel);

@@ -306,7 +306,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_TimeSystem_Hud = true;
 　　var Moghunter = Moghunter || {}; 
 

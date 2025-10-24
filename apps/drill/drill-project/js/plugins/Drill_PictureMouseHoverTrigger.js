@@ -22,7 +22,6 @@
  * 必须基于核心插件才能运行。
  * 基于：
  *   - Drill_CoreOfPictureWithMouse   图片-图片与鼠标控制核心
- * 可被扩展：
  *   - Drill_LayerCommandThread       地图-多线程
  *   - Drill_BattleCommandThread      战斗-多线程
  * 
@@ -340,7 +339,7 @@
 	//==============================
 	// * 提示信息 - 报错 - 缺少基础插件
 	//			
-	//			说明：	此函数只提供提示信息，不校验真实的插件关系。
+	//			说明：	> 此函数只提供提示信息，不校验真实的插件关系。
 	//==============================
 	DrillUp.drill_PMHT_getPluginTip_NoBasePlugin = function(){
 		if( DrillUp.g_PMHT_PluginTip_baseList.length == 0 ){ return ""; }
@@ -355,23 +354,30 @@
 	// * 提示信息 - 报错 - 找不到图片
 	//==============================
 	DrillUp.drill_PMHT_getPluginTip_PictureNotFind = function( pic_id ){
-		return "【" + DrillUp.g_PMHT_PluginTip_curName + "】\n插件指令错误，id为"+pic_id+"的图片还没被创建。\n你可能需要将指令放在'显示图片'事件指令之后。\n（如果你知道存在此问题但不想弹出此提示，可在配置中关闭此提示）";
+		return "【" + DrillUp.g_PMHT_PluginTip_curName + "】（此提示可在插件中关闭）\n" +   //『可关闭提示信息』
+				"插件指令错误，id为"+pic_id+"的图片还没被创建。\n你可能需要将指令放在'显示图片'事件指令之后。\n（如果你知道存在此问题但不想弹出此提示，可在配置中关闭此提示）";
+	};
+	//==============================
+	// * 提示信息 - 报错 - 外部插件冲突（旧插件改名）
+	//==============================
+	DrillUp.drill_PMHT_getPluginTip_ConflictOldName = function(){
+		return "【" + DrillUp.g_PMHT_PluginTip_curName + "】\n注意，检测到重复的鼠标触发图片插件，请及时去掉旧插件 Drill_MouseTriggerPicture 。";
 	};
 	
 	
 //=============================================================================
 // ** ☆静态数据
 //=============================================================================
-　　var Imported = Imported || {};
-　　Imported.Drill_PictureMouseHoverTrigger = true;
-　　var DrillUp = DrillUp || {}; 
-    DrillUp.parameters = PluginManager.parameters('Drill_PictureMouseHoverTrigger');
+	var Imported = Imported || {};
+	Imported.Drill_PictureMouseHoverTrigger = true;
+	var DrillUp = DrillUp || {}; 
+	DrillUp.parameters = PluginManager.parameters('Drill_PictureMouseHoverTrigger');
 	
 	
 	/*-----------------杂项------------------*/
-    DrillUp.g_PMHT_remainTrigger = String(DrillUp.parameters['对话框弹出时是否保持触发'] || "true") === "true";
-    DrillUp.g_PMHT_pressSingleTrigger = String(DrillUp.parameters['鼠标按下重合区域时'] || "只触发最上面的");
-    DrillUp.g_PMHT_TipEnabled_PictureNotFind = String(DrillUp.parameters['DEBUG-是否提示找不到图片'] || "true") === "true";
+	DrillUp.g_PMHT_remainTrigger = String(DrillUp.parameters['对话框弹出时是否保持触发'] || "true") === "true";
+	DrillUp.g_PMHT_pressSingleTrigger = String(DrillUp.parameters['鼠标按下重合区域时'] || "只触发最上面的");
+	DrillUp.g_PMHT_TipEnabled_PictureNotFind = String(DrillUp.parameters['DEBUG-是否提示找不到图片'] || "true") === "true";
 	
 	
 	
@@ -382,13 +388,33 @@ if( Imported.Drill_CoreOfPictureWithMouse &&
 	Imported.Drill_LayerCommandThread &&
 	Imported.Drill_BattleCommandThread ){
 	
+//==============================
+// * >>>>基于插件检测>>>> - 最后继承
+//==============================
+var _drill_PMHT_scene_initialize = SceneManager.initialize;
+SceneManager.initialize = function() {
+	_drill_PMHT_scene_initialize.call(this);
+	if( Imported.Drill_MouseTriggerPicture ){
+		alert( DrillUp.drill_PMHT_getPluginTip_ConflictOldName() );
+	};
+}
+
 	
 //=============================================================================
 // ** ☆插件指令
 //=============================================================================
+//==============================
+// * 插件指令 - 指令绑定
+//==============================
 var _drill_PMHT_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_drill_PMHT_pluginCommand.call(this, command, args);
+	this.drill_PMHT_pluginCommand( command, args );
+}
+//==============================
+// * 插件指令 - 指令执行
+//==============================
+Game_Interpreter.prototype.drill_PMHT_pluginCommand = function( command, args ){
 	if( command === ">鼠标悬停触发图片" ){
 			
 		/*-----------------对象组获取------------------*/
@@ -746,12 +772,30 @@ Game_Screen.prototype.drill_PMHT_isPictureExist = function( pic_id ){
 	
 	var pic = this.picture( pic_id );
 	if( pic == undefined ){
-		if( DrillUp.g_PMHT_TipEnabled_PictureNotFind == true ){		//（提示信息开关）
+		if( DrillUp.g_PMHT_TipEnabled_PictureNotFind == true ){  //『可关闭提示信息』
 			alert( DrillUp.drill_PMHT_getPluginTip_PictureNotFind( pic_id ) );
 		}
 		return false;
 	}
 	return true;
+};
+//==============================
+// * 插件指令 - STG兼容『STG的插件指令』
+//==============================
+if( Imported.Drill_STG__objects ){
+	
+	//==============================
+	// * 插件指令 - STG指令绑定
+	//==============================
+	var _drill_STG_PMHT_pluginCommand = Drill_STG_GameInterpreter.prototype.pluginCommand;
+	Drill_STG_GameInterpreter.prototype.pluginCommand = function( command, args ){
+		_drill_STG_PMHT_pluginCommand.call(this, command, args);
+		this.drill_PMHT_pluginCommand( command, args );
+	}
+	//==============================
+	// * 插件指令 - STG指令执行
+	//==============================
+	Drill_STG_GameInterpreter.prototype.drill_PMHT_pluginCommand = Game_Interpreter.prototype.drill_PMHT_pluginCommand;
 };
 
 
@@ -1051,11 +1095,11 @@ Game_Picture.prototype.drill_PMHT_setMouseType = function( switch_index, type ){
 // * 图片的属性 - 获取图片ID
 //==============================
 Game_Screen.prototype.drill_PMHT_getPictureId = function( game_picture ){
-    if( $gameParty.inBattle() ){	//战斗界面的图片
+    if( $gameParty.inBattle() ){	//战斗界面的图片『图片与多场景-战斗界面』
 		var pic_id = this._pictures.indexOf( game_picture );
 		if( pic_id == -1 ){ return -1; }
         return pic_id - this.maxPictures();
-    }else{							//地图界面的图片
+    }else{							//地图界面的图片『图片与多场景-地图界面』
 		var pic_id = this._pictures.indexOf( game_picture );
         return pic_id;
     }
@@ -1137,16 +1181,25 @@ Game_Map.prototype.setup = function( mapId ){
 	_drill_PMHT_gmap_setup.call(this,mapId);
 };
 //==============================
-// * 容器 - 切换贴图时（菜单界面/战斗界面 刷新）
+// * 容器 - 切换贴图时『图片与多场景-地图界面』
 //==============================
-var _drill_PMHT_sbase_createPictures = Spriteset_Base.prototype.createPictures;
-Spriteset_Base.prototype.createPictures = function() {
+var _drill_PMHT_map_createPictures1 = Spriteset_Map.prototype.createPictures;
+Spriteset_Map.prototype.createPictures = function() {
 	$gameTemp._drill_PMHT_pictureTank = [];		//实体类容器
 	$gameTemp._drill_PMHT_needRestatistics = true;
-	_drill_PMHT_sbase_createPictures.call(this);
+	_drill_PMHT_map_createPictures1.call(this);
 };
 //==============================
-// * 容器 - 场景销毁时『图片与多场景』
+// * 容器 - 切换贴图时『图片与多场景-战斗界面』
+//==============================
+var _drill_PMHT_battle_createPictures1 = Spriteset_Battle.prototype.createPictures;
+Spriteset_Battle.prototype.createPictures = function() {
+	$gameTemp._drill_PMHT_pictureTank = [];		//实体类容器
+	$gameTemp._drill_PMHT_needRestatistics = true;
+	_drill_PMHT_battle_createPictures1.call(this);
+};
+//==============================
+// * 容器 - 场景销毁时『图片与多场景-战斗界面』
 //==============================
 var _drill_PMHT_terminate = Scene_Battle.prototype.terminate;
 Scene_Battle.prototype.terminate = function() {
@@ -1171,10 +1224,10 @@ Game_Screen.prototype.drill_PMHT_updateRestatistics = function() {
 	
 	$gameTemp._drill_PMHT_pictureTank = [];		//实体类容器
 	
-	// > 图片遍历『图片与多场景』
-	var i_offset = 0;							//地图界面的图片
+	// > 图片遍历
+	var i_offset = 0;							//地图界面的图片『图片与多场景-地图界面』
 	var pic_length = this.maxPictures();
-	if( $gameParty.inBattle() == true ){		//战斗界面的图片
+	if( $gameParty.inBattle() == true ){		//战斗界面的图片『图片与多场景-战斗界面』
 		i_offset = pic_length;
 	}
 	for(var i = 0; i < pic_length; i++ ){
@@ -1209,7 +1262,7 @@ Game_Screen.prototype.drill_PMHT_updateRestatistics = function() {
 //					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
-// * 图片触发控制 - 帧刷新（地图界面）
+// * 图片触发控制 - 帧刷新绑定『图片与多场景-地图界面』
 //==============================
 var _drill_PMHT_map_update2 = Scene_Map.prototype.update;
 Scene_Map.prototype.update = function(){
@@ -1229,7 +1282,7 @@ Scene_Map.prototype.drill_PMHT_isOptimizationPassed = function(){
 	return true;
 }
 //==============================
-// * 图片触发控制 - 帧刷新
+// * 图片触发控制 - 帧刷新『图片与多场景-地图界面』
 //==============================
 Scene_Map.prototype.drill_PMHT_updatePictureList = function(){
 	
@@ -1472,7 +1525,7 @@ Scene_Map.prototype.drill_PMHT_executeResult = function( triggerResult ){
 };
 
 //==============================
-// * 图片触发控制 - 帧刷新（战斗界面）
+// * 图片触发控制 - 帧刷新绑定『图片与多场景-战斗界面』
 //==============================
 var _drill_PMHT_battle_update2 = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function(){
@@ -1481,7 +1534,7 @@ Scene_Battle.prototype.update = function(){
 	this.drill_PMHT_updatePictureList();
 }
 //==============================
-// * 图片触发控制 - 函数赋值『图片与多场景』
+// * 图片触发控制 - 函数赋值『图片与多场景-战斗界面』
 //==============================
 Scene_Battle.prototype.drill_PMHT_isOptimizationPassed = Scene_Map.prototype.drill_PMHT_isOptimizationPassed;
 Scene_Battle.prototype.drill_PMHT_updatePictureList = Scene_Map.prototype.drill_PMHT_updatePictureList;
@@ -1496,7 +1549,7 @@ Scene_Battle.prototype.drill_PMHT_executeResult = Scene_Map.prototype.drill_PMHT
 //					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
-// * 公共事件控制 - 『执行公共事件』（地图界面）
+// * 公共事件控制 - 『执行公共事件』『图片与多场景-地图界面』
 //==============================
 Scene_Map.prototype.drill_PMHT_executeCommonEvent = function( commonId ){
 	
@@ -1514,7 +1567,7 @@ Scene_Map.prototype.drill_PMHT_executeCommonEvent = function( commonId ){
 	$gameMap.drill_LCT_addPipeEvent( e_data );
 }
 //==============================
-// * 公共事件控制 - 『执行公共事件』（战斗界面）『图片与多场景』
+// * 公共事件控制 - 『执行公共事件』『图片与多场景-战斗界面』
 //==============================
 Scene_Battle.prototype.drill_PMHT_executeCommonEvent = function( commonId ){
 	
@@ -1540,7 +1593,7 @@ Scene_Battle.prototype.drill_PMHT_executeCommonEvent = function( commonId ){
 //					（插件完整的功能目录去看看：功能结构树）
 //=============================================================================
 //==============================
-// * 地图点击拦截 - 点击监听『图片与多场景』
+// * 地图点击拦截 - 点击监听『图片与多场景-地图界面』
 //==============================
 var _drill_PMHT_processMapTouch = Scene_Map.prototype.processMapTouch;
 Scene_Map.prototype.processMapTouch = function() {	

@@ -89,7 +89,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_EmergeMotion = true;
 　　var Moghunter = Moghunter || {}; 
 

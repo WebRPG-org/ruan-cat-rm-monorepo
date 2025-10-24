@@ -1146,7 +1146,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_SceneEquip = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -1193,7 +1193,8 @@
 	Moghunter.scEquip_Slot_left_margin = Number(Moghunter.parameters['装备图标左间距'] || 138);
 	Moghunter.scEquip_Slot_Name_visible = String(Moghunter.parameters['是否显示装备槽名'] || "true") === "true";
 	Moghunter.scEquip_Slot_pos_reset = String(Moghunter.parameters['是否手动分配所有槽位置'] || "false") === "true";	
-	if( Moghunter.parameters['所有槽位置'] != "" ){
+	if( Moghunter.parameters['所有槽位置'] != "" &&
+		Moghunter.parameters['所有槽位置'] != undefined ){
 		Moghunter.scEquip_Slot_pos = JSON.parse(Moghunter.parameters['所有槽位置' ]);
 	}else{
 		Moghunter.scEquip_Slot_pos = [];
@@ -1635,18 +1636,19 @@ Window_EquipSlot.prototype.drawText = function(text, x, y, maxWidth, align) {
 // * Window Slot Rect 
 //==============================
 var _mog_scEquipM_Slot_itemRect = Window_EquipSlot.prototype.itemRect;
-Window_EquipSlot.prototype.itemRect = function(index) {
-	if( !Moghunter.scEquip_Slot_pos_reset ){
-		return _mog_scEquipM_Slot_itemRect.call(this,index);
+Window_EquipSlot.prototype.itemRect = function( index ){
+    var rect = _mog_scEquipM_Slot_itemRect.call( this, index );
+	if( Moghunter.scEquip_Slot_pos_reset != true ){
+		return rect;
 	}
-    var rect = new Rectangle();
     var maxCols = this.maxCols();
     rect.width = this.itemWidth();
     rect.height = this.itemHeight();
     rect.x = index % maxCols * (rect.width + this.spacing()) - this._scrollX;
     rect.y = Math.floor(index / maxCols) * rect.height - this._scrollY;
 	if( index < Moghunter.scEquip_Slot_pos.length ){
-		var pos = Moghunter.scEquip_Slot_pos[index].split(/[，,]/);
+		var pos_str = String( Moghunter.scEquip_Slot_pos[ index ] );
+		var pos = pos_str.split(/[，,]/);
 		if( pos.length == 2 ){
 			rect.x = Number(pos[0]);
 			rect.y = Number(pos[1]);

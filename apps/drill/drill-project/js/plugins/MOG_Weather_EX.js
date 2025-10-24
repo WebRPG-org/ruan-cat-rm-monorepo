@@ -1062,7 +1062,7 @@ Game_System.prototype.weatherMode = function(id) {
 // * Plugin Command
 //==============================
 var _mog_weatherEX_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	this.commandWeatherEX(command, args);
 	_mog_weatherEX_pluginCommand.call(this,command, args);
 	return true;
@@ -1274,9 +1274,22 @@ Spriteset_Base.prototype.createWeatherField_3 = function(mode) {
 //==============================
 // * Create Pictures
 //==============================
-var _mog_weatherEX_sprtbase_createPictures = Spriteset_Base.prototype.createPictures;
-Spriteset_Base.prototype.createPictures = function() {
-	_mog_weatherEX_sprtbase_createPictures.call(this);
+var _mog_weatherEX_sprtbase_createPictures1 = Spriteset_Map.prototype.createPictures;
+Spriteset_Map.prototype.createPictures = function() {
+	_mog_weatherEX_sprtbase_createPictures1.call(this);
+	
+	// > 强制添加 图片层
+	if( !this._drill_mapPicArea ){
+		this._drill_mapPicArea = new Sprite();
+		this.addChild(this._drill_mapPicArea);	
+	}
+	
+	this.createWeatherField_3();
+	if (this.canReloadWeatherEX()) {this.reloadWeatherEX();};
+};
+var _mog_weatherEX_sprtbase_createPictures2 = Spriteset_Battle.prototype.createPictures;
+Spriteset_Battle.prototype.createPictures = function() {
+	_mog_weatherEX_sprtbase_createPictures2.call(this);
 	
 	// > 强制添加 图片层
 	if( !this._drill_mapPicArea ){

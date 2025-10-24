@@ -1397,7 +1397,7 @@
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_ActorHud = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -1643,7 +1643,7 @@ Game_CharacterBase.prototype.screen_realY = function() {
 // * PluginCommand
 //==============================
 var _alias_mog_actorhud_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_actorhud_pluginCommand.call(this,command, args)
 	if (command === "show_actor_hud")  { $gameSystem._ahud_visible = true};
 	if (command === "hide_actor_hud")  { $gameSystem._ahud_visible = false;};

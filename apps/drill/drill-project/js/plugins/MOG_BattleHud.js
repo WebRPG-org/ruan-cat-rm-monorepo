@@ -550,11 +550,11 @@
  * @param 生命数值文本对齐方式
  * @parent ==生命==
  * @type select
- * @option 左对齐
+ * @option 右对齐
  * @value 0
  * @option 居中
  * @value 1
- * @option 右对齐
+ * @option 左对齐
  * @value 2
  * @desc 0 - 右对齐，1- 居中，2 - 左对齐
  * @default 0
@@ -2004,7 +2004,7 @@
 // ** PLUGIN PARAMETERS
 //=============================================================================
 
-　　var Imported = Imported || {};
+	var Imported = Imported || {};
 　　Imported.MOG_BattleHud = true;
 　　var Moghunter = Moghunter || {}; 
 
@@ -2291,7 +2291,7 @@ ImageManager.loadBHud = function(filename) {
 // * PluginCommand
 //==============================
 var _alias_mog_bhud_pluginCommand = Game_Interpreter.prototype.pluginCommand
-Game_Interpreter.prototype.pluginCommand = function(command, args) {
+Game_Interpreter.prototype.pluginCommand = function( command, args ){
 	_alias_mog_bhud_pluginCommand.call(this,command, args)
 	if (command === "bhud_disable")  {$gameSystem._bhud_visible = false};
 	if (command === "bhud_enable")  {$gameSystem._bhud_visible = true};
