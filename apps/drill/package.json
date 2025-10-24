@@ -7,7 +7,8 @@
 	"type": "module",
 	"main": "index.html",
 	"scripts": {
-		"dev": "vite",
+		"dev": "pnpm run dev:drill",
+		"build": "pnpm run build:qj-en",
 		"dev:drill": "vite --mode drill",
 		"dev:qj-en": "vite --mode qj-en",
 		"vue-tsc": "vue-tsc -b",
@@ -21,7 +22,6 @@
 		"build:drill": "vite build --mode drill",
 		"build:qj-en": "vite build --mode qj-en",
 		"build-muti": "cross-env isSingleDomain=true pnpm run -r \"/^build:.*/\" ",
-		"build": "pnpm run build:qj-en",
 		"postbuild": "tsx ./scripts/uglify.ts",
 		"preview": "vite preview",
 		"lint:eslint": "eslint . --fix",
