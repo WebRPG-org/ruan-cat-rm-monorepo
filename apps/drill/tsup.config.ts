@@ -3,6 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
 	// RPGMV插件入口配置
 	entry: {
+		NodeCompatLayer: "./src/rpgmv-plugins/NodeCompatLayer.ts",
 		VueBridge: "./src/rpgmv-plugins/VueBridge.ts",
 		// 可以在这里添加更多插件
 		// "OtherPlugin": "./src/rpgmv-plugins/OtherPlugin.ts",
@@ -55,13 +56,24 @@ export default defineConfig({
 		NODE_ENV: "production",
 	},
 
-	// 自定义横幅注释
-	banner: {
-		js: `//=============================================================================
+	// 自定义横幅注释 - 动态生成
+	banner({ format, name }) {
+		const bannerMap: { [key: string]: string } = {
+			NodeCompatLayer: `//=============================================================================
+// NodeCompatLayer.js - 由TypeScript编译生成
+// Node.js API 兼容层 - 为纯浏览器环境提供 Node.js API 兼容
+// 编译时间: ${new Date().toISOString()}
+//=============================================================================`,
+			VueBridge: `//=============================================================================
 // VueBridge.js - 由TypeScript编译生成
 // Vue与RPGMV双向通信桥接插件
 // 编译时间: ${new Date().toISOString()}
 //=============================================================================`,
+		};
+
+		return {
+			js: bannerMap[name] || `// ${name}.js - 编译时间: ${new Date().toISOString()}`,
+		};
 	},
 
 	// 监听模式配置（开发时使用）
@@ -71,6 +83,8 @@ export default defineConfig({
 	onSuccess: async () => {
 		console.log("🎮 RPGMV插件构建完成！");
 		console.log("📁 输出目录: apps/drill/drill-project/js/plugins/");
-		console.log("📋 生成的插件文件: VueBridge.js");
+		console.log("📋 生成的插件文件:");
+		console.log("   - NodeCompatLayer.js (Node.js API 兼容层)");
+		console.log("   - VueBridge.js (Vue与RPGMV双向通信桥接)");
 	},
 });

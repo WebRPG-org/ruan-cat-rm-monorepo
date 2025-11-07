@@ -42,7 +42,7 @@ function shouldBuildPlugins(options: TsupRpgmvPluginOptions, root: string): bool
 	}
 
 	// 检查输出文件是否存在
-	const defaultOutputPaths = ["drill-project/js/plugins/VueBridge.js"];
+	const defaultOutputPaths = ["drill-project/js/plugins/NodeCompatLayer.js", "drill-project/js/plugins/VueBridge.js"];
 	const outputPaths = options.outputPaths || defaultOutputPaths;
 
 	for (const outputPath of outputPaths) {
@@ -71,6 +71,7 @@ async function buildRpgmvPlugins(options: TsupRpgmvPluginOptions): Promise<void>
 		// 默认的tsup配置
 		const defaultTsupOptions: TsupOptions = {
 			entry: {
+				NodeCompatLayer: "./src/rpgmv-plugins/NodeCompatLayer.ts",
 				VueBridge: "./src/rpgmv-plugins/VueBridge.ts",
 			},
 			outDir: "./drill-project/js/plugins",
@@ -94,12 +95,22 @@ async function buildRpgmvPlugins(options: TsupRpgmvPluginOptions): Promise<void>
 				"Scene_Boot",
 				"Game_Actor",
 			],
-			banner: {
-				js: `//=============================================================================
+			banner({ format, name }) {
+				const bannerMap: { [key: string]: string } = {
+					NodeCompatLayer: `//=============================================================================
+// NodeCompatLayer.js - 由TypeScript编译生成
+// Node.js API 兼容层 - 为纯浏览器环境提供 Node.js API 兼容
+// 编译时间: ${new Date().toISOString()}
+//=============================================================================`,
+					VueBridge: `//=============================================================================
 // VueBridge.js - 由TypeScript编译生成
 // Vue与RPGMV双向通信桥接插件
 // 编译时间: ${new Date().toISOString()}
 //=============================================================================`,
+				};
+				return {
+					js: bannerMap[name] || `// ${name}.js - 编译时间: ${new Date().toISOString()}`,
+				};
 			},
 			silent: !options.verbose,
 		};
@@ -116,7 +127,9 @@ async function buildRpgmvPlugins(options: TsupRpgmvPluginOptions): Promise<void>
 		if (options.verbose) {
 			console.log("✅ RPGMV插件构建成功！");
 			console.log("📁 输出目录: drill-project/js/plugins/");
-			console.log("📋 生成的插件文件: VueBridge.js");
+			console.log("📋 生成的插件文件:");
+			console.log("   - NodeCompatLayer.js (Node.js API 兼容层)");
+			console.log("   - VueBridge.js (Vue与RPGMV双向通信桥接)");
 		}
 	} catch (error) {
 		console.error("❌ RPGMV插件构建失败:", error);
