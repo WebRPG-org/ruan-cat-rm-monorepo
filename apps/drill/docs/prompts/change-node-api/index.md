@@ -49,3 +49,31 @@
 ## 01 处理类型报错
 
 请你使用谷歌浏览器 MCP，运行 `apps\drill\package.json` 的 dev 命令。在浏览器内阅读控制台报错，根据报错信息，改进你设计的 `apps\drill\src\rpgmv-plugins\NodeCompatLayer.ts` node 兼容层插件。并处理好报错信息。
+
+## 02 改写拓展 vitePluginTsupRpgmv 这款 vite 插件
+
+现在这款 vitePluginTsupRpgmv `apps\drill\build\plugins\vite-plugin-tsup-rpgmv\index.ts` 插件，为我构建了两款插件，分别是：
+
+- NodeCompatLayer
+- VueBridge
+
+我希望你把这样的配置，实现 vite 插件配置化。因为未来 vitePluginTsupRpgmv 可能会构建很多款 rm 插件，我希望构建这些插件的配置，可以在 vitePluginTsupRpgmv vite 插件内实现配置，而不是预先写死在 vitePluginTsupRpgmv 的 buildRpgmvPlugins 函数内。
+
+1. 我希望你对此做出改造，适当地增加一个构建插件列表配置。允许未来我借助 vitePluginTsupRpgmv 来构建多款 rm 插件。
+2. 改造后，请你在 `apps\drill\build\plugins\index.ts` 的 vitePluginTsupRpgmv 插件处，增加你的配置。这个配置预期应该包括：
+   - rm 插件名称
+   - rm 插件的文件存储地址
+   - 预设固定好的 banner 说明文本
+3. 其中，对于预设固定好的 banner 说明文本，我希望包含以下内容：
+   - 插件名称： 比如 `NodeCompatLayer.js`
+   - 插件说明： 比如 `Node.js API 兼容层`
+   - 插件编译时间： 比如 `2025-11-07 12:22:18` 。其日期格式为 `YYYY-MM-DD HH:mm:ss"` 。格式化日期请使用 `day.js` 来完成格式化。如果没有这个库，请安装并使用。
+   - 插件版本号： 语义化的版本号，比如 `v0.1.23` 这样的。版本号应该从被构建的 rm 插件本身提取，如果被构建的 rm 插件本身不对外提供基础的 version 字段，请改造现存的 typescript 编写的 rm 插件，适当的增加 version 字段，使得 vitePluginTsupRpgmv 这款 vite 插件能获取数据并打包构建顶部头的 banner 说明文本。
+4. 请你对 `apps\drill\tsup.config.ts` 也做出适当的改造，未来构建的 rm 插件会来越来越多，我希望关于 tsup 的构建细节和要求，全部都在预设在 vitePluginTsupRpgmv 的 buildRpgmvPlugins 函数内。按理说项目 `apps\drill` 不应该再出现具体的 `tsup.config.ts` 文件了，因为在 buildRpgmvPlugins 函数内，我已经使用函数化的 tsup 完成目标 typescript 文件的构建了。
+5. 改造后，请你在 `apps\drill\build\plugins\vite-plugin-tsup-rpgmv` 目录内，编写一个简单的，简要的插件使用文档。使用文档务必要**清晰简单**。
+
+## 03 安装 vite-plugin-node-polyfills
+
+<!-- TODO:  -->
+
+ <!-- 02 改写 NodeCompatLayer 的 createFsModule 实现 -->
