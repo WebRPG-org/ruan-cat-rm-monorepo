@@ -1,4 +1,4 @@
-// undefined.js - 编译时间: 2025-11-07T11:47:00.846Z
+// .js - 编译时间: 2025-11-07T12:22:18.859Z
 "use strict";
 var VueBridgePlugin = function() {
     // src/rpgmv-plugins/NodeCompatLayer.ts
@@ -58,6 +58,10 @@ var VueBridgePlugin = function() {
             }
             this.registerModule("path", this.createPathModule());
             console.log("[NodeCompatLayer] Registered built-in module: path");
+            this.registerModule("fs", this.createFsModule());
+            console.log("[NodeCompatLayer] Registered built-in module: fs");
+            this.registerModule("nw.gui", this.createNwGuiModule());
+            console.log("[NodeCompatLayer] Registered built-in module: nw.gui");
             if (typeof win.process === "undefined") {
                 win.process = this.createProcessObject();
                 console.log("[NodeCompatLayer] Created process object");
@@ -124,6 +128,85 @@ var VueBridgePlugin = function() {
                 console.warn("[NodeCompatLayer] Module '".concat(moduleName, "' not found in browser environment"));
                 console.warn("[NodeCompatLayer] You can register custom modules using: NodeCompatLayer.registerModule('".concat(moduleName, "', yourModuleExports)"));
                 return {};
+            };
+        },
+        /**
+     * 创建 fs 模块的浏览器 mock 实现
+     */ createFsModule: function createFsModule() {
+            return {
+                existsSync: function existsSync(_path) {
+                    return false;
+                },
+                mkdirSync: function mkdirSync(path) {
+                    console.warn("[NodeCompatLayer] fs.mkdirSync('".concat(path, "') called in browser - no-op"));
+                },
+                writeFileSync: function writeFileSync(path, _data) {
+                    console.warn("[NodeCompatLayer] fs.writeFileSync('".concat(path, "') called in browser - no-op"));
+                },
+                readFileSync: function readFileSync(path) {
+                    console.warn("[NodeCompatLayer] fs.readFileSync('".concat(path, "') called in browser - returning empty string"));
+                    return "";
+                },
+                unlinkSync: function unlinkSync(path) {
+                    console.warn("[NodeCompatLayer] fs.unlinkSync('".concat(path, "') called in browser - no-op"));
+                },
+                readdirSync: function readdirSync(path) {
+                    console.warn("[NodeCompatLayer] fs.readdirSync('".concat(path, "') called in browser - returning empty array"));
+                    return [];
+                },
+                statSync: function statSync(_path) {
+                    return {
+                        isFile: function isFile() {
+                            return false;
+                        },
+                        isDirectory: function isDirectory() {
+                            return false;
+                        }
+                    };
+                }
+            };
+        },
+        /**
+     * 创建 nw.gui 模块的浏览器 mock 实现
+     */ createNwGuiModule: function createNwGuiModule() {
+            var mockWindow = {
+                menu: null,
+                showDevTools: function showDevTools() {
+                    console.warn("[NodeCompatLayer] nw.gui.Window.showDevTools() called in browser - opening browser DevTools");
+                },
+                show: function show() {
+                    console.warn("[NodeCompatLayer] nw.gui.Window.show() called in browser - no-op");
+                },
+                hide: function hide() {
+                    console.warn("[NodeCompatLayer] nw.gui.Window.hide() called in browser - no-op");
+                },
+                focus: function focus() {
+                    window.focus();
+                },
+                blur: function blur() {
+                    window.blur();
+                },
+                close: function close() {
+                    console.warn("[NodeCompatLayer] nw.gui.Window.close() called in browser - no-op");
+                }
+            };
+            var MockMenu = function MockMenu(options) {
+                this.items = [];
+                this.type = (options === null || options === void 0 ? void 0 : options.type) || "contextmenu";
+            };
+            MockMenu.prototype.append = function(item) {
+                this.items.push(item);
+            };
+            MockMenu.prototype.createMacBuiltin = function(appName, _options) {
+                console.warn("[NodeCompatLayer] nw.gui.Menu.createMacBuiltin('".concat(appName, "') called in browser - no-op"));
+            };
+            return {
+                Window: {
+                    get: function get() {
+                        return mockWindow;
+                    }
+                },
+                Menu: MockMenu
             };
         },
         /**
@@ -211,6 +294,18 @@ var VueBridgePlugin = function() {
                 versions: {
                     node: "0.0.0",
                     browser: "1.0.0"
+                },
+                // 添加 mainModule 以支持 process.mainModule.filename
+                mainModule: {
+                    // 主模块应该指向入口页面，而不是插件文件
+                    // 在浏览器中，使用当前页面的路径
+                    filename: window.location.pathname || "/index.html",
+                    exports: {},
+                    require: win.require,
+                    id: ".",
+                    loaded: true,
+                    parent: null,
+                    children: []
                 }
             };
         }
@@ -234,6 +329,8 @@ var VueBridgePlugin = function() {
             console.log("");
             console.log("Available modules:");
             console.log("  - path: require('path')");
+            console.log("  - fs: require('fs') (mock implementation)");
+            console.log("  - nw.gui: require('nw.gui') (mock implementation)");
             console.log("");
             console.log("To register custom modules:");
             console.log("  NodeCompatLayer.registerModule('moduleName', { ... })");

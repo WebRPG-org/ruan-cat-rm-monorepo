@@ -45,3 +45,7 @@
 ## 参考资料
 
 - https://juejin.cn/post/7128218760300724232
+
+## 01 处理类型报错
+
+请你使用谷歌浏览器 MCP，运行 `apps\drill\package.json` 的 dev 命令。在浏览器内阅读控制台报错，根据报错信息，改进你设计的 `apps\drill\src\rpgmv-plugins\NodeCompatLayer.ts` node 兼容层插件。并处理好报错信息。

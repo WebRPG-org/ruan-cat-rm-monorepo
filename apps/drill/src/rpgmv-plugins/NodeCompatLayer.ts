@@ -31,6 +31,15 @@ interface ProcessObject {
 	platform: string;
 	version: string;
 	versions: { [key: string]: string };
+	mainModule?: {
+		filename: string;
+		exports: any;
+		require: any;
+		id: string;
+		loaded: boolean;
+		parent: any;
+		children: any[];
+	};
 }
 
 /**
@@ -57,6 +66,8 @@ interface NodeCompatLayerStatic {
 	createRequireFunction(): (moduleName: string) => any;
 
 	// 内置模块实现
+	createFsModule(): any;
+	createNwGuiModule(): any;
 	createPathModule(): PathModule;
 	createProcessObject(): ProcessObject;
 }
@@ -150,6 +161,12 @@ const NodeCompatLayer: NodeCompatLayerStatic = {
 		this.registerModule("path", this.createPathModule());
 		console.log("[NodeCompatLayer] Registered built-in module: path");
 
+		this.registerModule("fs", this.createFsModule());
+		console.log("[NodeCompatLayer] Registered built-in module: fs");
+
+		this.registerModule("nw.gui", this.createNwGuiModule());
+		console.log("[NodeCompatLayer] Registered built-in module: nw.gui");
+
 		// 3. 创建 process 对象（如果不存在）
 		if (typeof win.process === "undefined") {
 			win.process = this.createProcessObject();
@@ -242,6 +259,112 @@ const NodeCompatLayer: NodeCompatLayerStatic = {
 
 			// 返回空对象，避免程序崩溃
 			return {};
+		};
+	},
+
+	/**
+	 * 创建 fs 模块的浏览器 mock 实现
+	 */
+	createFsModule(): any {
+		return {
+			existsSync(_path: string): boolean {
+				// 在浏览器中，假设文件系统相关操作都失败
+				return false;
+			},
+
+			mkdirSync(path: string): void {
+				// 浏览器中无操作
+				console.warn(`[NodeCompatLayer] fs.mkdirSync('${path}') called in browser - no-op`);
+			},
+
+			writeFileSync(path: string, _data: any): void {
+				// 浏览器中无操作
+				console.warn(`[NodeCompatLayer] fs.writeFileSync('${path}') called in browser - no-op`);
+			},
+
+			readFileSync(path: string): string {
+				// 浏览器中返回空字符串
+				console.warn(`[NodeCompatLayer] fs.readFileSync('${path}') called in browser - returning empty string`);
+				return "";
+			},
+
+			unlinkSync(path: string): void {
+				// 浏览器中无操作
+				console.warn(`[NodeCompatLayer] fs.unlinkSync('${path}') called in browser - no-op`);
+			},
+
+			readdirSync(path: string): string[] {
+				// 浏览器中返回空数组
+				console.warn(`[NodeCompatLayer] fs.readdirSync('${path}') called in browser - returning empty array`);
+				return [];
+			},
+
+			statSync(_path: string): any {
+				// 返回一个 mock 的 stat 对象
+				return {
+					isFile(): boolean {
+						return false;
+					},
+					isDirectory(): boolean {
+						return false;
+					},
+				};
+			},
+		};
+	},
+
+	/**
+	 * 创建 nw.gui 模块的浏览器 mock 实现
+	 */
+	createNwGuiModule(): any {
+		// 创建一个 mock 的窗口对象
+		const mockWindow = {
+			menu: null,
+			showDevTools(): void {
+				console.warn("[NodeCompatLayer] nw.gui.Window.showDevTools() called in browser - opening browser DevTools");
+				// 在浏览器中，尝试触发 DevTools（虽然这个 API 不存在）
+			},
+			show(): void {
+				console.warn("[NodeCompatLayer] nw.gui.Window.show() called in browser - no-op");
+			},
+			hide(): void {
+				console.warn("[NodeCompatLayer] nw.gui.Window.hide() called in browser - no-op");
+			},
+			focus(): void {
+				// 在浏览器中，尝试聚焦到当前窗口
+				window.focus();
+			},
+			blur(): void {
+				// 在浏览器中，尝试失焦当前窗口
+				window.blur();
+			},
+			close(): void {
+				console.warn("[NodeCompatLayer] nw.gui.Window.close() called in browser - no-op");
+				// 不关闭浏览器窗口，因为这可能不是用户期望的
+			},
+		};
+
+		// 创建一个 mock 的 Menu 构造函数
+		const MockMenu = function (this: any, options?: any) {
+			this.items = [];
+			this.type = options?.type || "contextmenu";
+		} as any;
+
+		MockMenu.prototype.append = function (item: any) {
+			this.items.push(item);
+		};
+
+		MockMenu.prototype.createMacBuiltin = function (appName: string, _options?: any) {
+			console.warn(`[NodeCompatLayer] nw.gui.Menu.createMacBuiltin('${appName}') called in browser - no-op`);
+		};
+
+		return {
+			Window: {
+				get(): any {
+					return mockWindow;
+				},
+			},
+			Menu: MockMenu,
 		};
 	},
 
@@ -351,6 +474,19 @@ const NodeCompatLayer: NodeCompatLayerStatic = {
 				node: "0.0.0",
 				browser: "1.0.0",
 			},
+
+			// 添加 mainModule 以支持 process.mainModule.filename
+			mainModule: {
+				// 主模块应该指向入口页面，而不是插件文件
+				// 在浏览器中，使用当前页面的路径
+				filename: window.location.pathname || "/index.html",
+				exports: {},
+				require: win.require,
+				id: ".",
+				loaded: true,
+				parent: null,
+				children: [],
+			} as any,
 		};
 	},
 };
@@ -385,6 +521,8 @@ const NodeCompatLayer: NodeCompatLayerStatic = {
 		console.log("");
 		console.log("Available modules:");
 		console.log("  - path: require('path')");
+		console.log("  - fs: require('fs') (mock implementation)");
+		console.log("  - nw.gui: require('nw.gui') (mock implementation)");
 		console.log("");
 		console.log("To register custom modules:");
 		console.log("  NodeCompatLayer.registerModule('moduleName', { ... })");

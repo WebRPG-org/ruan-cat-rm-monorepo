@@ -57,7 +57,8 @@ export default defineConfig({
 	},
 
 	// 自定义横幅注释 - 动态生成
-	banner({ format, name }) {
+	banner(context: any) {
+		const name = context.name || "";
 		const bannerMap: { [key: string]: string } = {
 			NodeCompatLayer: `//=============================================================================
 // NodeCompatLayer.js - 由TypeScript编译生成
