@@ -76,8 +76,36 @@
 
 请使用谷歌浏览器 MCP，运行 apps\drill\package.json 的 dev 命令，检查关于 【改写拓展 vitePluginTsupRpgmv 这款 vite 插件】 的一系列需求是否完成。
 
-## 03 安装 vite-plugin-node-polyfills
+## 03 调研由 vite 全面接管 node 兼容的 rm 插件生成方案
+
+请阅读以下对话报告：
+
+- https://gemini.google.com/share/aa9de61e86c0
+
+注意到 `apps\drill\src\rpgmv-plugins\NodeCompatLayer.ts` 的 createFsModule 函数，其本质是忽略，欺骗，报错的形式来避免 H5 浏览器环境直接使用 node 的 API。
+
+我希望你结合上面的参考资料，或者是你自己的思考调研，帮我提出一款全新的方案。大胆的使用 vite 本身的能力，或者是其他的兼容库，设计一个全新的 node 环境兼容 rm 插件。
+
+我希望你设计的新 rm 插件，可以最终实现在 H5 环境内，使用兼容改造的 node 环境 API。请提出你的思考和新的设计。
+
+我们共同讨论设计一个方案。
+
+### 01 回答 AI 问题
+
+1. 包体积增加
+   - 可以接受。请你大胆的安装 npm 包
+2. 持久化策略
+   - Option B
+3. 如何过渡到新方案？
+   - Option C: 提供切换开关（兼容模式）
+4. 功能范围
+   - 完整支持: 包括 events, stream, crypto, util 等
+
+请你直接开始完整实施下去。
+
+## 04
+
+vite-plugin-node-polyfills
 
 <!-- TODO:  -->
-
  <!-- 02 改写 NodeCompatLayer 的 createFsModule 实现 -->

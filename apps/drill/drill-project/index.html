@@ -26,8 +26,55 @@
 		<script type="text/javascript" src="js/rpg_windows.js"></script>
 		<script type="text/javascript" src="js/plugins.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
-		<!-- NodeCompatLayer.js - Node.js API 兼容层，必须在所有其他插件之前加载 -->
-		<script src="./js/plugins/NodeCompatLayer.js"></script>
+
+		<!-- ========================================
+		     Node.js API 兼容层配置
+		     ======================================== -->
+		<script>
+			/**
+			 * NodeCompatLayer 配置
+			 *
+			 * 修改以下配置来切换版本或调整行为：
+			 *
+			 * useV2: true (推荐) - 使用 v2.0 版本（真实文件系统 + IndexedDB）
+			 *       false - 使用 v1.0 版本（Mock 实现，向后兼容）
+			 *
+			 * enablePersistence: true (推荐) - 启用数据持久化
+			 *                   false - 禁用持久化（数据不保存）
+			 *
+			 * autosaveInterval: 5000 - 自动保存间隔（毫秒）
+			 *                  0 - 禁用自动保存
+			 *
+			 * verbose: false (推荐) - 简洁日志
+			 *         true - 详细日志（用于调试）
+			 */
+			window.__nodeCompatConfig = {
+				enableV2: true,              // 🔥 使用 v2.0 版本
+				enablePersistence: true,     // 💾 启用持久化
+				autosaveInterval: 5000,      // ⏰ 每 5 秒自动保存
+				verbose: false,              // 📝 简洁日志
+			};
+		</script>
+
+		<!-- NodeCompatLayer - 根据配置加载对应版本 -->
+		<script>
+			// 动态加载 NodeCompatLayer
+			(function() {
+				const config = window.__nodeCompatConfig || {};
+				const useV2 = config.enableV2 !== false; // 默认 v2
+
+				if (useV2) {
+					// 加载 v2.0 版本
+					console.log('[HTML] Loading NodeCompatLayer v2.0...');
+					document.write('<script src="./js/plugins/NodeCompatLayerV2.js"><\/script>');
+				} else {
+					// 加载 v1.0 版本（向后兼容）
+					console.log('[HTML] Loading NodeCompatLayer v1.0 (compatibility mode)...');
+					document.write('<script src="./js/plugins/NodeCompatLayer.js"><\/script>');
+				}
+			})();
+		</script>
+
 		<!-- VueBridge.js - 由TypeScript编译生成的Vue与RPGMV双向通信插件 -->
 		<script src="./js/plugins/VueBridge.js"></script>
 

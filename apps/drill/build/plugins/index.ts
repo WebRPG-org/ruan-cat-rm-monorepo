@@ -15,6 +15,9 @@ import { createHtmlPlugin } from "vite-plugin-html";
 // 开发调试插件
 import vueDevTools from "vite-plugin-vue-devtools";
 
+// Node.js polyfills 插件
+import { nodePolyfills } from "vite-plugin-node-polyfills";
+
 import { vitePluginTsupRpgmv } from "./vite-plugin-tsup-rpgmv/index";
 // 集中封装后的 别名插件
 import tsAlias from "./vite-plugin-ts-alias/index";
@@ -40,6 +43,46 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 	const isDevMode = env.MODE?.includes('dev');
 
 	return [
+		// Node.js polyfills 插件（放在最前面）
+		nodePolyfills({
+			// 包含所有常用 Node.js 核心模块
+			include: [
+				'buffer',
+				'process',
+				'events',
+				'stream',
+				'util',
+				'path',
+				'url',
+				'querystring',
+				'string_decoder',
+				'punycode',
+				'crypto',
+				'http',
+				'https',
+				'os',
+				'assert',
+				'constants',
+				'timers',
+				'console',
+				'vm',
+				'zlib',
+			],
+
+			// 全局变量注入
+			globals: {
+				Buffer: true,
+				global: true,
+				process: true,
+			},
+
+			// 支持 node: 协议导入
+			protocolImports: true,
+
+			// 不包含 fs，因为我们用 memfs 自定义实现
+			exclude: ['fs'],
+		}),
+
 		// RPGMV插件自动构建器
 		vitePluginTsupRpgmv({
 			// 启用详细日志
@@ -54,7 +97,13 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 					name: "NodeCompatLayer",
 					srcPath: "./src/rpgmv-plugins/NodeCompatLayer.ts",
 					outputPath: "./drill-project/js/plugins/NodeCompatLayer.js",
-					description: "Node.js API 兼容层 - 为纯浏览器环境提供 Node.js API 兼容",
+					description: "Node.js API 兼容层 v1.0 - Mock 实现（向后兼容）",
+				},
+				{
+					name: "NodeCompatLayerV2",
+					srcPath: "./src/rpgmv-plugins/NodeCompatLayerV2.ts",
+					outputPath: "./drill-project/js/plugins/NodeCompatLayerV2.js",
+					description: "Node.js API 兼容层 v2.0 - 真实文件系统 + IndexedDB 持久化",
 				},
 				{
 					name: "VueBridge",
