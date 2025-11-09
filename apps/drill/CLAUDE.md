@@ -42,18 +42,6 @@ pnpm run dev:qj-en
 pnpm run dev
 ```
 
-### RPGMV 插件构建
-
-```bash
-# 手动构建所有 RPGMV 插件（TypeScript -> JavaScript）
-pnpm run build:rpgmv-plugins
-
-# 监听模式：自动重新构建插件
-pnpm run build:rpgmv-plugins:watch
-```
-
-**注意**：通常不需要手动运行这些命令，因为 `dev:drill` 会自动构建插件。
-
 ### 生产构建
 
 ```bash
@@ -136,24 +124,28 @@ RMMV <--> VueBridge 插件 <--> GameBridge <--> Vue 组件
 #### 插件开发流程
 
 1. 在 `src/rpgmv-plugins/` 创建 `.ts` 文件
-2. 在 `tsup.config.ts` 的 `entry` 中添加插件：
+2. 在 `build/plugins/index.ts` 的 `vitePluginTsupRpgmv` 配置中添加插件：
    ```typescript
-   entry: {
-     YourPlugin: "./src/rpgmv-plugins/YourPlugin.ts",
-   }
+   plugins: [
+     {
+       name: "YourPlugin",
+       srcPath: "./src/rpgmv-plugins/YourPlugin.ts",
+       outputPath: "./drill-project/js/plugins/YourPlugin.js",
+       description: "你的插件描述",
+     },
+   ]
    ```
-3. 更新 `banner` 配置添加插件注释
-4. 在项目 HTML 文件中引用生成的 `.js` 文件
-5. 运行 `pnpm run dev:drill` - 自动构建并启动
+3. 在项目 HTML 文件中引用生成的 `.js` 文件
+4. 运行 `pnpm run dev:drill` - 自动构建并启动
 
-#### 构建配置 (tsup.config.ts)
+#### 构建配置
 
-关键配置要求：
+Vite 插件 `vitePluginTsupRpgmv` 会自动使用以下 tsup 配置：
 
 - **format**: `["iife"]` - RMMV 要求 IIFE 格式
 - **target**: `"es5"` - RMMV 引擎兼容 ES5
 - **external**: 列出所有 RMMV 全局对象（如 `$gameVariables`, `SceneManager` 等）
-- **banner**: 为每个插件生成带时间戳的注释头
+- **banner**: 自动为每个插件生成带版本号和时间戳的注释头
 
 ---
 
@@ -316,10 +308,10 @@ VueBridge.sendToVue("variable-changed", { id: 1, value: 100 });
 
 ### 插件未生成或未更新
 
-1. 检查 tsup 配置中是否添加了插件入口
-2. 手动运行 `pnpm run build:rpgmv-plugins`
-3. 检查 TypeScript 编译错误
-4. 确认 HTML 文件中正确引用了插件
+1. 检查 `build/plugins/index.ts` 中的 `vitePluginTsupRpgmv` 配置是否添加了插件
+2. 检查 TypeScript 编译错误（查看终端输出）
+3. 确认 HTML 文件中正确引用了插件
+4. 尝试删除输出文件后重新运行 `pnpm run dev:drill`
 
 ### 环境检测失败
 

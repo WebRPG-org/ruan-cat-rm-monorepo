@@ -40,9 +40,29 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 	const isDevMode = env.MODE?.includes('dev');
 
 	return [
+		// RPGMV插件自动构建器
 		vitePluginTsupRpgmv({
-			verbose: true, // 启用详细日志
-			forceRebuild: false, // 仅在需要时构建
+			// 启用详细日志
+			verbose: true,
+			// 仅在需要时构建（不强制重新构建）
+			forceRebuild: false,
+			// 输出目录
+			outDir: "./drill-project/js/plugins",
+			// RPGMV插件列表配置
+			plugins: [
+				{
+					name: "NodeCompatLayer",
+					srcPath: "./src/rpgmv-plugins/NodeCompatLayer.ts",
+					outputPath: "./drill-project/js/plugins/NodeCompatLayer.js",
+					description: "Node.js API 兼容层 - 为纯浏览器环境提供 Node.js API 兼容",
+				},
+				{
+					name: "VueBridge",
+					srcPath: "./src/rpgmv-plugins/VueBridge.ts",
+					outputPath: "./drill-project/js/plugins/VueBridge.js",
+					description: "Vue与RPGMV双向通信桥接插件",
+				},
+			],
 		}) as any,
 
 		vue(),

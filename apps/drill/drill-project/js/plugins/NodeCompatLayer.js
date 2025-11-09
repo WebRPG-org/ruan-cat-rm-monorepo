@@ -1,6 +1,11 @@
-// .js - 编译时间: 2025-11-07T12:22:18.859Z
+//=============================================================================
+// NodeCompatLayer.js - 由@vitejs/vite构建自动生成 - 请勿手动修改
+// Node.js API 兼容层 - 为纯浏览器环境提供 Node.js API 兼容
+// 插件版本: v1.0.0
+// 编译时间: 2025-11-09 22:22:38
+//=============================================================================
 "use strict";
-var VueBridgePlugin = function() {
+(function() {
     // src/rpgmv-plugins/NodeCompatLayer.ts
     var NodeCompatLayer = {
         version: "1.0.0",
@@ -338,4 +343,4 @@ var VueBridgePlugin = function() {
             console.log("");
         }
     })();
-}();
+})();

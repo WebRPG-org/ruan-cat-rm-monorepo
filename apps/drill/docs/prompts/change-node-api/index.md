@@ -52,8 +52,6 @@
 
 ## 02 改写拓展 vitePluginTsupRpgmv 这款 vite 插件
 
-<!-- TODO: 准备开始 -->
-
 现在这款 vitePluginTsupRpgmv `apps\drill\build\plugins\vite-plugin-tsup-rpgmv\index.ts` 插件，为我构建了两款插件，分别是：
 
 - NodeCompatLayer
@@ -73,6 +71,10 @@
    - 插件版本号： 语义化的版本号，比如 `v0.1.23` 这样的。版本号应该从被构建的 rm 插件本身提取，如果被构建的 rm 插件本身不对外提供基础的 version 字段，请改造现存的 typescript 编写的 rm 插件，适当的增加 version 字段，使得 vitePluginTsupRpgmv 这款 vite 插件能获取数据并打包构建顶部头的 banner 说明文本。
 4. 请你对 `apps\drill\tsup.config.ts` 也做出适当的改造，未来构建的 rm 插件会来越来越多，我希望关于 tsup 的构建细节和要求，全部都在预设在 vitePluginTsupRpgmv 的 buildRpgmvPlugins 函数内。按理说项目 `apps\drill` 不应该再出现具体的 `tsup.config.ts` 文件了，因为在 buildRpgmvPlugins 函数内，我已经使用函数化的 tsup 完成目标 typescript 文件的构建了。
 5. 改造后，请你在 `apps\drill\build\plugins\vite-plugin-tsup-rpgmv` 目录内，编写一个简单的，简要的插件使用文档。使用文档务必要**清晰简单**。
+
+### 01 运行命令并测试
+
+请使用谷歌浏览器 MCP，运行 apps\drill\package.json 的 dev 命令，检查关于 【改写拓展 vitePluginTsupRpgmv 这款 vite 插件】 的一系列需求是否完成。
 
 ## 03 安装 vite-plugin-node-polyfills
 
