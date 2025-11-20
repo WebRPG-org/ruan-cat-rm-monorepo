@@ -103,11 +103,12 @@
 
 请你直接开始完整实施下去。
 
-## 04 修复故障
+## 04 在谷歌浏览器 MCP 运行项目并修复项目出现的故障
+
+<!-- TODO: 继续处理这些故障 -->
 
 1. 阅读 `apps\drill\docs\reports\node-compat-new-solution.md` 文档，代码 `apps\drill\src\rpgmv-plugins\NodeCompatLayerV2.ts` 的设计逻辑就是根据该文件设计的。
-2. 阅读 `apps\drill\src\rpgmv-plugins\NodeCompatLayerV2.ts` ，请修复其类型故障。
-3. 在 `apps\drill\package.json` 内，用谷歌浏览器，运行 dev 命令，阅读其控制台报错，请修复其控制台出现的报错。其具体报错如下：
+2. 在 `apps\drill\package.json` 内，用谷歌浏览器，运行 dev 命令，阅读其控制台报错，请修复其控制台出现的报错。其具体报错如下：
 
 ```log
 Uncaught Error: Dynamic require of "buffer" is not supported
@@ -122,6 +123,10 @@ Uncaught Error: Dynamic require of "buffer" is not supported
     at __require2 (NodeCompatLayerV2.js:1131:60)
     at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/index.js (NodeCompatLayerV2.js:7697:28)
 ```
+
+### 01 已处理
+
+阅读 `apps\drill\src\rpgmv-plugins\NodeCompatLayerV2.ts` ，请修复其类型故障。
 
 ## 05 调整类型配置
 
