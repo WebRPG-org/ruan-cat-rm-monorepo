@@ -129,6 +129,18 @@ Uncaught Error: Dynamic require of "buffer" is not supported
 2. 删除掉刚才你新增的 `.d.ts` 类型文件、`.js` 文件、和 `.tsbuildinfo` 文件
 3. 帮我清理掉在 git 暂存区中，你生成出来的 `.d.ts` 类型文件。
 
+## 06 处理 tsconfig.json 警告与报错
+
+请你阅读以下类型配置文件：
+
+- apps\drill\tsconfig.node.json
+- apps\drill\tsconfig.app.json
+- apps\drill\tsconfig.json
+
+项目 `apps\drill\package.json` 是一个 vite 项目，请你直接去照搬照抄 vite+vue 项目最新模板内的 tsconfig.json 配置文件，结合模板的配置文件，照抄合并本项目的配置。最好做到大部分的配置覆盖。除了专属于本项目的特征性配置，其他的配置都用 vite+vue 官方模板的配置来实现覆盖。
+
+请你适当阅读 `https://github.com/vuejs/create-vue` 仓库，了解清楚最新的 vite+vue 官方模板是怎么使用默认的 tsconfig.json 配置的。请你以这个为 tsconfig.json 模板。
+
 ## 04
 
 vite-plugin-node-polyfills
