@@ -13,7 +13,12 @@
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true
+		"noFallthroughCasesInSwitch": true,
+		/* 禁用文件生成 - 只做类型检查，不生成任何输出文件 */
+		"noEmit": true,
+		"declaration": false,
+		"declarationMap": false,
+		"emitDeclarationOnly": false
 	},
 	"include": ["vite.config.ts", "./scripts", "./build"]
 }

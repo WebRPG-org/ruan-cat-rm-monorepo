@@ -103,6 +103,32 @@
 
 请你直接开始完整实施下去。
 
+## 04 修复故障
+
+1. 阅读 `apps\drill\docs\reports\node-compat-new-solution.md` 文档，代码 `apps\drill\src\rpgmv-plugins\NodeCompatLayerV2.ts` 的设计逻辑就是根据该文件设计的。
+2. 阅读 `apps\drill\src\rpgmv-plugins\NodeCompatLayerV2.ts` ，请修复其类型故障。
+3. 在 `apps\drill\package.json` 内，用谷歌浏览器，运行 dev 命令，阅读其控制台报错，请修复其控制台出现的报错。其具体报错如下：
+
+```log
+Uncaught Error: Dynamic require of "buffer" is not supported
+    at NodeCompatLayerV2.js:1122:15
+    at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/vendor/node/buffer.js (NodeCompatLayerV2.js:1370:33)
+    at __require2 (NodeCompatLayerV2.js:1131:60)
+    at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/vendor/node/internal/buffer.js (NodeCompatLayerV2.js:1395:28)
+    at __require2 (NodeCompatLayerV2.js:1131:60)
+    at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/encoding.js (NodeCompatLayerV2.js:1625:28)
+    at __require2 (NodeCompatLayerV2.js:1131:60)
+    at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/node/Dirent.js (NodeCompatLayerV2.js:1639:30)
+    at __require2 (NodeCompatLayerV2.js:1131:60)
+    at ../../node_modules/.pnpm/memfs@4.50.0/node_modules/memfs/lib/index.js (NodeCompatLayerV2.js:7697:28)
+```
+
+## 05 调整类型配置
+
+1. 对 `apps\drill\tsconfig.node.json` 和 `apps\drill\tsconfig.json` 文件，修改配置。使其在运行 tsc 类型检查命令时，不会生成类型文件。我不希望未来运行类型检查的命令时，生成 `.d.ts` 类型文件，并编译 `.js` 文件。也不要生成 `.tsbuildinfo` 文件。
+2. 删除掉刚才你新增的 `.d.ts` 类型文件、`.js` 文件、和 `.tsbuildinfo` 文件
+3. 帮我清理掉在 git 暂存区中，你生成出来的 `.d.ts` 类型文件。
+
 ## 04
 
 vite-plugin-node-polyfills

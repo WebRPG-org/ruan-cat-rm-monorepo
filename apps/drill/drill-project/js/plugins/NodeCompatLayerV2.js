@@ -2,7 +2,7 @@
 // NodeCompatLayerV2.js - 由@vitejs/vite构建自动生成 - 请勿手动修改
 // Node.js API 兼容层 v2.0 - 真实文件系统 + IndexedDB 持久化
 // 插件版本: v2.0.0
-// 编译时间: 2025-11-10 06:15:09
+// 编译时间: 2025-11-20 08:37:38
 //=============================================================================
 "use strict";
 function _arrayLikeToArray(arr, len) {
@@ -7723,6 +7723,7 @@ var __generator = this && this.__generator || function(thisArg, body) {
         }
     });
     // src/rpgmv-plugins/NodeCompatLayerV2.ts
+    var import_buffer = __require("buffer");
     var import_memfs = __toESM(require_lib3(), 1);
     // ../../node_modules/.pnpm/idb@8.0.3/node_modules/idb/build/index.js
     var instanceOfAny = function(object, constructors) {
@@ -8614,6 +8615,11 @@ var __generator = this && this.__generator || function(thisArg, body) {
                 if (moduleName === "fs") {
                     return import_memfs.fs;
                 }
+                if (moduleName === "buffer") {
+                    return {
+                        Buffer: import_buffer.Buffer
+                    };
+                }
                 if (self.moduleRegistry[moduleName]) {
                     return self.moduleRegistry[moduleName];
                 }
@@ -8626,6 +8632,12 @@ var __generator = this && this.__generator || function(thisArg, body) {
      * 注入全局对象
      */ injectGlobals: function injectGlobals() {
             var win = window;
+            if (typeof win.Buffer === "undefined") {
+                win.Buffer = import_buffer.Buffer;
+            }
+            if (typeof win.global === "undefined") {
+                win.global = win;
+            }
             win.fs = import_memfs.fs;
             if (typeof win.require === "undefined") {
                 win.require = this.createRequire();
@@ -8646,6 +8658,8 @@ var __generator = this && this.__generator || function(thisArg, body) {
             }
             if (this.config.verbose) {
                 console.log("[NodeCompatLayerV2] Global objects injected:");
+                console.log("  - window.Buffer");
+                console.log("  - window.global");
                 console.log("  - window.fs");
                 console.log("  - window.require");
                 console.log("  - __dirname");
@@ -8702,15 +8716,68 @@ var __generator = this && this.__generator || function(thisArg, body) {
             autosaveInterval: 5e3,
             verbose: false
         };
+        window.NodeCompatLayerV2 = NodeCompatLayerV2;
+        NodeCompatLayerV2.detectEnvironment();
+        if (!NodeCompatLayerV2.isNwjs) {
+            var win = window;
+            if (typeof win.Buffer === "undefined") {
+                win.Buffer = globalThis.Buffer;
+            }
+            if (typeof win.global === "undefined") {
+                win.global = win;
+            }
+            var syncRequire = function syncRequire(moduleName) {
+                if (moduleName === "buffer") {
+                    return {
+                        Buffer: win.Buffer
+                    };
+                }
+                if (moduleName === "fs") {
+                    return NodeCompatLayerV2.fs;
+                }
+                switch(moduleName){
+                    case "process":
+                        return win.process;
+                    case "path":
+                        return globalThis.path;
+                    case "events":
+                        return globalThis.events;
+                    case "util":
+                        return globalThis.util;
+                    case "stream":
+                        return globalThis.stream;
+                    case "crypto":
+                        return globalThis.crypto;
+                    default:
+                        return {};
+                }
+            };
+            if (typeof win.require === "undefined") {
+                win.require = syncRequire;
+            }
+            if (typeof win.__dirname === "undefined") {
+                win.__dirname = "/";
+            }
+            if (typeof win.__filename === "undefined") {
+                win.__filename = "/index.html";
+            }
+            if (typeof win.module === "undefined") {
+                win.module = {
+                    exports: {}
+                };
+            }
+            if (typeof win.exports === "undefined") {
+                win.exports = win.module.exports;
+            }
+            console.log("[NodeCompatLayerV2] Basic globals injected synchronously");
+        }
         NodeCompatLayerV2.init(config).then(function() {
             console.log("[NodeCompatLayerV2] Plugin loaded successfully");
-            window.NodeCompatLayerV2 = NodeCompatLayerV2;
             if (config.enableV2) {
                 window.NodeCompatLayer = NodeCompatLayerV2;
             }
         }).catch(function(error) {
             console.error("[NodeCompatLayerV2] Plugin initialization failed:", error);
-            window.NodeCompatLayerV2 = NodeCompatLayerV2;
         });
     })();
 })();

@@ -17,10 +17,15 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"allowJs": true,
-		"noEmit": true,
 		"rootDir": ".",
 		"baseUrl": ".",
 		"outDir": "dist",
+		/* 禁用文件生成 - 只做类型检查，不生成任何输出文件 */
+		"noEmit": true,
+		"declaration": false,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"incremental": false,
 		"types": [
 			"fpsmeter",
 			"lz-string",

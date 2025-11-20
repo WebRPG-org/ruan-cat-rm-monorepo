@@ -3,6 +3,7 @@
 // Node.js API 兼容层 v2.0 - 真实文件系统 + IndexedDB 持久化
 //=============================================================================
 
+import { Buffer } from 'buffer';
 import { fs as memfsInstance, vol } from 'memfs';
 import { openDB, type IDBPDatabase } from 'idb';
 
@@ -121,6 +122,10 @@ interface NodeCompatLayerV2Static {
 	// 核心方法
 	init(config?: NodeCompatConfig): Promise<void>;
 	detectEnvironment(): void;
+	setupVirtualFS(): void;
+	initPersistence(): Promise<void>;
+	injectGlobals(): void;
+	printUsageInfo(): void;
 
 	// 持久化方法
 	saveToStorage(): Promise<void>;
@@ -492,6 +497,11 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 				return memfsInstance;
 			}
 
+			// buffer 模块使用导入的 Buffer
+			if (moduleName === 'buffer') {
+				return { Buffer };
+			}
+
 			// 检查自定义模块注册表
 			if (self.moduleRegistry[moduleName]) {
 				return self.moduleRegistry[moduleName];
@@ -511,6 +521,14 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 	 */
 	injectGlobals(): void {
 		const win = window as any;
+
+		// 注入 Buffer（确保 memfs 可以访问）
+		if (typeof win.Buffer === 'undefined') {
+			win.Buffer = Buffer;
+		}
+		if (typeof win.global === 'undefined') {
+			win.global = win;
+		}
 
 		// 注入 fs 模块
 		win.fs = memfsInstance;
@@ -538,6 +556,8 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 
 		if (this.config.verbose) {
 			console.log('[NodeCompatLayerV2] Global objects injected:');
+			console.log('  - window.Buffer');
+			console.log('  - window.global');
 			console.log('  - window.fs');
 			console.log('  - window.require');
 			console.log('  - __dirname');
@@ -602,13 +622,86 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		verbose: false,
 	};
 
-	// 异步初始化
+	// 立即暴露到全局（同步）
+	(window as any).NodeCompatLayerV2 = NodeCompatLayerV2;
+
+	// 立即进行环境检测和基础全局注入（同步）
+	NodeCompatLayerV2.detectEnvironment();
+
+	// 如果不是 nw.js 环境，立即注入基础全局变量
+	if (!NodeCompatLayerV2.isNwjs) {
+		// 同步注入必要的全局变量，确保其他插件能立即使用
+		const win = window as any;
+
+		// 注入 Buffer（关键：解决 dynamic require 问题）
+		if (typeof win.Buffer === 'undefined') {
+			// 使用 vite-plugin-node-polyfills 提供的 Buffer
+			win.Buffer = (globalThis as any).Buffer;
+		}
+		if (typeof win.global === 'undefined') {
+			win.global = win;
+		}
+
+		// 创建一个同步的 require 函数，优先处理 buffer 模块
+		const syncRequire = function(moduleName: string): any {
+			// 优先处理 buffer 模块
+			if (moduleName === 'buffer') {
+				return { Buffer: win.Buffer };
+			}
+
+			// fs 模块使用 memfs
+			if (moduleName === 'fs') {
+				return NodeCompatLayerV2.fs;
+			}
+
+			// 其他已知模块的处理
+			switch (moduleName) {
+				case 'process':
+					return win.process;
+				case 'path':
+					return (globalThis as any).path;
+				case 'events':
+					return (globalThis as any).events;
+				case 'util':
+					return (globalThis as any).util;
+				case 'stream':
+					return (globalThis as any).stream;
+				case 'crypto':
+					return (globalThis as any).crypto;
+				default:
+					// 返回空对象以避免 "require is not defined" 错误
+					return {};
+			}
+		};
+
+		// 立即注入 require 函数
+		if (typeof win.require === 'undefined') {
+			win.require = syncRequire;
+		}
+
+		// 注入基础变量
+		if (typeof win.__dirname === 'undefined') {
+			win.__dirname = '/';
+		}
+		if (typeof win.__filename === 'undefined') {
+			win.__filename = '/index.html';
+		}
+
+		// 注入 module 和 exports
+		if (typeof win.module === 'undefined') {
+			win.module = { exports: {} };
+		}
+		if (typeof win.exports === 'undefined') {
+			win.exports = win.module.exports;
+		}
+
+		console.log("[NodeCompatLayerV2] Basic globals injected synchronously");
+	}
+
+	// 异步初始化剩余功能
 	NodeCompatLayerV2.init(config)
 		.then(() => {
 			console.log("[NodeCompatLayerV2] Plugin loaded successfully");
-
-			// 暴露到全局
-			(window as any).NodeCompatLayerV2 = NodeCompatLayerV2;
 
 			// 向后兼容：也暴露为 NodeCompatLayer
 			if (config.enableV2) {
@@ -617,8 +710,5 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		})
 		.catch((error) => {
 			console.error("[NodeCompatLayerV2] Plugin initialization failed:", error);
-
-			// 即使失败也暴露到全局，以便调试
-			(window as any).NodeCompatLayerV2 = NodeCompatLayerV2;
 		});
 })();

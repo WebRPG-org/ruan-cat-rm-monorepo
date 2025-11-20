@@ -56,6 +56,206 @@
 			};
 		</script>
 
+		<!-- Node.js polyfills - 必须在 NodeCompatLayer 之前加载 -->
+		<script>
+			// 确保 Buffer 在任何代码执行之前就可用
+			// 这解决了 memfs 动态 require('buffer') 的问题
+
+			// 尝试多种方式获取 Buffer polyfill
+			let bufferPolyfill = null;
+
+			// 方法1: 检查 globalThis
+			if (typeof globalThis !== 'undefined' && globalThis.Buffer) {
+				bufferPolyfill = globalThis.Buffer;
+				console.log('[HTML] Found Buffer via globalThis');
+			}
+			// 方法2: 检查 if the vite-plugin-node-polyfills has already injected it
+			else if (typeof Buffer !== 'undefined') {
+				bufferPolyfill = Buffer;
+				console.log('[HTML] Found Buffer via global Buffer');
+			}
+			// 方法3: 创建一个简单的 Buffer polyfill 来满足 memfs
+			else {
+				console.log('[HTML] Creating basic Buffer polyfill for memfs');
+				// 创建一个基本的 Buffer 实现，满足 memfs 的基本需求
+				bufferPolyfill = function Buffer(str, encoding) {
+					if (typeof str === 'string') {
+						// 转换字符串为字节数组
+						const arr = new Uint8Array(str.length);
+						for (let i = 0; i < str.length; i++) {
+							arr[i] = str.charCodeAt(i);
+						}
+						return arr;
+					} else if (typeof str === 'number') {
+						// 创建指定大小的缓冲区
+						return new Uint8Array(str);
+					} else if (Array.isArray(str) || str instanceof Uint8Array) {
+						// 从数组创建
+						return new Uint8Array(str);
+					}
+					return new Uint8Array(0);
+				};
+
+				// 添加常用的 Buffer 方法
+				bufferPolyfill.isBuffer = function(obj) {
+					return obj instanceof Uint8Array;
+				};
+
+				bufferPolyfill.byteLength = function(str, encoding) {
+					return new Blob([str]).size;
+				};
+
+				bufferPolyfill.concat = function(list, totalLength) {
+					if (list.length === 0) return new Uint8Array(0);
+					if (list.length === 1) return list[0];
+
+					if (typeof totalLength === 'undefined') {
+						totalLength = list.reduce((sum, buf) => sum + buf.length, 0);
+					}
+
+					const result = new Uint8Array(totalLength);
+					let offset = 0;
+					for (const buf of list) {
+						result.set(buf, offset);
+						offset += buf.length;
+					}
+					return result;
+				};
+			}
+
+			// 创建 CommonJS require 函数来处理 memfs 的动态 require
+			const requireFunction = function(moduleName) {
+				console.log('[HTML] require called for:', moduleName);
+
+				switch(moduleName) {
+					case 'buffer':
+						return { Buffer: bufferPolyfill };
+					case 'process':
+						return window.process;
+					case 'path':
+						// 基本的 path polyfill
+						return {
+							join: function(...args) {
+								return args.join('/').replace(/\/+/g, '/');
+							},
+							resolve: function(...args) {
+								return args.join('/').replace(/\/+/g, '/');
+							},
+							dirname: function(p) {
+								return p.split('/').slice(0, -1).join('/') || '/';
+							},
+							basename: function(p) {
+								return p.split('/').pop() || '';
+							},
+							extname: function(p) {
+								const parts = p.split('.');
+								return parts.length > 1 ? '.' + parts.pop() : '';
+							}
+						};
+					case 'events':
+						// 基本 EventEmitter polyfill
+						return {
+							EventEmitter: class EventEmitter {
+								constructor() {
+									this._events = {};
+								}
+								on(event, listener) {
+									if (!this._events[event]) {
+										this._events[event] = [];
+									}
+									this._events[event].push(listener);
+									return this;
+								}
+								emit(event, ...args) {
+									if (this._events[event]) {
+										this._events[event].forEach(listener => listener(...args));
+									}
+									return this;
+								}
+							}
+						};
+					case 'stream':
+						// 基本 stream polyfill
+						return {
+							Writable: class Writable {
+								constructor() {}
+								write() {}
+								end() {}
+							},
+							Readable: class Readable {
+								constructor() {}
+								read() {}
+							}
+						};
+					case 'util':
+						// 基本 util polyfill
+						return {
+							inherits: function(ctor, superCtor) {
+								ctor.super_ = superCtor;
+								ctor.prototype = Object.create(superCtor.prototype, {
+									constructor: {
+										value: ctor,
+										enumerable: false,
+										writable: true,
+										configurable: true
+									}
+								});
+							}
+						};
+					case 'fs':
+						// 这里返回一个空的 fs 对象，等 NodeCompatLayer 加载后会被替换
+						return {
+							readFileSync: () => '',
+							writeFileSync: () => {},
+							existsSync: () => false,
+							mkdirSync: () => {},
+							readdirSync: () => []
+						};
+					default:
+						console.warn('[HTML] Unknown module required:', moduleName);
+						return {};
+				}
+			};
+
+			// 注入全局变量
+			if (typeof window.Buffer === 'undefined') {
+				window.Buffer = bufferPolyfill;
+			}
+			if (typeof window.global === 'undefined') {
+				window.global = window;
+			}
+			if (typeof window.process === 'undefined') {
+				window.process = {
+					version: '',
+					platform: 'browser',
+					argv: [],
+					env: {},
+					nextTick: function(fn) { setTimeout(fn, 0); }
+				};
+			}
+
+			// 注入 require 函数到全局和模块作用域
+			if (typeof window.require === 'undefined') {
+				window.require = requireFunction;
+			}
+
+			// 为了兼容 memfs 的内部 require 调用，也注入到全局作用域
+			if (typeof require === 'undefined') {
+				// 在非严格模式下，这会创建一个全局变量
+				try {
+					// 使用 eval 来创建全局 require 变量
+					eval('var require = window.require;');
+				} catch (e) {
+					console.warn('[HTML] Could not create global require:', e);
+				}
+			}
+
+			console.log('[HTML] Buffer and global polyfills injected');
+			console.log('[HTML] Buffer available:', !!window.Buffer);
+			console.log('[HTML] global available:', !!window.global);
+			console.log('[HTML] process available:', !!window.process);
+		</script>
+
 		<!-- NodeCompatLayer - 根据配置加载对应版本 -->
 		<script>
 			// 动态加载 NodeCompatLayer
