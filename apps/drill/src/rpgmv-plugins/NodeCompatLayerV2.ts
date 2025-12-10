@@ -3,9 +3,9 @@
 // Node.js API 兼容层 v2.0 - 真实文件系统 + IndexedDB 持久化
 //=============================================================================
 
-import { Buffer } from 'buffer';
-import { fs as memfsInstance, vol } from 'memfs';
-import { openDB, type IDBPDatabase } from 'idb';
+import { Buffer } from "buffer";
+import { fs as memfsInstance, vol } from "memfs";
+import { openDB, type IDBPDatabase } from "idb";
 
 /**
  * 配置接口
@@ -29,75 +29,75 @@ interface NodeCompatConfig {
  */
 class IndexedDBPersistence {
 	private db: IDBPDatabase | null = null;
-	private dbName = 'NodeCompatLayerV2';
-	private storeName = 'virtual-fs';
+	private dbName = "NodeCompatLayerV2";
+	private storeName = "virtual-fs";
 	private version = 1;
 
 	async init(): Promise<void> {
 		try {
 			this.db = await openDB(this.dbName, this.version, {
 				upgrade(db) {
-					if (!db.objectStoreNames.contains('virtual-fs')) {
-						db.createObjectStore('virtual-fs');
+					if (!db.objectStoreNames.contains("virtual-fs")) {
+						db.createObjectStore("virtual-fs");
 					}
 				},
 			});
-			console.log('[NodeCompatLayerV2] IndexedDB initialized');
+			console.log("[NodeCompatLayerV2] IndexedDB initialized");
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to initialize IndexedDB:', error);
+			console.error("[NodeCompatLayerV2] Failed to initialize IndexedDB:", error);
 			throw error;
 		}
 	}
 
 	async save(key: string, value: any): Promise<void> {
 		if (!this.db) {
-			throw new Error('IndexedDB not initialized');
+			throw new Error("IndexedDB not initialized");
 		}
 
 		try {
 			await this.db.put(this.storeName, value, key);
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to save to IndexedDB:', error);
+			console.error("[NodeCompatLayerV2] Failed to save to IndexedDB:", error);
 			throw error;
 		}
 	}
 
 	async load(key: string): Promise<any> {
 		if (!this.db) {
-			throw new Error('IndexedDB not initialized');
+			throw new Error("IndexedDB not initialized");
 		}
 
 		try {
 			return await this.db.get(this.storeName, key);
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to load from IndexedDB:', error);
+			console.error("[NodeCompatLayerV2] Failed to load from IndexedDB:", error);
 			return null;
 		}
 	}
 
 	async delete(key: string): Promise<void> {
 		if (!this.db) {
-			throw new Error('IndexedDB not initialized');
+			throw new Error("IndexedDB not initialized");
 		}
 
 		try {
 			await this.db.delete(this.storeName, key);
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to delete from IndexedDB:', error);
+			console.error("[NodeCompatLayerV2] Failed to delete from IndexedDB:", error);
 			throw error;
 		}
 	}
 
 	async clear(): Promise<void> {
 		if (!this.db) {
-			throw new Error('IndexedDB not initialized');
+			throw new Error("IndexedDB not initialized");
 		}
 
 		try {
 			await this.db.clear(this.storeName);
-			console.log('[NodeCompatLayerV2] IndexedDB cleared');
+			console.log("[NodeCompatLayerV2] IndexedDB cleared");
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to clear IndexedDB:', error);
+			console.error("[NodeCompatLayerV2] Failed to clear IndexedDB:", error);
 			throw error;
 		}
 	}
@@ -249,11 +249,11 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 	setupVirtualFS(): void {
 		// 创建标准目录结构
 		vol.fromJSON({
-			'/home': null,
-			'/tmp': null,
-			'/save': null,
-			'/config': null,
-			'/data': null,
+			"/home": null,
+			"/tmp": null,
+			"/save": null,
+			"/config": null,
+			"/data": null,
 		});
 
 		if (this.config.verbose) {
@@ -273,8 +273,8 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 			// 加载已保存的数据
 			await this.loadFromStorage();
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to initialize persistence:', error);
-			console.warn('[NodeCompatLayerV2] Continuing without persistence');
+			console.error("[NodeCompatLayerV2] Failed to initialize persistence:", error);
+			console.warn("[NodeCompatLayerV2] Continuing without persistence");
 		}
 	},
 
@@ -309,12 +309,12 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 
 			// 保存到 localStorage（小文件）
 			try {
-				localStorage.setItem('vfs-small', JSON.stringify(smallFiles));
+				localStorage.setItem("vfs-small", JSON.stringify(smallFiles));
 				if (this.config.verbose) {
 					console.log(`[NodeCompatLayerV2] Saved ${Object.keys(smallFiles).length} small files to localStorage`);
 				}
 			} catch (error) {
-				console.warn('[NodeCompatLayerV2] Failed to save to localStorage:', error);
+				console.warn("[NodeCompatLayerV2] Failed to save to localStorage:", error);
 			}
 
 			// 保存到 IndexedDB（大文件）
@@ -327,17 +327,17 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 			}
 
 			// 保存文件系统元数据
-			await this.persistence.save('metadata', {
+			await this.persistence.save("metadata", {
 				timestamp: Date.now(),
 				smallFileCount: Object.keys(smallFiles).length,
 				largeFileCount: Object.keys(largeFiles).length,
 			});
 
 			if (this.config.verbose) {
-				console.log('[NodeCompatLayerV2] File system saved to persistent storage');
+				console.log("[NodeCompatLayerV2] File system saved to persistent storage");
 			}
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to save to storage:', error);
+			console.error("[NodeCompatLayerV2] Failed to save to storage:", error);
 		}
 	},
 
@@ -354,7 +354,7 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 
 			// 从 localStorage 加载小文件
 			try {
-				const smallData = localStorage.getItem('vfs-small');
+				const smallData = localStorage.getItem("vfs-small");
 				if (smallData) {
 					const smallFiles = JSON.parse(smallData);
 					Object.assign(files, smallFiles);
@@ -363,13 +363,13 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 					}
 				}
 			} catch (error) {
-				console.warn('[NodeCompatLayerV2] Failed to load from localStorage:', error);
+				console.warn("[NodeCompatLayerV2] Failed to load from localStorage:", error);
 			}
 
 			// 从 IndexedDB 加载元数据
-			const metadata = await this.persistence.load('metadata');
+			const metadata = await this.persistence.load("metadata");
 			if (metadata && this.config.verbose) {
-				console.log('[NodeCompatLayerV2] Loaded metadata:', metadata);
+				console.log("[NodeCompatLayerV2] Loaded metadata:", metadata);
 			}
 
 			// TODO: 从 IndexedDB 加载大文件
@@ -381,11 +381,11 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 				console.log(`[NodeCompatLayerV2] Restored ${Object.keys(files).length} files from persistent storage`);
 			} else {
 				if (this.config.verbose) {
-					console.log('[NodeCompatLayerV2] No saved data found, starting with fresh file system');
+					console.log("[NodeCompatLayerV2] No saved data found, starting with fresh file system");
 				}
 			}
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to load from storage:', error);
+			console.error("[NodeCompatLayerV2] Failed to load from storage:", error);
 		}
 	},
 
@@ -395,13 +395,13 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 	enableAutosave(interval: number = 5000): void {
 		// 定期保存
 		(window as any).__nodeCompatAutosaveTimer = setInterval(() => {
-			this.saveToStorage().catch(err => {
-				console.error('[NodeCompatLayerV2] Autosave failed:', err);
+			this.saveToStorage().catch((err) => {
+				console.error("[NodeCompatLayerV2] Autosave failed:", err);
 			});
 		}, interval);
 
 		// 页面关闭前保存
-		window.addEventListener('beforeunload', () => {
+		window.addEventListener("beforeunload", () => {
 			// 使用同步方式尽可能保存（IndexedDB 部分可能丢失）
 			try {
 				const snapshot = vol.toJSON();
@@ -413,9 +413,9 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 					}
 				}
 
-				localStorage.setItem('vfs-small', JSON.stringify(smallFiles));
+				localStorage.setItem("vfs-small", JSON.stringify(smallFiles));
 			} catch (error) {
-				console.error('[NodeCompatLayerV2] Failed to save on beforeunload:', error);
+				console.error("[NodeCompatLayerV2] Failed to save on beforeunload:", error);
 			}
 		});
 
@@ -432,7 +432,7 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		if (timer) {
 			clearInterval(timer);
 			delete (window as any).__nodeCompatAutosaveTimer;
-			console.log('[NodeCompatLayerV2] Autosave disabled');
+			console.log("[NodeCompatLayerV2] Autosave disabled");
 		}
 	},
 
@@ -442,7 +442,7 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 	async clearStorage(): Promise<void> {
 		try {
 			// 清除 localStorage
-			localStorage.removeItem('vfs-small');
+			localStorage.removeItem("vfs-small");
 
 			// 清除 IndexedDB
 			await this.persistence.clear();
@@ -451,9 +451,9 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 			vol.reset();
 			this.setupVirtualFS();
 
-			console.log('[NodeCompatLayerV2] Storage cleared and file system reset');
+			console.log("[NodeCompatLayerV2] Storage cleared and file system reset");
 		} catch (error) {
-			console.error('[NodeCompatLayerV2] Failed to clear storage:', error);
+			console.error("[NodeCompatLayerV2] Failed to clear storage:", error);
 			throw error;
 		}
 	},
@@ -493,12 +493,12 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 
 		return function require(moduleName: string): any {
 			// fs 模块使用 memfs
-			if (moduleName === 'fs') {
+			if (moduleName === "fs") {
 				return memfsInstance;
 			}
 
 			// buffer 模块使用导入的 Buffer
-			if (moduleName === 'buffer') {
+			if (moduleName === "buffer") {
 				return { Buffer };
 			}
 
@@ -510,7 +510,9 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 			// 其他模块由 vite-plugin-node-polyfills 提供
 			// 在运行时，这些模块已经被 Vite 打包进来了
 			console.warn(`[NodeCompatLayerV2] Module '${moduleName}' not found in registry`);
-			console.warn(`[NodeCompatLayerV2] If this is a Node.js core module, it should be polyfilled by vite-plugin-node-polyfills`);
+			console.warn(
+				`[NodeCompatLayerV2] If this is a Node.js core module, it should be polyfilled by vite-plugin-node-polyfills`,
+			);
 
 			return {};
 		};
@@ -523,10 +525,10 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		const win = window as any;
 
 		// 注入 Buffer（确保 memfs 可以访问）
-		if (typeof win.Buffer === 'undefined') {
+		if (typeof win.Buffer === "undefined") {
 			win.Buffer = Buffer;
 		}
-		if (typeof win.global === 'undefined') {
+		if (typeof win.global === "undefined") {
 			win.global = win;
 		}
 
@@ -534,34 +536,34 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		win.fs = memfsInstance;
 
 		// 注入 require 函数
-		if (typeof win.require === 'undefined') {
+		if (typeof win.require === "undefined") {
 			win.require = this.createRequire();
 		}
 
 		// 注入 __dirname 和 __filename
-		if (typeof win.__dirname === 'undefined') {
-			win.__dirname = '/';
+		if (typeof win.__dirname === "undefined") {
+			win.__dirname = "/";
 		}
-		if (typeof win.__filename === 'undefined') {
-			win.__filename = '/index.html';
+		if (typeof win.__filename === "undefined") {
+			win.__filename = "/index.html";
 		}
 
 		// 注入 module 和 exports
-		if (typeof win.module === 'undefined') {
+		if (typeof win.module === "undefined") {
 			win.module = { exports: {} };
 		}
-		if (typeof win.exports === 'undefined') {
+		if (typeof win.exports === "undefined") {
 			win.exports = win.module.exports;
 		}
 
 		if (this.config.verbose) {
-			console.log('[NodeCompatLayerV2] Global objects injected:');
-			console.log('  - window.Buffer');
-			console.log('  - window.global');
-			console.log('  - window.fs');
-			console.log('  - window.require');
-			console.log('  - __dirname');
-			console.log('  - __filename');
+			console.log("[NodeCompatLayerV2] Global objects injected:");
+			console.log("  - window.Buffer");
+			console.log("  - window.global");
+			console.log("  - window.fs");
+			console.log("  - window.require");
+			console.log("  - __dirname");
+			console.log("  - __filename");
 		}
 	},
 
@@ -634,39 +636,39 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		const win = window as any;
 
 		// 注入 Buffer（关键：解决 dynamic require 问题）
-		if (typeof win.Buffer === 'undefined') {
+		if (typeof win.Buffer === "undefined") {
 			// 使用 vite-plugin-node-polyfills 提供的 Buffer
 			win.Buffer = (globalThis as any).Buffer;
 		}
-		if (typeof win.global === 'undefined') {
+		if (typeof win.global === "undefined") {
 			win.global = win;
 		}
 
 		// 创建一个同步的 require 函数，优先处理 buffer 模块
-		const syncRequire = function(moduleName: string): any {
+		const syncRequire = function (moduleName: string): any {
 			// 优先处理 buffer 模块
-			if (moduleName === 'buffer') {
+			if (moduleName === "buffer") {
 				return { Buffer: win.Buffer };
 			}
 
 			// fs 模块使用 memfs
-			if (moduleName === 'fs') {
+			if (moduleName === "fs") {
 				return NodeCompatLayerV2.fs;
 			}
 
 			// 其他已知模块的处理
 			switch (moduleName) {
-				case 'process':
+				case "process":
 					return win.process;
-				case 'path':
+				case "path":
 					return (globalThis as any).path;
-				case 'events':
+				case "events":
 					return (globalThis as any).events;
-				case 'util':
+				case "util":
 					return (globalThis as any).util;
-				case 'stream':
+				case "stream":
 					return (globalThis as any).stream;
-				case 'crypto':
+				case "crypto":
 					return (globalThis as any).crypto;
 				default:
 					// 返回空对象以避免 "require is not defined" 错误
@@ -675,23 +677,23 @@ const NodeCompatLayerV2: NodeCompatLayerV2Static = {
 		};
 
 		// 立即注入 require 函数
-		if (typeof win.require === 'undefined') {
+		if (typeof win.require === "undefined") {
 			win.require = syncRequire;
 		}
 
 		// 注入基础变量
-		if (typeof win.__dirname === 'undefined') {
-			win.__dirname = '/';
+		if (typeof win.__dirname === "undefined") {
+			win.__dirname = "/";
 		}
-		if (typeof win.__filename === 'undefined') {
-			win.__filename = '/index.html';
+		if (typeof win.__filename === "undefined") {
+			win.__filename = "/index.html";
 		}
 
 		// 注入 module 和 exports
-		if (typeof win.module === 'undefined') {
+		if (typeof win.module === "undefined") {
 			win.module = { exports: {} };
 		}
-		if (typeof win.exports === 'undefined') {
+		if (typeof win.exports === "undefined") {
 			win.exports = win.module.exports;
 		}
 

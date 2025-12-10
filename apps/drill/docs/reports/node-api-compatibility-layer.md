@@ -74,7 +74,7 @@
 
 ### 核心架构
 
-```
+```plain
 ┌─────────────────────────────────────────┐
 │       NodeCompatLayer 插件加载          │
 └─────────────────┬───────────────────────┘
@@ -114,13 +114,10 @@
 
 ```typescript
 // nw.js 环境检测
-const isNwjs = typeof process !== 'undefined' &&
-               process.versions &&
-               process.versions.nw;
+const isNwjs = typeof process !== "undefined" && process.versions && process.versions.nw;
 
 // Node.js 环境检测（包括 nw.js）
-const isNodeEnv = typeof process !== 'undefined' &&
-                  typeof window.require === 'function';
+const isNodeEnv = typeof process !== "undefined" && typeof window.require === "function";
 
 // 纯浏览器环境
 const isBrowser = !isNodeEnv;
@@ -163,8 +160,8 @@ getScriptPath(): { dirname: string; filename: string } {
 
 ```javascript
 // 在浏览器环境中
-console.log(__dirname);   // 输出: /drill-project/js/plugins
-console.log(__filename);  // 输出: /drill-project/js/plugins/NodeCompatLayer.js
+console.log(__dirname); // 输出: /drill-project/js/plugins
+console.log(__filename); // 输出: /drill-project/js/plugins/NodeCompatLayer.js
 ```
 
 ---
@@ -216,18 +213,20 @@ createPathModule(): PathModule {
 
 ```javascript
 // 使用预注册的 path 模块
-const path = require('path');
-console.log(path.dirname('/foo/bar/baz.js'));  // 输出: /foo/bar
-console.log(path.basename('/foo/bar/baz.js')); // 输出: baz.js
-console.log(path.join('foo', 'bar', 'baz'));   // 输出: foo/bar/baz
+const path = require("path");
+console.log(path.dirname("/foo/bar/baz.js")); // 输出: /foo/bar
+console.log(path.basename("/foo/bar/baz.js")); // 输出: baz.js
+console.log(path.join("foo", "bar", "baz")); // 输出: foo/bar/baz
 
 // 注册自定义模块
-NodeCompatLayer.registerModule('myModule', {
-    hello: function() { return 'world'; }
+NodeCompatLayer.registerModule("myModule", {
+	hello: function () {
+		return "world";
+	},
 });
 
-const myModule = require('myModule');
-console.log(myModule.hello());  // 输出: world
+const myModule = require("myModule");
+console.log(myModule.hello()); // 输出: world
 ```
 
 ---
@@ -261,17 +260,17 @@ createProcessObject(): ProcessObject {
 ```typescript
 // IIFE 立即执行，不依赖 Scene_Boot
 (() => {
-    "use strict";
+	"use strict";
 
-    console.log("[NodeCompatLayer] Plugin loading...");
+	console.log("[NodeCompatLayer] Plugin loading...");
 
-    // 立即初始化兼容层
-    NodeCompatLayer.init();
+	// 立即初始化兼容层
+	NodeCompatLayer.init();
 
-    // 暴露到全局
-    window.NodeCompatLayer = NodeCompatLayer;
+	// 暴露到全局
+	window.NodeCompatLayer = NodeCompatLayer;
 
-    console.log("[NodeCompatLayer] Plugin loaded successfully");
+	console.log("[NodeCompatLayer] Plugin loaded successfully");
 })();
 ```
 
@@ -324,33 +323,33 @@ pnpm run dev:drill
 
 ```javascript
 // 全局变量
-console.log(__dirname);   // 当前目录路径
-console.log(__filename);  // 当前文件路径
+console.log(__dirname); // 当前目录路径
+console.log(__filename); // 当前文件路径
 
 // require() 加载模块
-const path = require('path');
+const path = require("path");
 ```
 
 #### 高级 API
 
 ```javascript
 // 1. 注册自定义模块
-NodeCompatLayer.registerModule('fs', {
-    readFileSync: function(path) {
-        // 自定义实现
-        return "file content";
-    }
+NodeCompatLayer.registerModule("fs", {
+	readFileSync: function (path) {
+		// 自定义实现
+		return "file content";
+	},
 });
 
 // 2. 访问环境信息
-console.log(NodeCompatLayer.isNodeEnv);   // false (在浏览器中)
-console.log(NodeCompatLayer.isNwjs);      // false (在浏览器中)
-console.log(NodeCompatLayer.isBrowser);   // true (在浏览器中)
+console.log(NodeCompatLayer.isNodeEnv); // false (在浏览器中)
+console.log(NodeCompatLayer.isNwjs); // false (在浏览器中)
+console.log(NodeCompatLayer.isBrowser); // true (在浏览器中)
 
 // 3. 使用 process 对象
-console.log(process.platform);  // "browser"
+console.log(process.platform); // "browser"
 console.log(process.env.NODE_ENV); // "browser"
-console.log(process.cwd());     // 当前目录
+console.log(process.cwd()); // 当前目录
 ```
 
 ---
@@ -358,28 +357,28 @@ console.log(process.cwd());     // 当前目录
 ### Path 模块完整 API
 
 ```javascript
-const path = require('path');
+const path = require("path");
 
 // 分隔符
-path.sep;  // "/"
+path.sep; // "/"
 
 // 获取目录名
-path.dirname('/foo/bar/baz.js');  // "/foo/bar"
+path.dirname("/foo/bar/baz.js"); // "/foo/bar"
 
 // 获取文件名
-path.basename('/foo/bar/baz.js');         // "baz.js"
-path.basename('/foo/bar/baz.js', '.js');  // "baz"
+path.basename("/foo/bar/baz.js"); // "baz.js"
+path.basename("/foo/bar/baz.js", ".js"); // "baz"
 
 // 获取扩展名
-path.extname('/foo/bar/baz.js');  // ".js"
+path.extname("/foo/bar/baz.js"); // ".js"
 
 // 拼接路径
-path.join('foo', 'bar', 'baz');   // "foo/bar/baz"
-path.join('/foo', 'bar', '../qux');  // "/foo/qux"
+path.join("foo", "bar", "baz"); // "foo/bar/baz"
+path.join("/foo", "bar", "../qux"); // "/foo/qux"
 
 // 解析绝对路径
-path.resolve('foo', 'bar');       // "{__dirname}/foo/bar"
-path.resolve('/foo', 'bar');      // "/foo/bar"
+path.resolve("foo", "bar"); // "{__dirname}/foo/bar"
+path.resolve("/foo", "bar"); // "/foo/bar"
 ```
 
 ---
@@ -402,7 +401,7 @@ pnpm run dev:drill
 2. 查看控制台输出
 3. 应该看到以下日志：
 
-```
+```plain
 [NodeCompatLayer] Plugin loading...
 [NodeCompatLayer] Initializing Node.js API compatibility layer...
 [NodeCompatLayer] Environment detection:
@@ -426,8 +425,8 @@ console.log(__dirname);
 console.log(__filename);
 
 // 测试 require
-const path = require('path');
-console.log(path.dirname('/foo/bar/baz.js'));
+const path = require("path");
+console.log(path.dirname("/foo/bar/baz.js"));
 
 // 测试 process
 console.log(process.platform);
@@ -472,7 +471,7 @@ npx http-server -p 8080
 
 在 nw.js 环境中，插件应该检测到原生 Node.js API 并跳过兼容层初始化：
 
-```
+```plain
 [NodeCompatLayer] Plugin loading...
 [NodeCompatLayer] Initializing Node.js API compatibility layer...
 [NodeCompatLayer] Environment detection:
@@ -493,94 +492,93 @@ npx http-server -p 8080
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-    <title>NodeCompatLayer Test</title>
-</head>
-<body>
-    <h1>NodeCompatLayer Test Suite</h1>
-    <div id="results"></div>
+	<head>
+		<title>NodeCompatLayer Test</title>
+	</head>
+	<body>
+		<h1>NodeCompatLayer Test Suite</h1>
+		<div id="results"></div>
 
-    <script src="../drill-project/js/plugins/NodeCompatLayer.js"></script>
-    <script>
-        const results = [];
+		<script src="../drill-project/js/plugins/NodeCompatLayer.js"></script>
+		<script>
+			const results = [];
 
-        function test(name, fn) {
-            try {
-                fn();
-                results.push(`✅ ${name}`);
-            } catch (error) {
-                results.push(`❌ ${name}: ${error.message}`);
-            }
-        }
+			function test(name, fn) {
+				try {
+					fn();
+					results.push(`✅ ${name}`);
+				} catch (error) {
+					results.push(`❌ ${name}: ${error.message}`);
+				}
+			}
 
-        // 测试全局变量
-        test('__dirname is defined', () => {
-            if (typeof __dirname === 'undefined') throw new Error('__dirname is undefined');
-        });
+			// 测试全局变量
+			test("__dirname is defined", () => {
+				if (typeof __dirname === "undefined") throw new Error("__dirname is undefined");
+			});
 
-        test('__filename is defined', () => {
-            if (typeof __filename === 'undefined') throw new Error('__filename is undefined');
-        });
+			test("__filename is defined", () => {
+				if (typeof __filename === "undefined") throw new Error("__filename is undefined");
+			});
 
-        // 测试 require
-        test('require is a function', () => {
-            if (typeof require !== 'function') throw new Error('require is not a function');
-        });
+			// 测试 require
+			test("require is a function", () => {
+				if (typeof require !== "function") throw new Error("require is not a function");
+			});
 
-        // 测试 path 模块
-        test('path module is available', () => {
-            const path = require('path');
-            if (!path) throw new Error('path module not found');
-        });
+			// 测试 path 模块
+			test("path module is available", () => {
+				const path = require("path");
+				if (!path) throw new Error("path module not found");
+			});
 
-        test('path.dirname works', () => {
-            const path = require('path');
-            const result = path.dirname('/foo/bar/baz.js');
-            if (result !== '/foo/bar') throw new Error(`Expected '/foo/bar', got '${result}'`);
-        });
+			test("path.dirname works", () => {
+				const path = require("path");
+				const result = path.dirname("/foo/bar/baz.js");
+				if (result !== "/foo/bar") throw new Error(`Expected '/foo/bar', got '${result}'`);
+			});
 
-        test('path.basename works', () => {
-            const path = require('path');
-            const result = path.basename('/foo/bar/baz.js');
-            if (result !== 'baz.js') throw new Error(`Expected 'baz.js', got '${result}'`);
-        });
+			test("path.basename works", () => {
+				const path = require("path");
+				const result = path.basename("/foo/bar/baz.js");
+				if (result !== "baz.js") throw new Error(`Expected 'baz.js', got '${result}'`);
+			});
 
-        test('path.extname works', () => {
-            const path = require('path');
-            const result = path.extname('/foo/bar/baz.js');
-            if (result !== '.js') throw new Error(`Expected '.js', got '${result}'`);
-        });
+			test("path.extname works", () => {
+				const path = require("path");
+				const result = path.extname("/foo/bar/baz.js");
+				if (result !== ".js") throw new Error(`Expected '.js', got '${result}'`);
+			});
 
-        test('path.join works', () => {
-            const path = require('path');
-            const result = path.join('foo', 'bar', 'baz');
-            if (result !== 'foo/bar/baz') throw new Error(`Expected 'foo/bar/baz', got '${result}'`);
-        });
+			test("path.join works", () => {
+				const path = require("path");
+				const result = path.join("foo", "bar", "baz");
+				if (result !== "foo/bar/baz") throw new Error(`Expected 'foo/bar/baz', got '${result}'`);
+			});
 
-        // 测试自定义模块注册
-        test('Custom module registration works', () => {
-            NodeCompatLayer.registerModule('testModule', { hello: 'world' });
-            const mod = require('testModule');
-            if (mod.hello !== 'world') throw new Error('Custom module not registered correctly');
-        });
+			// 测试自定义模块注册
+			test("Custom module registration works", () => {
+				NodeCompatLayer.registerModule("testModule", { hello: "world" });
+				const mod = require("testModule");
+				if (mod.hello !== "world") throw new Error("Custom module not registered correctly");
+			});
 
-        // 测试 process 对象
-        test('process object exists', () => {
-            if (typeof process === 'undefined') throw new Error('process is undefined');
-        });
+			// 测试 process 对象
+			test("process object exists", () => {
+				if (typeof process === "undefined") throw new Error("process is undefined");
+			});
 
-        test('process.platform is "browser"', () => {
-            if (process.platform !== 'browser') throw new Error(`Expected 'browser', got '${process.platform}'`);
-        });
+			test('process.platform is "browser"', () => {
+				if (process.platform !== "browser") throw new Error(`Expected 'browser', got '${process.platform}'`);
+			});
 
-        // 显示结果
-        document.getElementById('results').innerHTML =
-            '<pre>' + results.join('\n') + '</pre>';
+			// 显示结果
+			document.getElementById("results").innerHTML = "<pre>" + results.join("\n") + "</pre>";
 
-        console.log('Test Results:');
-        results.forEach(r => console.log(r));
-    </script>
-</body>
+			console.log("Test Results:");
+			results.forEach((r) => console.log(r));
+		</script>
+	</body>
 </html>
 ```
 
@@ -617,10 +615,10 @@ open apps/drill/test/node-compat-test.html
 
 ```javascript
 // Node.js 环境
-__dirname  // C:\Users\username\project\app
+__dirname; // C:\Users\username\project\app
 
 // 浏览器环境
-__dirname  // /project/app  (URL pathname)
+__dirname; // /project/app  (URL pathname)
 ```
 
 ### 3. Process 对象的限制
@@ -693,13 +691,13 @@ __dirname  // /project/app  (URL pathname)
 
 ## 技术栈总结
 
-| 技术 | 版本 | 用途 |
-|------|------|------|
-| TypeScript | 最新 | 插件源码语言 |
-| tsup | v8.5.0 | 编译工具 |
-| ES5 | - | 目标兼容性 |
-| IIFE | - | 输出格式 |
-| Vite | v5.4.1 | 开发服务器 |
+| 技术       | 版本   | 用途         |
+| ---------- | ------ | ------------ |
+| TypeScript | 最新   | 插件源码语言 |
+| tsup       | v8.5.0 | 编译工具     |
+| ES5        | -      | 目标兼容性   |
+| IIFE       | -      | 输出格式     |
+| Vite       | v5.4.1 | 开发服务器   |
 
 ---
 
@@ -759,25 +757,25 @@ __dirname  // /project/app  (URL pathname)
 
 ```typescript
 interface NodeCompatLayerStatic {
-    // 版本信息
-    version: string;              // "1.0.0"
+	// 版本信息
+	version: string; // "1.0.0"
 
-    // 状态标志
-    initialized: boolean;          // 是否已初始化
-    isNodeEnv: boolean;           // 是否是 Node.js 环境
-    isNwjs: boolean;              // 是否是 nw.js 环境
-    isBrowser: boolean;           // 是否是纯浏览器环境
+	// 状态标志
+	initialized: boolean; // 是否已初始化
+	isNodeEnv: boolean; // 是否是 Node.js 环境
+	isNwjs: boolean; // 是否是 nw.js 环境
+	isBrowser: boolean; // 是否是纯浏览器环境
 
-    // 模块注册表
-    moduleRegistry: {
-        [key: string]: any;
-    };
+	// 模块注册表
+	moduleRegistry: {
+		[key: string]: any;
+	};
 
-    // 方法
-    init(): void;                  // 初始化（自动调用）
-    detectEnvironment(): void;     // 检测环境（自动调用）
-    setupBrowserCompat(): void;    // 设置兼容层（自动调用）
-    registerModule(name: string, exports: any): void;  // 注册模块
+	// 方法
+	init(): void; // 初始化（自动调用）
+	detectEnvironment(): void; // 检测环境（自动调用）
+	setupBrowserCompat(): void; // 设置兼容层（自动调用）
+	registerModule(name: string, exports: any): void; // 注册模块
 }
 ```
 
@@ -793,11 +791,11 @@ declare function require(moduleName: string): any;
 
 // 进程对象
 declare const process: {
-    env: { [key: string]: string };
-    cwd(): string;
-    platform: string;
-    version: string;
-    versions: { [key: string]: string };
+	env: { [key: string]: string };
+	cwd(): string;
+	platform: string;
+	version: string;
+	versions: { [key: string]: string };
 };
 
 // CommonJS 导出
@@ -809,12 +807,12 @@ declare const exports: any;
 
 ```typescript
 interface PathModule {
-    sep: string;                   // 路径分隔符 "/"
-    dirname(path: string): string;
-    basename(path: string, ext?: string): string;
-    extname(path: string): string;
-    join(...paths: string[]): string;
-    resolve(...paths: string[]): string;
+	sep: string; // 路径分隔符 "/"
+	dirname(path: string): string;
+	basename(path: string, ext?: string): string;
+	extname(path: string): string;
+	join(...paths: string[]): string;
+	resolve(...paths: string[]): string;
 }
 ```
 
@@ -829,11 +827,13 @@ interface PathModule {
 **解决方案**:
 
 1. 检查 HTML 文件中是否正确引用了插件：
+
    ```html
    <script src="./js/plugins/NodeCompatLayer.js"></script>
    ```
 
 2. 检查插件文件是否存在：
+
    ```bash
    ls apps/drill/drill-project/js/plugins/NodeCompatLayer.js
    ```
@@ -852,15 +852,16 @@ interface PathModule {
 **解决方案**:
 
 手动注册模块：
+
 ```javascript
-NodeCompatLayer.registerModule('yourModule', {
-    // 模块内容
+NodeCompatLayer.registerModule("yourModule", {
+	// 模块内容
 });
 ```
 
 ---
 
-### 问题 3: __dirname 路径不正确
+### 问题 3: \_\_dirname 路径不正确
 
 **症状**: `__dirname` 指向错误的目录
 
@@ -869,8 +870,9 @@ NodeCompatLayer.registerModule('yourModule', {
 **解决方案**:
 
 手动设置：
+
 ```javascript
-window.__dirname = '/your/custom/path';
+window.__dirname = "/your/custom/path";
 ```
 
 ---
@@ -882,6 +884,7 @@ window.__dirname = '/your/custom/path';
 **解决方案**:
 
 检查环境检测逻辑，确认 `process.versions.nw` 存在：
+
 ```javascript
 console.log(process.versions);
 ```

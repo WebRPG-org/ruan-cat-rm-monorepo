@@ -66,10 +66,7 @@ export interface TsupRpgmvPluginOptions {
 /**
  * 检查是否需要构建RPGMV插件
  */
-function shouldBuildPlugins(
-	options: TsupRpgmvPluginOptions,
-	root: string,
-): boolean {
+function shouldBuildPlugins(options: TsupRpgmvPluginOptions, root: string): boolean {
 	// 如果强制重新构建，直接返回true
 	if (options.forceRebuild) {
 		return true;
@@ -135,10 +132,7 @@ function extractPluginVersion(srcPath: string, root: string): string {
 /**
  * 构建RPGMV插件
  */
-async function buildRpgmvPlugins(
-	options: TsupRpgmvPluginOptions,
-	root?: string,
-): Promise<void> {
+async function buildRpgmvPlugins(options: TsupRpgmvPluginOptions, root?: string): Promise<void> {
 	try {
 		if (options.verbose) {
 			console.log("🔨 开始构建RPGMV插件...");

@@ -39,34 +39,34 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 	const VITE_project_path = env.VITE_project_path;
 
 	// 检查是否在开发环境中
-	const isDev = env.NODE_ENV !== 'production';
-	const isDevMode = env.MODE?.includes('dev');
+	const isDev = env.NODE_ENV !== "production";
+	const isDevMode = env.MODE?.includes("dev");
 
 	return [
 		// Node.js polyfills 插件（放在最前面）
 		nodePolyfills({
 			// 包含所有常用 Node.js 核心模块
 			include: [
-				'buffer',
-				'process',
-				'events',
-				'stream',
-				'util',
-				'path',
-				'url',
-				'querystring',
-				'string_decoder',
-				'punycode',
-				'crypto',
-				'http',
-				'https',
-				'os',
-				'assert',
-				'constants',
-				'timers',
-				'console',
-				'vm',
-				'zlib',
+				"buffer",
+				"process",
+				"events",
+				"stream",
+				"util",
+				"path",
+				"url",
+				"querystring",
+				"string_decoder",
+				"punycode",
+				"crypto",
+				"http",
+				"https",
+				"os",
+				"assert",
+				"constants",
+				"timers",
+				"console",
+				"vm",
+				"zlib",
 			],
 
 			// 全局变量注入
@@ -80,7 +80,7 @@ export function getPluginsList(params: GetPluginsListParams): PluginOption[] {
 			protocolImports: true,
 
 			// 不包含 fs，因为我们用 memfs 自定义实现
-			exclude: ['fs'],
+			exclude: ["fs"],
 		}),
 
 		// RPGMV插件自动构建器

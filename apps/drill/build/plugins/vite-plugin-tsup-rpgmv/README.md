@@ -21,31 +21,31 @@
 import { vitePluginTsupRpgmv } from "./vite-plugin-tsup-rpgmv";
 
 export function getPluginsList() {
-  return [
-    vitePluginTsupRpgmv({
-      // 启用详细日志
-      verbose: true,
-      // 只在需要时构建
-      forceRebuild: false,
-      // 输出目录
-      outDir: "./drill-project/js/plugins",
-      // 插件列表配置
-      plugins: [
-        {
-          name: "NodeCompatLayer",
-          srcPath: "./src/rpgmv-plugins/NodeCompatLayer.ts",
-          outputPath: "./drill-project/js/plugins/NodeCompatLayer.js",
-          description: "Node.js API 兼容层",
-        },
-        {
-          name: "VueBridge",
-          srcPath: "./src/rpgmv-plugins/VueBridge.ts",
-          outputPath: "./drill-project/js/plugins/VueBridge.js",
-          description: "Vue与RPGMV双向通信桥接插件",
-        },
-      ],
-    }),
-  ];
+	return [
+		vitePluginTsupRpgmv({
+			// 启用详细日志
+			verbose: true,
+			// 只在需要时构建
+			forceRebuild: false,
+			// 输出目录
+			outDir: "./drill-project/js/plugins",
+			// 插件列表配置
+			plugins: [
+				{
+					name: "NodeCompatLayer",
+					srcPath: "./src/rpgmv-plugins/NodeCompatLayer.ts",
+					outputPath: "./drill-project/js/plugins/NodeCompatLayer.js",
+					description: "Node.js API 兼容层",
+				},
+				{
+					name: "VueBridge",
+					srcPath: "./src/rpgmv-plugins/VueBridge.ts",
+					outputPath: "./drill-project/js/plugins/VueBridge.js",
+					description: "Vue与RPGMV双向通信桥接插件",
+				},
+			],
+		}),
+	];
 }
 ```
 
@@ -64,36 +64,36 @@ export function getPluginsList() {
 // =============================================================================
 
 interface MyNewPluginStatic {
-  // 版本号（必须包含）
-  version: string;
-  initialized: boolean;
+	// 版本号（必须包含）
+	version: string;
+	initialized: boolean;
 
-  init(): void;
-  myCustomMethod(): void;
+	init(): void;
+	myCustomMethod(): void;
 }
 
 const MyNewPlugin: MyNewPluginStatic = {
-  // 版本号（必须定义，会在构建时提取到 banner）
-  version: "1.0.0",
+	// 版本号（必须定义，会在构建时提取到 banner）
+	version: "1.0.0",
 
-  // 初始化
-  init(): void {
-    if (this.initialized) return;
-    console.log("MyNewPlugin initialized");
-    this.initialized = true;
-  },
+	// 初始化
+	init(): void {
+		if (this.initialized) return;
+		console.log("MyNewPlugin initialized");
+		this.initialized = true;
+	},
 
-  // 自定义方法
-  myCustomMethod(): void {
-    // 插件逻辑
-  },
+	// 自定义方法
+	myCustomMethod(): void {
+		// 插件逻辑
+	},
 };
 
 // 暴露到全局
 declare global {
-  interface Window {
-    MyNewPlugin: typeof MyNewPlugin;
-  }
+	interface Window {
+		MyNewPlugin: typeof MyNewPlugin;
+	}
 }
 window.MyNewPlugin = MyNewPlugin;
 ```
@@ -104,16 +104,16 @@ window.MyNewPlugin = MyNewPlugin;
 
 ```typescript
 vitePluginTsupRpgmv({
-  plugins: [
-    // ... 现有的插件配置 ...
-    {
-      name: "MyNewPlugin",  // 插件名称，必须与文件对象名一致
-      srcPath: "./src/rpgmv-plugins/MyNewPlugin.ts",  // 源文件路径
-      outputPath: "./drill-project/js/plugins/MyNewPlugin.js",  // 输出路径
-      description: "我的新插件 - 功能说明",  // 插件描述
-    },
-  ],
-})
+	plugins: [
+		// ... 现有的插件配置 ...
+		{
+			name: "MyNewPlugin", // 插件名称，必须与文件对象名一致
+			srcPath: "./src/rpgmv-plugins/MyNewPlugin.ts", // 源文件路径
+			outputPath: "./drill-project/js/plugins/MyNewPlugin.js", // 输出路径
+			description: "我的新插件 - 功能说明", // 插件描述
+		},
+	],
+});
 ```
 
 #### 第 3 步：运行项目
@@ -132,17 +132,17 @@ pnpm run dev:drill
 
 ```typescript
 interface RpgmvPluginConfig {
-  /** 插件名称（入口对象名，如 NodeCompatLayer） */
-  name: string;
+	/** 插件名称（入口对象名，如 NodeCompatLayer） */
+	name: string;
 
-  /** 插件源文件路径 */
-  srcPath: string;
+	/** 插件源文件路径 */
+	srcPath: string;
 
-  /** 插件输出路径 */
-  outputPath: string;
+	/** 插件输出路径 */
+	outputPath: string;
 
-  /** 插件说明/描述（可选） */
-  description?: string;
+	/** 插件说明/描述（可选） */
+	description?: string;
 }
 ```
 
@@ -152,20 +152,20 @@ interface RpgmvPluginConfig {
 
 ```typescript
 interface TsupRpgmvPluginOptions {
-  /** tsup 配置选项（可选） */
-  tsupOptions?: TsupOptions;
+	/** tsup 配置选项（可选） */
+	tsupOptions?: TsupOptions;
 
-  /** 是否强制重新构建（默认 false） */
-  forceRebuild?: boolean;
+	/** 是否强制重新构建（默认 false） */
+	forceRebuild?: boolean;
 
-  /** 是否启用详细日志（默认 false） */
-  verbose?: boolean;
+	/** 是否启用详细日志（默认 false） */
+	verbose?: boolean;
 
-  /** RPGMV 插件列表配置 */
-  plugins?: RpgmvPluginConfig[];
+	/** RPGMV 插件列表配置 */
+	plugins?: RpgmvPluginConfig[];
 
-  /** 输出目录（默认 ./drill-project/js/plugins） */
-  outDir?: string;
+	/** 输出目录（默认 ./drill-project/js/plugins） */
+	outDir?: string;
 }
 ```
 
@@ -194,9 +194,9 @@ interface TsupRpgmvPluginOptions {
 
 ```typescript
 const MyPlugin: MyPluginStatic = {
-  version: "1.0.0",  // 会被自动提取
-  // ...
-}
+	version: "1.0.0", // 会被自动提取
+	// ...
+};
 ```
 
 版本号会显示在生成的 banner 中。
@@ -216,6 +216,7 @@ pnpm run build:rpgmv-plugins
 ### 4. 插件版本号不正确？
 
 检查：
+
 - 源文件中是否正确定义了 `version` 字段
 - 格式是否正确：`version: "x.x.x"`
 - 是否在导出的对象内部
@@ -228,9 +229,9 @@ pnpm run build:rpgmv-plugins
 4. **全局暴露**：确保插件在 `window` 对象中正确注册：
    ```typescript
    declare global {
-     interface Window {
-       MyPlugin: typeof MyPlugin;
-     }
+   	interface Window {
+   		MyPlugin: typeof MyPlugin;
+   	}
    }
    window.MyPlugin = MyPlugin;
    ```

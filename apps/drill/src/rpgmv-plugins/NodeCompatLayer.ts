@@ -254,7 +254,7 @@ const NodeCompatLayer: NodeCompatLayerStatic = {
 			// 未找到模块，提供友好的警告
 			console.warn(`[NodeCompatLayer] Module '${moduleName}' not found in browser environment`);
 			console.warn(
-				`[NodeCompatLayer] You can register custom modules using: NodeCompatLayer.registerModule('${moduleName}', yourModuleExports)`
+				`[NodeCompatLayer] You can register custom modules using: NodeCompatLayer.registerModule('${moduleName}', yourModuleExports)`,
 			);
 
 			// 返回空对象，避免程序崩溃
