@@ -22,7 +22,7 @@
 5. 在 apps\gitee.jiumengjun.rmmv\package.json 内，做命令拆分。
    - 新建 format 格式化命令。格式化 apps\gitee.jiumengjun.rmmv 的全部文件。
    - 使用 prettier 完成格式化。
-   - prettier 的格式化配置选用项目根目录的 prettier.config.js 文件。
+   - prettier 的格式化配置选用项目根目录的 prettier.config.mjs 文件。
    - 从 `prettier --experimental-cli --write .` 命令的基础上开始配置。
 
 6. 继续做命令拆分。在 apps\gitee.jiumengjun.rmmv\package.json 内，将 docs:build 命令拆分成独立干净的命令。只负责运行 `vitepress build docs` 命令即可。
