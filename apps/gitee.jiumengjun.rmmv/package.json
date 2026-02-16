@@ -9,7 +9,7 @@
 		"docs:dev": "vitepress dev docs",
 		"docs:build": "vitepress build docs",
 		"docs:preview": "vitepress preview docs",
-		"format": "prettier --experimental-cli --write . --ignore-path=.prettierignore --config-path=../../prettier.config.mjs",
+		"format": "prettier --experimental-cli --write .",
 		"build": "turbo do-build",
 		"jsdoc:generate": "tsx scripts/markdown-generator/index.ts",
 		"legacy:make-doc": "jsdoc2md --files ./rpg_*.js > ./dist/jsdoc2md-res.md",
